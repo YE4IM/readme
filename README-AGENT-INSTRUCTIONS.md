@@ -195,7 +195,7 @@
 ```
 
 - 默认使用 `assets/opc-fish-project-signature-readme-2400x800-on-cream.png`（2400×800，为 README 准备的宽图）。同目录的 `assets/opc-fish-project-signature-on-cream.png` 是同一标志的较紧裁切，不作为默认署名。
-- 其他仓库要显示这张图，上述 raw 地址必须能被公开访问。地址不可公开时，仍然保留这一行，并在交付说明中写明图片目前无法在仓库外加载。
+- 其他仓库要显示这张图，上述 raw 地址必须能被公开访问。`YE4IM/readme` 现为公开仓库，未登录即可加载这张图。若该地址以后不可公开，仍然保留这一行，并在交付说明中写明图片目前无法在仓库外加载。
 
 ---
 

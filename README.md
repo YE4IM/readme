@@ -27,6 +27,6 @@ In another repository, use this address:
 
 `assets/opc-fish-project-signature-on-cream.png` is a tighter crop of the same mark. The README default is the 2400×800 image.
 
-That raw address loads in other repositories when this repository is public.
+This repository is public. That address loads in other repositories without signing in.
 
 <a href="https://opc.fish"><img src="./assets/opc-fish-project-signature-readme-2400x800-on-cream.png" alt="OPC.FISH Project" width="720"></a>

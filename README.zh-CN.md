@@ -27,6 +27,6 @@
 
 `assets/opc-fish-project-signature-on-cream.png` 是同一标志的较紧裁切。README 默认使用 2400×800 这张。
 
-上述 raw 地址要在其他仓库里显示，本仓库需要是公开的。
+本仓库已公开。其他仓库无需登录即可加载这个地址。
 
 <a href="https://opc.fish"><img src="./assets/opc-fish-project-signature-readme-2400x800-on-cream.png" alt="OPC.FISH Project" width="720"></a>
