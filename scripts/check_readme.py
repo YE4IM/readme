@@ -4,8 +4,7 @@
 Usage:
   python3 scripts/check_readme.py all
   python3 scripts/check_readme.py templates
-  python3 scripts/check_readme.py pair README.md README.zh-CN.md --signature local
-  python3 scripts/check_readme.py pair A.md B.md --signature remote
+  python3 scripts/check_readme.py pair README.md README.zh-CN.md
 """
 
 from __future__ import annotations
@@ -16,21 +15,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REMOTE_LIGHT = (
-    "https://raw.githubusercontent.com/YE4IM/readme/main/assets/"
-    "opc-fish-project-signature-readme-2400x800-on-cream.png"
-)
-REMOTE_DARK = (
-    "https://raw.githubusercontent.com/YE4IM/readme/main/assets/"
-    "opc-fish-project-signature-readme-2400x800-web-dark.png"
-)
-LOCAL_LIGHT = "./assets/opc-fish-project-signature-readme-2400x800-on-cream.png"
-LOCAL_DARK = "./assets/opc-fish-project-signature-readme-2400x800-web-dark.png"
 EN_SWITCH = "[**English**](./README.md) | [中文](./README.zh-CN.md)"
 ZH_SWITCH = "[English](./README.md) | [**中文**](./README.zh-CN.md)"
 PLACEHOLDER = re.compile(r"\{\{([^{}]+)\}\}")
 FENCE = re.compile(r"```.*?```", re.S)
-PICTURE = re.compile(r"<picture>\s*(.*?)\s*</picture>", re.S | re.I)
 COMMENT = re.compile(r"<!--(.*?)-->", re.S)
 HEADING = re.compile(r"^#{1,6} ", re.M)
 SECRET_PATTERNS = (
@@ -53,7 +41,6 @@ def main() -> int:
     pair = sub.add_parser("pair", help="check a delivered README pair")
     pair.add_argument("english")
     pair.add_argument("chinese")
-    pair.add_argument("--signature", choices=("local", "remote"), required=True)
 
     args = parser.parse_args()
     errors: list[str] = []
@@ -61,16 +48,15 @@ def main() -> int:
         errors.extend(check_templates())
     elif args.command == "all":
         errors.extend(check_templates())
-        errors.extend(check_pair(ROOT / "README.md", ROOT / "README.zh-CN.md", "local"))
+        errors.extend(check_pair(ROOT / "README.md", ROOT / "README.zh-CN.md"))
         errors.extend(
             check_pair(
                 ROOT / "examples/sample-cli/README.md",
                 ROOT / "examples/sample-cli/README.zh-CN.md",
-                "remote",
             )
         )
     else:
-        errors.extend(check_pair(Path(args.english), Path(args.chinese), args.signature))
+        errors.extend(check_pair(Path(args.english), Path(args.chinese)))
 
     if errors:
         for error in errors:
@@ -101,16 +87,12 @@ def check_templates() -> list[str]:
     if en_headings != zh_headings:
         errors.append(f"template headings differ: English {en_headings}, Chinese {zh_headings}")
     for label, text in (("English template", english), ("Chinese template", chinese)):
-        if "opc-fish-project-signature-readme-2400x800-on-cream.png" not in text:
-            errors.append(f"{label} is missing the light signature")
-        if "opc-fish-project-signature-readme-2400x800-web-dark.png" not in text:
-            errors.append(f"{label} is missing the dark signature")
         if text.count("> [!NOTE]") != 1 or text.count("> [!WARNING]") != 1:
             errors.append(f"{label} should keep NOTE and WARNING in separate blocks")
     return errors
 
 
-def check_pair(english_path: Path, chinese_path: Path, signature: str) -> list[str]:
+def check_pair(english_path: Path, chinese_path: Path) -> list[str]:
     errors: list[str] = []
     files = {"English": english_path, "Chinese": chinese_path}
     texts: dict[str, str] = {}
@@ -132,7 +114,6 @@ def check_pair(english_path: Path, chinese_path: Path, signature: str) -> list[s
         errors.extend(placeholder_errors(label, visible))
         errors.extend(comment_errors(label, visible))
         errors.extend(secret_errors(label, text))
-        errors.extend(signature_errors(label, visible, signature))
         badges = len(re.findall(r"\[!\[", text))
         if badges > 4:
             errors.append(f"{label} has {badges} badges; the default limit is 4")
@@ -169,32 +150,6 @@ def comment_errors(label: str, visible: str) -> list[str]:
 
 def secret_errors(label: str, text: str) -> list[str]:
     return [f"{label} matches a live-secret pattern: {pattern.pattern}" for pattern in SECRET_PATTERNS if pattern.search(text)]
-
-
-def signature_errors(label: str, visible: str, signature: str) -> list[str]:
-    pictures = PICTURE.findall(visible)
-    if len(pictures) != 1:
-        return [f"{label} should contain one signature <picture>, found {len(pictures)}"]
-    block = pictures[0]
-    light = REMOTE_LIGHT if signature == "remote" else LOCAL_LIGHT
-    dark = REMOTE_DARK if signature == "remote" else LOCAL_DARK
-    errors = []
-    if 'href="https://opc.fish"' not in visible:
-        errors.append(f"{label} signature link must be https://opc.fish")
-    if 'media="(prefers-color-scheme: dark)"' not in block or f'srcset="{dark}"' not in block:
-        errors.append(f"{label} is missing the dark signature source")
-    img = re.search(r"<img\b([^>]*)>", block, re.I)
-    if not img:
-        return errors + [f"{label} signature is missing an img"]
-    attrs = img.group(1)
-    if f'src="{light}"' not in attrs:
-        errors.append(f"{label} is missing the light signature src")
-    if 'width="720"' not in attrs:
-        errors.append(f'{label} signature width must be 720')
-    alt = re.search(r'alt="([^"]+)"', attrs)
-    if not alt or not alt.group(1).strip():
-        errors.append(f"{label} signature needs a descriptive alt")
-    return errors
 
 
 def strip_fences(text: str) -> str:

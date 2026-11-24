@@ -33,5 +33,3 @@ sample-cli: ok
 ## 用法
 
 脚本不接受参数。它每次都打印同一行后退出。
-
-<a href="https://opc.fish"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/assets/opc-fish-project-signature-readme-2400x800-web-dark.png"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/assets/opc-fish-project-signature-readme-2400x800-on-cream.png" alt="OPC.FISH 项目署名" width="720"></picture></a>

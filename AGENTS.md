@@ -8,7 +8,7 @@ Write or update a target repository's README from the facts in that repository.
 4. From this repository, run:
 
 ```bash
-python3 scripts/check_readme.py pair /path/to/README.md /path/to/README.zh-CN.md --signature remote
+python3 scripts/check_readme.py pair /path/to/README.md /path/to/README.zh-CN.md
 ```
 
 `examples/sample-cli/` is a finished CLI pair next to a command that runs. This repository's own README pair is the finished documentation shape.
