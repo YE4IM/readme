@@ -16,7 +16,7 @@ OPTIONAL: Logo。仅当仓库已有 Logo 文件时启用。优先相对路径。
 <img src="{{LOGO_PATH}}" alt="{{PROJECT_NAME}} logo" width="120">
 -->
 
-[English](./README.md) | [**中文**](./README.zh-CN.md)
+[English](./README.md) | [**中文**](./README-zh-CN.md)
 
 {{ONE_LINE_DESCRIPTION}}
 

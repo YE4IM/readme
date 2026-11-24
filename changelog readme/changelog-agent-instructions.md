@@ -2,18 +2,18 @@
 
 本文是给 Agent 的执行规范，**不是**给仓库用户看的变更日志正文，也不是为某个虚构仓库填写的示例 CHANGELOG。
 
-当需要为 GitHub 上的真实项目编制、补全或更新**项目整体变更日志**时，先读完本文件，再按其中的工作流、证据要求，以及同目录下的版本节模板产出可交付文稿。把本规范与两个版本模板一并复制后，供后续 Agent 直接阅读使用即可。不要把 `*.template.md` 或本规范的文件名写进变更日志正文。
+当需要为 GitHub 上的真实项目编制、补全或更新**项目整体变更日志**时，先读完本文件，再按其中的工作流、证据要求，以及同目录下的版本节模板产出可交付文稿。把本规范与两个版本模板一并复制后，供后续 Agent 直接阅读使用即可。不要把 `*-template.md` 或本规范的文件名写进变更日志正文。
 
 同目录配套模板：
 
-- [`changelog-version.template.md`](./changelog-version.template.md) → 单个已发布版本的**英文稿**，写入 `CHANGELOG.md`（或仓库既有的英文变更日志）
-- [`changelog-version.zh-CN.template.md`](./changelog-version.zh-CN.template.md) → 单个已发布版本的**中文稿**，写入 `CHANGELOG.zh-CN.md`（或仓库既有的中文变更日志）
+- [`changelog-version-template.md`](./changelog-version-template.md) → 单个已发布版本的**英文稿**，写入 `CHANGELOG.md`（或仓库既有的英文变更日志）
+- [`changelog-version-zh-CN-template.md`](./changelog-version-zh-CN-template.md) → 单个已发布版本的**中文稿**，写入 `CHANGELOG-zh-CN.md`（或仓库既有的中文变更日志）
 
 文件开头、`Unreleased` 节和正文清理规则仍见第 8 节；不要把版本模板误当成完整 CHANGELOG 文件。
 
 配套关系（供判断，不要混用规范）：
 
-- 仓库介绍文档（`README.md` / `README.zh-CN.md`）应另按 README Agent 规范编写。
+- 仓库介绍文档（`README.md` / `README-zh-CN.md`）应另按 README Agent 规范编写。
 - 某一次 GitHub Release 的描述框正文应另按 Release Notes Agent 规范编写。
 - **本文只约束仓库内的项目整体 CHANGELOG**（通常是 `CHANGELOG.md`，以及仓库已有的中文对应文件）。
 
@@ -226,29 +226,29 @@ GitHub Release 页面已经展示标题和 Tag，因此 Release 正文可以不�
 ### 7.1 文件名与位置
 
 - 默认写仓库根目录的 `CHANGELOG.md`。若仓库已有 `CHANGELOG.md`、`CHANGES.md`、`HISTORY.md` 或 `docs/CHANGELOG.md` 等既有文件，**沿用既有路径和文件名**，不要平行再造一份互相竞争的日志。
-- 不要把本规范文件名，或 `*.template.md` 之类名称写进变更日志正文。
+- 不要把本规范文件名，或 `*-template.md` 之类名称写进变更日志正文。
 
 ### 7.2 双语：何时分文件，何时单篇
 
 - **仓库文档习惯（来自 README 规范）：** 根目录介绍使用两份独立文件，并在顶部用相对路径做语言切换。
 - **GitHub Release 习惯（来自 Release 规范的最新约定）：** 单篇正文、完整英文在前、`---` 分隔、完整中文在后；**不要**单独注明 “English / 中文”，也**不要**加语言切换链接；两侧分类用 `##` 对等标题。
 - **本规范对 CHANGELOG 的化解：**
-  1. 仓库已经有变更日志文件结构时，**先跟随仓库**（单文件或 `CHANGELOG.md` + `CHANGELOG.zh-CN.md` 均可）。
+  1. 仓库已经有变更日志文件结构时，**先跟随仓库**（单文件或 `CHANGELOG.md` + `CHANGELOG-zh-CN.md` 均可）。
   2. 需要新建、且用户要求双语时：默认采用两份独立文件，因为多版本长文档不适合把全部英文历史和全部中文历史对贴在同一篇里。
      - `CHANGELOG.md`：英文主文件
-     - `CHANGELOG.zh-CN.md`：简体中文文件
+     - `CHANGELOG-zh-CN.md`：简体中文文件
      - 两份文件顶部使用相对链接，当前语言加粗：
 
        英文文件：
 
        ```markdown
-       [**English**](./CHANGELOG.md) | [中文](./CHANGELOG.zh-CN.md)
+       [**English**](./CHANGELOG.md) | [中文](./CHANGELOG-zh-CN.md)
        ```
 
        中文文件：
 
        ```markdown
-       [English](./CHANGELOG.md) | [**中文**](./CHANGELOG.zh-CN.md)
+       [English](./CHANGELOG.md) | [**中文**](./CHANGELOG-zh-CN.md)
        ```
 
      - 使用相对路径，便于 fork 与换分支后仍可用。不要把语言切换做成 GitHub 绝对 URL，也不要链到本规范文件。
@@ -286,7 +286,7 @@ GitHub Release 页面已经展示标题和 Tag，因此 Release 正文可以不�
 ```markdown
 # Changelog
 
-<!-- 仅当使用 CHANGELOG.md + CHANGELOG.zh-CN.md 时保留对应切换行；单语言文件删除本行。 -->
+<!-- 仅当使用 CHANGELOG.md + CHANGELOG-zh-CN.md 时保留对应切换行；单语言文件删除本行。 -->
 ```
 
 ### 8.1 未发布变更
@@ -307,18 +307,18 @@ GitHub Release 页面已经展示标题和 Tag，因此 Release 正文可以不�
 
 使用说明：
 
-1. 打开同目录模板 [`changelog-version.template.md`](./changelog-version.template.md)。
+1. 打开同目录模板 [`changelog-version-template.md`](./changelog-version-template.md)。
 2. 用已核实的事实替换 `{{PLACEHOLDER}}`；散文按英文习惯写，命令、路径、编号、URL 与中文稿保持一致。
 3. 需要某个 `OPTIONAL` 块时，去掉包围注释并删除说明文字；不需要或无证据则整块删除，不要留空标题、`None` 或未解开的注释。
 4. 将该版本节按第 8.1 节和第 8.4 节，与文件开头、`Unreleased`（若有）以及其他版本一起组装：多个版本按**新到旧**排列。
 
 ### 8.3 单个已发布版本（中文稿）
 
-用途：写入仓库**中文**变更日志（通常是 `CHANGELOG.zh-CN.md`，或仓库既有的中文变更日志文件）中的一个已发布版本节。结构必须与英文稿对等，分类集合、条目数量、编号、命令和链接一致。不要把本模板当成完整 CHANGELOG 文件，也不要把它的文件名写进正文。
+用途：写入仓库**中文**变更日志（通常是 `CHANGELOG-zh-CN.md`，或仓库既有的中文变更日志文件）中的一个已发布版本节。结构必须与英文稿对等，分类集合、条目数量、编号、命令和链接一致。不要把本模板当成完整 CHANGELOG 文件，也不要把它的文件名写进正文。
 
 使用说明：
 
-1. 打开同目录模板 [`changelog-version.zh-CN.template.md`](./changelog-version.zh-CN.template.md)。
+1. 打开同目录模板 [`changelog-version-zh-CN-template.md`](./changelog-version-zh-CN-template.md)。
 2. 基于**同一份事实清单**填写；先同步版本号、日期、分类、条目与引用，再组织中文表述，不要生硬直译。
 3. `OPTIONAL` 块的启用与删除规则与英文模板相同；无证据的分类整块删除，不要留空标题。
 4. 组装方式与第 8.2 节相同：按新到旧排列，并遵守第 8.1 节与第 8.4 节。

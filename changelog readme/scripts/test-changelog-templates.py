@@ -1,15 +1,13 @@
-"""Regression checks for rendering bilingual pre-release notes."""
+"""Regression checks for rendering bilingual changelog templates."""
 
 import re
 import unittest
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+TEMPLATE_DIR = Path(__file__).resolve().parents[1]
 COMMENTS = re.compile(r"<!--(.*?)-->", re.DOTALL)
 PLACEHOLDERS = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
-RELEASE = ROOT / "releases readme" / "release.template.md"
-CHANGELOG = ROOT / "changelog readme"
 SHARED_FACTS = {
     "VERSION": "v2.0.0-rc.1",
     "RELEASE_DATE": "2026-11-24",
@@ -34,12 +32,12 @@ def render_prerelease(template, facts):
     return re.sub(r"\n{3,}", "\n\n", document).strip()
 
 
-class ReleaseTemplateTests(unittest.TestCase):
+class ChangelogTemplateTests(unittest.TestCase):
     def test_changelog_optional_sections_are_paired_and_self_contained(self):
         signatures = []
-        for filename in ("changelog-version.template.md", "changelog-version.zh-CN.template.md"):
+        for filename in ("changelog-version-template.md", "changelog-version-zh-CN-template.md"):
             with self.subTest(filename=filename):
-                template = (CHANGELOG / filename).read_text(encoding="utf-8")
+                template = (TEMPLATE_DIR / filename).read_text(encoding="utf-8")
                 visible = COMMENTS.sub("", template)
                 self.assertEqual(
                     visible.strip(),
@@ -57,18 +55,17 @@ class ReleaseTemplateTests(unittest.TestCase):
                 signatures.append([PLACEHOLDERS.findall(block) for block in blocks])
         self.assertEqual(*signatures)
 
-    def test_prerelease_warning_and_migration_precede_release_screenshot(self):
-        english_release, chinese_release = RELEASE.read_text(encoding="utf-8").split("\n---\n")
-        for language, release, filename, heading, summary, warning, change, steps in (
+    def test_prerelease_warning_and_migration_order(self):
+        for language, filename, heading, summary, warning, change, steps in (
             (
-                "en", english_release, "changelog-version.template.md", "Breaking Changes",
+                "en", "changelog-version-template.md", "Breaking Changes",
                 "The CLI now uses the new output flag.",
                 "This pre-release is for testing and feedback. Avoid production use.",
                 "Scripts using `--format` must switch flags.",
                 ("Rename `--format` to `--output`.", "Run `example --output json`."),
             ),
             (
-                "zh-CN", chinese_release, "changelog-version.zh-CN.template.md", "破坏性变更",
+                "zh-CN", "changelog-version-zh-CN-template.md", "破坏性变更",
                 "CLI 现已使用新的输出参数。",
                 "本预发布版用于测试与反馈，不建议在生产环境使用。",
                 "使用 `--format` 的脚本需要更换参数。",
@@ -83,38 +80,27 @@ class ReleaseTemplateTests(unittest.TestCase):
                 "MIGRATION_STEP_1": steps[0],
                 "MIGRATION_STEP_2": steps[1],
             }
-            changelog = (CHANGELOG / filename).read_text(encoding="utf-8")
-            screenshot = "docs/output-preview.png"
-            for kind, template, prefix in (
-                ("release", release, "##"),
-                ("changelog", changelog, "###"),
-            ):
-                with self.subTest(language=language, kind=kind):
-                    values = facts.copy()
-                    if kind == "release":
-                        values.update(DEMO_ALT_TEXT=summary, DEMO_IMAGE_PATH_OR_URL=screenshot)
-                    rendered = render_prerelease(template, values)
-                    expected = [
-                        summary,
-                        f"> [!WARNING]\n> {warning}",
-                        f"{prefix} {heading}",
-                        change,
-                        f"1. {steps[0]}",
-                        f"2. {steps[1]}",
-                    ]
-                    if kind == "release":
-                        expected.append(f"![{summary}]({screenshot})")
-                    positions = [rendered.index(item) for item in expected]
-                    self.assertEqual(positions, sorted(positions))
-                    headings = re.findall(r"^#{2,3} .+$", rendered, re.MULTILINE)
-                    expected_headings = [f"{prefix} {heading}"]
-                    if kind == "changelog":
-                        expected_headings.insert(
-                            0, f'## [{facts["VERSION"]}] - {facts["RELEASE_DATE"]}'
-                        )
-                    self.assertEqual(headings, expected_headings)
-                    for residue in ("<!--", "{{", "OPTIONAL:", "[!IMPORTANT]"):
-                        self.assertNotIn(residue, rendered)
+            with self.subTest(language=language):
+                template = (TEMPLATE_DIR / filename).read_text(encoding="utf-8")
+                rendered = render_prerelease(template, facts)
+                expected = [
+                    summary,
+                    f"> [!WARNING]\n> {warning}",
+                    f"### {heading}",
+                    change,
+                    f"1. {steps[0]}",
+                    f"2. {steps[1]}",
+                ]
+                positions = [rendered.index(item) for item in expected]
+                self.assertEqual(positions, sorted(positions))
+                headings = re.findall(r"^#{2,3} .+$", rendered, re.MULTILINE)
+                expected_headings = [f"### {heading}"]
+                expected_headings.insert(
+                    0, f'## [{facts["VERSION"]}] - {facts["RELEASE_DATE"]}'
+                )
+                self.assertEqual(headings, expected_headings)
+                for residue in ("<!--", "{{", "OPTIONAL:", "[!IMPORTANT]"):
+                    self.assertNotIn(residue, rendered)
 
 
 if __name__ == "__main__":

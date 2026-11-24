@@ -2,9 +2,9 @@
 
 本文是给 Agent 的执行规范，**不是**给仓库用户看的 Release 正文。生成或更新 GitHub Release 说明时，先读完本文件，再填写同目录下的：
 
-- `release.template.md` → 输出为 GitHub Release 的**单篇正文**（中英双语同文，英文在前、中文在后）
+- `release-template.md` → 输出为 GitHub Release 的**单篇正文**（中英双语同文，英文在前、中文在后）
 
-不要把 `release.template.md` 这个文件名写进 Release 正文。GitHub Release 是单篇内容，不要拆成仓库根目录那种 `README.md` / `README.zh-CN.md` 两份文件。
+不要把 `release-template.md` 这个文件名写进 Release 正文。GitHub Release 是单篇内容，不要拆成仓库根目录那种 `README.md` / `README-zh-CN.md` 两份文件。
 
 结构约定：
 

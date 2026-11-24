@@ -16,7 +16,7 @@ To enable: remove the surrounding comment markers and fill the real path. Otherw
 <img src="{{LOGO_PATH}}" alt="{{PROJECT_NAME}} logo" width="120">
 -->
 
-[**English**](./README.md) | [中文](./README.zh-CN.md)
+[**English**](./README.md) | [中文](./README-zh-CN.md)
 
 {{ONE_LINE_DESCRIPTION}}
 

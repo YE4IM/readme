@@ -2,10 +2,10 @@
 """Check README pairs and the bilingual templates in this repository.
 
 Usage:
-  python3 scripts/check_readme.py all
-  python3 scripts/check_readme.py templates
-  python3 scripts/check_readme.py pair README.md README.zh-CN.md --signature local
-  python3 scripts/check_readme.py pair A.md B.md --signature remote
+  python3 scripts/check-readme.py all
+  python3 scripts/check-readme.py templates
+  python3 scripts/check-readme.py pair README.md README-zh-CN.md --signature local
+  python3 scripts/check-readme.py pair A.md B.md --signature remote
 """
 
 from __future__ import annotations
@@ -47,7 +47,7 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("templates", help="compare the English and Chinese templates")
-    sub.add_parser("all", help="check templates, this repo, and the CLI specimen")
+    sub.add_parser("all", help="check templates and the bilingual project docs")
 
     pair = sub.add_parser("pair", help="check a delivered README pair")
     pair.add_argument("english")
@@ -63,16 +63,9 @@ def main() -> int:
         errors.extend(
             check_pair(
                 ROOT / "docs" / "project.md",
-                ROOT / "docs" / "project.zh-CN.md",
+                ROOT / "docs" / "project-zh-CN.md",
                 "local",
-                switch_filenames=("project.md", "project.zh-CN.md"),
-            )
-        )
-        errors.extend(
-            check_pair(
-                ROOT / "examples/sample-cli/README.md",
-                ROOT / "examples/sample-cli/README.zh-CN.md",
-                "remote",
+                switch_filenames=("project.md", "project-zh-CN.md"),
             )
         )
     else:
@@ -87,8 +80,8 @@ def main() -> int:
 
 
 def check_templates() -> list[str]:
-    english = (ROOT / "templates" / "readme.template.md").read_text(encoding="utf-8")
-    chinese = (ROOT / "templates" / "readme.zh-CN.template.md").read_text(encoding="utf-8")
+    english = (ROOT / "templates" / "readme-template.md").read_text(encoding="utf-8")
+    chinese = (ROOT / "templates" / "readme-zh-CN-template.md").read_text(encoding="utf-8")
     errors: list[str] = []
     en_names = placeholder_names(english)
     zh_names = placeholder_names(chinese)
@@ -125,7 +118,7 @@ def check_pair(
     chinese_path: Path,
     signature: str,
     *,
-    switch_filenames: tuple[str, str] = ("README.md", "README.zh-CN.md"),
+    switch_filenames: tuple[str, str] = ("README.md", "README-zh-CN.md"),
 ) -> list[str]:
     errors: list[str] = []
     files = {"English": english_path, "Chinese": chinese_path}

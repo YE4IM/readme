@@ -2,7 +2,7 @@
 
 # readme
 
-[**English**](./project.md) | [中文](./project.zh-CN.md)
+[**English**](./project.md) | [中文](./project-zh-CN.md)
 
 Rules and bilingual templates an agent follows when writing a GitHub README. Generated READMEs keep the OPC.FISH signature at the top. This file is the documentation-shaped result of those templates.
 
@@ -10,16 +10,14 @@ Rules and bilingual templates an agent follows when writing a GitHub README. Gen
 
 Instruction version 1.5.0. This file is in `project readme/docs/`. The repository also contains `releases readme` and `changelog readme` for other deliverables. There is nothing to install.
 
-An agent writing someone else's README starts at [AGENTS.md](../agent/AGENTS.md), then follows [readme-agent-instructions.md](../agent/readme-agent-instructions.md).
+The workflow and writing rules are in [AGENTS.md](../agent/AGENTS.md).
 
 | File | Role |
 |---|---|
-| `agent/AGENTS.md` | Short entry for an agent. |
-| `agent/readme-agent-instructions.md` | The rules. This is not a project README. |
-| `templates/readme.template.md` | English template. The filled result is `README.md` in the target repository. |
-| `templates/readme.zh-CN.template.md` | Chinese template. The filled result is `README.zh-CN.md` in the target repository. |
-| `scripts/check_readme.py` | Checks a finished pair, and checks that the two templates still match. |
-| `examples/sample-cli/` | A finished CLI pair beside a one-file command that runs. |
+| `agent/AGENTS.md` | Workflow and writing rules for agents. |
+| `templates/readme-template.md` | English template. The filled result is `README.md` in the target repository. |
+| `templates/readme-zh-CN-template.md` | Chinese template. The filled result is `README-zh-CN.md` in the target repository. |
+| `scripts/check-readme.py` | Checks a finished pair, and checks that the two templates still match. |
 | `assets/` | Signature images. |
 | `docs/` | This README pair. |
 
@@ -28,10 +26,10 @@ An agent writing someone else's README starts at [AGENTS.md](../agent/AGENTS.md)
 From `project readme`:
 
 ```bash
-python3 scripts/check_readme.py all
+python3 scripts/check-readme.py all
 ```
 
-That checks the templates, this README pair, and `examples/sample-cli/`. Python 3 is enough.
+That checks both templates and this README pair. Python 3 is enough.
 
 ## Signature
 
