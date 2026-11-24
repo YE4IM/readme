@@ -2,7 +2,7 @@
 
 版本 1.5.0（2026-11-24）
 
-本文是给 Agent 的执行规范，**不是**给仓库用户看的 README。本文件在 `agent/`。模板在上一级的 `templates/`。整套材料在上一级目录；仓库根目录只有 `project readme`。生成或更新 README 时，先读完本文件，再填写：
+本文是给 Agent 的执行规范，**不是**给仓库用户看的 README。本文件在 `agent/`。模板在上一级的 `templates/`。整套 README 材料在上一级目录 `project readme`。同仓库另有 `releases readme` 与 `changelog readme`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。生成或更新 README 时，先读完本文件，再填写：
 
 - `../templates/README.template.md` → 输出为仓库中的 **`README.md`**（英文主文件）
 - `../templates/README.zh-CN.template.md` → 输出为仓库中的 **`README.zh-CN.md`**（中文独立文件）

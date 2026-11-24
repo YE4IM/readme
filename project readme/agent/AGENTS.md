@@ -1,6 +1,6 @@
 # Agent entry
 
-This file lives in `agent/`. The kit is the parent directory, `project readme`. The repository root contains only that folder.
+This file lives in `agent/`. The kit is the parent directory, `project readme`. The same repository also has `releases readme` and `changelog readme`. Use this file only for README work.
 
 Write or update a target repository's README from the facts in that repository.
 

@@ -8,7 +8,7 @@
 
 ## 概述
 
-规范版本 1.5.0。仓库根目录只有 `project readme`。本文件在 `docs/`。无需安装。
+规范版本 1.5.0。本文件在 `project readme/docs/`。同仓库另有 `releases readme` 与 `changelog readme`，分别用于其他交付物。无需安装。
 
 Agent 要给别的仓库写 README 时，先看 [AGENTS.md](../agent/AGENTS.md)，再按 [README-AGENT-INSTRUCTIONS.md](../agent/README-AGENT-INSTRUCTIONS.md) 执行。
 

@@ -8,7 +8,7 @@ Rules and bilingual templates an agent follows when writing a GitHub README. Gen
 
 ## Overview
 
-Instruction version 1.5.0. The repository root contains only `project readme`. This file is in `docs/`. There is nothing to install.
+Instruction version 1.5.0. This file is in `project readme/docs/`. The repository also contains `releases readme` and `changelog readme` for other deliverables. There is nothing to install.
 
 An agent writing someone else's README starts at [AGENTS.md](../agent/AGENTS.md), then follows [README-AGENT-INSTRUCTIONS.md](../agent/README-AGENT-INSTRUCTIONS.md).
 
