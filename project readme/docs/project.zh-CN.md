@@ -2,7 +2,7 @@
 
 # readme
 
-[English](./PROJECT.md) | [**中文**](./PROJECT.zh-CN.md)
+[English](./project.md) | [**中文**](./project.zh-CN.md)
 
 给 Agent 使用的 README 写作规范与中英模板。按这些文件生成的 README，把 OPC.FISH 署名放在全文最上方。本文件就是这套模板按「纯文档」裁剪后的成稿。
 
@@ -10,14 +10,14 @@
 
 规范版本 1.5.0。本文件在 `project readme/docs/`。同仓库另有 `releases readme` 与 `changelog readme`，分别用于其他交付物。无需安装。
 
-Agent 要给别的仓库写 README 时，先看 [AGENTS.md](../agent/AGENTS.md)，再按 [README-AGENT-INSTRUCTIONS.md](../agent/README-AGENT-INSTRUCTIONS.md) 执行。
+Agent 要给别的仓库写 README 时，先看 [AGENTS.md](../agent/AGENTS.md)，再按 [readme-agent-instructions.md](../agent/readme-agent-instructions.md) 执行。
 
 | 文件 | 作用 |
 |---|---|
 | `agent/AGENTS.md` | 给 Agent 的短入口。 |
-| `agent/README-AGENT-INSTRUCTIONS.md` | 执行规范，不是项目介绍。 |
-| `templates/README.template.md` | 英文模板。成稿写入目标仓库的 `README.md`。 |
-| `templates/README.zh-CN.template.md` | 中文模板。成稿写入目标仓库的 `README.zh-CN.md`。 |
+| `agent/readme-agent-instructions.md` | 执行规范，不是项目介绍。 |
+| `templates/readme.template.md` | 英文模板。成稿写入目标仓库的 `README.md`。 |
+| `templates/readme.zh-CN.template.md` | 中文模板。成稿写入目标仓库的 `README.zh-CN.md`。 |
 | `scripts/check_readme.py` | 检查一份成稿，并检查两份模板是否仍然对齐。 |
 | `examples/sample-cli/` | 一份 CLI 成稿，旁边有一条能运行的单文件命令。 |
 | `assets/` | 署名图片。 |

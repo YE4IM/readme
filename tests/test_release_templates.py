@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COMMENTS = re.compile(r"<!--(.*?)-->", re.DOTALL)
 PLACEHOLDERS = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
-RELEASE = ROOT / "releases readme" / "RELEASE.template.md"
+RELEASE = ROOT / "releases readme" / "release.template.md"
 CHANGELOG = ROOT / "changelog readme"
 SHARED_FACTS = {
     "VERSION": "v2.0.0-rc.1",
@@ -37,7 +37,7 @@ def render_prerelease(template, facts):
 class ReleaseTemplateTests(unittest.TestCase):
     def test_changelog_optional_sections_are_paired_and_self_contained(self):
         signatures = []
-        for filename in ("CHANGELOG.version.template.md", "CHANGELOG.version.zh-CN.template.md"):
+        for filename in ("changelog-version.template.md", "changelog-version.zh-CN.template.md"):
             with self.subTest(filename=filename):
                 template = (CHANGELOG / filename).read_text(encoding="utf-8")
                 visible = COMMENTS.sub("", template)
@@ -61,14 +61,14 @@ class ReleaseTemplateTests(unittest.TestCase):
         english_release, chinese_release = RELEASE.read_text(encoding="utf-8").split("\n---\n")
         for language, release, filename, heading, summary, warning, change, steps in (
             (
-                "en", english_release, "CHANGELOG.version.template.md", "Breaking Changes",
+                "en", english_release, "changelog-version.template.md", "Breaking Changes",
                 "The CLI now uses the new output flag.",
                 "This pre-release is for testing and feedback. Avoid production use.",
                 "Scripts using `--format` must switch flags.",
                 ("Rename `--format` to `--output`.", "Run `example --output json`."),
             ),
             (
-                "zh-CN", chinese_release, "CHANGELOG.version.zh-CN.template.md", "破坏性变更",
+                "zh-CN", chinese_release, "changelog-version.zh-CN.template.md", "破坏性变更",
                 "CLI 现已使用新的输出参数。",
                 "本预发布版用于测试与反馈，不建议在生产环境使用。",
                 "使用 `--format` 的脚本需要更换参数。",

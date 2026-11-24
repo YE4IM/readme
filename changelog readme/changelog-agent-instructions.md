@@ -6,8 +6,8 @@
 
 同目录配套模板：
 
-- [`CHANGELOG.version.template.md`](./CHANGELOG.version.template.md) → 单个已发布版本的**英文稿**，写入 `CHANGELOG.md`（或仓库既有的英文变更日志）
-- [`CHANGELOG.version.zh-CN.template.md`](./CHANGELOG.version.zh-CN.template.md) → 单个已发布版本的**中文稿**，写入 `CHANGELOG.zh-CN.md`（或仓库既有的中文变更日志）
+- [`changelog-version.template.md`](./changelog-version.template.md) → 单个已发布版本的**英文稿**，写入 `CHANGELOG.md`（或仓库既有的英文变更日志）
+- [`changelog-version.zh-CN.template.md`](./changelog-version.zh-CN.template.md) → 单个已发布版本的**中文稿**，写入 `CHANGELOG.zh-CN.md`（或仓库既有的中文变更日志）
 
 文件开头、`Unreleased` 节和正文清理规则仍见第 8 节；不要把版本模板误当成完整 CHANGELOG 文件。
 
@@ -307,7 +307,7 @@ GitHub Release 页面已经展示标题和 Tag，因此 Release 正文可以不�
 
 使用说明：
 
-1. 打开同目录模板 [`CHANGELOG.version.template.md`](./CHANGELOG.version.template.md)。
+1. 打开同目录模板 [`changelog-version.template.md`](./changelog-version.template.md)。
 2. 用已核实的事实替换 `{{PLACEHOLDER}}`；散文按英文习惯写，命令、路径、编号、URL 与中文稿保持一致。
 3. 需要某个 `OPTIONAL` 块时，去掉包围注释并删除说明文字；不需要或无证据则整块删除，不要留空标题、`None` 或未解开的注释。
 4. 将该版本节按第 8.1 节和第 8.4 节，与文件开头、`Unreleased`（若有）以及其他版本一起组装：多个版本按**新到旧**排列。
@@ -318,7 +318,7 @@ GitHub Release 页面已经展示标题和 Tag，因此 Release 正文可以不�
 
 使用说明：
 
-1. 打开同目录模板 [`CHANGELOG.version.zh-CN.template.md`](./CHANGELOG.version.zh-CN.template.md)。
+1. 打开同目录模板 [`changelog-version.zh-CN.template.md`](./changelog-version.zh-CN.template.md)。
 2. 基于**同一份事实清单**填写；先同步版本号、日期、分类、条目与引用，再组织中文表述，不要生硬直译。
 3. `OPTIONAL` 块的启用与删除规则与英文模板相同；无证据的分类整块删除，不要留空标题。
 4. 组装方式与第 8.2 节相同：按新到旧排列，并遵守第 8.1 节与第 8.4 节。

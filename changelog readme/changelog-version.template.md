@@ -4,7 +4,7 @@ Fill only verified facts, then paste the section into CHANGELOG.md or the repo's
 Do not copy this filename into the changelog body.
 To enable an OPTIONAL block: remove the surrounding comment markers, keep the section content, and delete the instruction text. Otherwise delete the entire block (including any empty heading).
 Do not leave unreplaced placeholders except an intentional {{TODO: ...}}.
-Follow changelog-agent-README.md in this directory for scope, evidence, bilingual alignment, and cleanup rules.
+Follow changelog-agent-instructions.md in this directory for scope, evidence, bilingual alignment, and cleanup rules.
 -->
 
 ## [{{VERSION}}] - {{RELEASE_DATE}}

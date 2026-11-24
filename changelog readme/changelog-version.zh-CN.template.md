@@ -5,7 +5,7 @@
 结构、分类集合、条目数量、编号、命令和链接必须与英文稿对等。
 启用 OPTIONAL 块时，去掉包围注释、保留正文并删除说明文字。不需要的块应连同标题和正文整块删除。
 除有意留下的 {{TODO: ...}} 外，不要残留未替换占位符。
-范围、证据、双语对齐与清理规则见同目录 changelog-agent-README.md。
+范围、证据、双语对齐与清理规则见同目录 changelog-agent-instructions.md。
 -->
 
 ## [{{VERSION}}] - {{RELEASE_DATE}}

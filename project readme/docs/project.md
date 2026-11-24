@@ -2,7 +2,7 @@
 
 # readme
 
-[**English**](./PROJECT.md) | [中文](./PROJECT.zh-CN.md)
+[**English**](./project.md) | [中文](./project.zh-CN.md)
 
 Rules and bilingual templates an agent follows when writing a GitHub README. Generated READMEs keep the OPC.FISH signature at the top. This file is the documentation-shaped result of those templates.
 
@@ -10,14 +10,14 @@ Rules and bilingual templates an agent follows when writing a GitHub README. Gen
 
 Instruction version 1.5.0. This file is in `project readme/docs/`. The repository also contains `releases readme` and `changelog readme` for other deliverables. There is nothing to install.
 
-An agent writing someone else's README starts at [AGENTS.md](../agent/AGENTS.md), then follows [README-AGENT-INSTRUCTIONS.md](../agent/README-AGENT-INSTRUCTIONS.md).
+An agent writing someone else's README starts at [AGENTS.md](../agent/AGENTS.md), then follows [readme-agent-instructions.md](../agent/readme-agent-instructions.md).
 
 | File | Role |
 |---|---|
 | `agent/AGENTS.md` | Short entry for an agent. |
-| `agent/README-AGENT-INSTRUCTIONS.md` | The rules. This is not a project README. |
-| `templates/README.template.md` | English template. The filled result is `README.md` in the target repository. |
-| `templates/README.zh-CN.template.md` | Chinese template. The filled result is `README.zh-CN.md` in the target repository. |
+| `agent/readme-agent-instructions.md` | The rules. This is not a project README. |
+| `templates/readme.template.md` | English template. The filled result is `README.md` in the target repository. |
+| `templates/readme.zh-CN.template.md` | Chinese template. The filled result is `README.zh-CN.md` in the target repository. |
 | `scripts/check_readme.py` | Checks a finished pair, and checks that the two templates still match. |
 | `examples/sample-cli/` | A finished CLI pair beside a one-file command that runs. |
 | `assets/` | Signature images. |

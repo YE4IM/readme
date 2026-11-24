@@ -62,10 +62,10 @@ def main() -> int:
         errors.extend(check_templates())
         errors.extend(
             check_pair(
-                ROOT / "docs" / "PROJECT.md",
-                ROOT / "docs" / "PROJECT.zh-CN.md",
+                ROOT / "docs" / "project.md",
+                ROOT / "docs" / "project.zh-CN.md",
                 "local",
-                switch_filenames=("PROJECT.md", "PROJECT.zh-CN.md"),
+                switch_filenames=("project.md", "project.zh-CN.md"),
             )
         )
         errors.extend(
@@ -87,8 +87,8 @@ def main() -> int:
 
 
 def check_templates() -> list[str]:
-    english = (ROOT / "templates" / "README.template.md").read_text(encoding="utf-8")
-    chinese = (ROOT / "templates" / "README.zh-CN.template.md").read_text(encoding="utf-8")
+    english = (ROOT / "templates" / "readme.template.md").read_text(encoding="utf-8")
+    chinese = (ROOT / "templates" / "readme.zh-CN.template.md").read_text(encoding="utf-8")
     errors: list[str] = []
     en_names = placeholder_names(english)
     zh_names = placeholder_names(chinese)
