@@ -1,3 +1,5 @@
+<a href="https://opc.fish"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+
 # sample-cli
 
 [**English**](./README.md) | [中文](./README.zh-CN.md)
@@ -33,5 +35,3 @@ This output was produced by running that command in this directory.
 ## Usage
 
 The script takes no arguments. It always prints the same line and exits.
-
-<a href="https://opc.fish"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>

@@ -11,21 +11,20 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REMOTE_LIGHT = (
-    "https://raw.githubusercontent.com/YE4IM/readme/main/assets/"
+    "https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/"
     "opc-fish-project-signature.svg"
 )
 REMOTE_DARK = (
-    "https://raw.githubusercontent.com/YE4IM/readme/main/assets/"
+    "https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/"
     "opc-fish-project-signature-web-dark.svg"
 )
-LOCAL_LIGHT = "./assets/opc-fish-project-signature.svg"
-LOCAL_DARK = "./assets/opc-fish-project-signature-web-dark.svg"
 EN_SWITCH = "[**English**](./README.md) | [中文](./README.zh-CN.md)"
 ZH_SWITCH = "[English](./README.md) | [**中文**](./README.zh-CN.md)"
 PLACEHOLDER = re.compile(r"\{\{([^{}]+)\}\}")
@@ -61,7 +60,9 @@ def main() -> int:
         errors.extend(check_templates())
     elif args.command == "all":
         errors.extend(check_templates())
-        errors.extend(check_pair(ROOT / "README.md", ROOT / "README.zh-CN.md", "local"))
+        errors.extend(
+            check_pair(ROOT / "docs" / "README.md", ROOT / "docs" / "README.zh-CN.md", "local")
+        )
         errors.extend(
             check_pair(
                 ROOT / "examples/sample-cli/README.md",
@@ -81,8 +82,8 @@ def main() -> int:
 
 
 def check_templates() -> list[str]:
-    english = (ROOT / "README.template.md").read_text(encoding="utf-8")
-    chinese = (ROOT / "README.zh-CN.template.md").read_text(encoding="utf-8")
+    english = (ROOT / "templates" / "README.template.md").read_text(encoding="utf-8")
+    chinese = (ROOT / "templates" / "README.zh-CN.template.md").read_text(encoding="utf-8")
     errors: list[str] = []
     en_names = placeholder_names(english)
     zh_names = placeholder_names(chinese)
@@ -105,6 +106,10 @@ def check_templates() -> list[str]:
             errors.append(f"{label} is missing the light signature")
         if "opc-fish-project-signature-web-dark.svg" not in text:
             errors.append(f"{label} is missing the dark signature")
+        heading = HEADING.search(text)
+        signature_at = text.find("opc-fish-project-signature.svg")
+        if heading and signature_at > heading.start():
+            errors.append(f"{label} signature must come before the title")
         if text.count("> [!NOTE]") != 1 or text.count("> [!WARNING]") != 1:
             errors.append(f"{label} should keep NOTE and WARNING in separate blocks")
     return errors
@@ -132,11 +137,38 @@ def check_pair(english_path: Path, chinese_path: Path, signature: str) -> list[s
         errors.extend(placeholder_errors(label, visible))
         errors.extend(comment_errors(label, visible))
         errors.extend(secret_errors(label, text))
-        errors.extend(signature_errors(label, visible, signature))
+        errors.extend(signature_errors(label, visible, signature, files[label]))
         badges = len(re.findall(r"\[!\[", text))
         if badges > 4:
             errors.append(f"{label} has {badges} badges; the default limit is 4")
+        errors.extend(badge_layout_errors(label, visible))
     return errors
+
+
+BADGE = re.compile(r"\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\)")
+BADGE_LINE = re.compile(r"^(?:\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\)\s*)+$")
+
+
+def badge_layout_errors(label: str, visible: str) -> list[str]:
+    """Several badges on separate lines stack vertically. Keep them on one line."""
+    lines_in_run = 0
+    badges_in_run = 0
+    for raw in visible.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        found = BADGE.findall(line)
+        if found and BADGE_LINE.match(line):
+            lines_in_run += 1
+            badges_in_run += len(found)
+            continue
+        if lines_in_run >= 2 and badges_in_run >= 2:
+            return [f"{label} badges must share one line so they sit side by side"]
+        lines_in_run = 0
+        badges_in_run = 0
+    if lines_in_run >= 2 and badges_in_run >= 2:
+        return [f"{label} badges must share one line so they sit side by side"]
+    return []
 
 
 def placeholder_names(text: str) -> set[str]:
@@ -171,16 +203,33 @@ def secret_errors(label: str, text: str) -> list[str]:
     return [f"{label} matches a live-secret pattern: {pattern.pattern}" for pattern in SECRET_PATTERNS if pattern.search(text)]
 
 
-def signature_errors(label: str, visible: str, signature: str) -> list[str]:
+def local_asset(readme_path: Path, filename: str) -> str:
+    parent = readme_path.resolve().parent
+    root = ROOT.resolve()
+    if parent == root or root in parent.parents:
+        return Path(os.path.relpath(root / "assets" / filename, parent)).as_posix()
+    return f"./assets/{filename}"
+
+
+def signature_errors(label: str, visible: str, signature: str, readme_path: Path) -> list[str]:
     pictures = PICTURE.findall(visible)
     if len(pictures) != 1:
         return [f"{label} should contain one signature <picture>, found {len(pictures)}"]
     block = pictures[0]
-    light = REMOTE_LIGHT if signature == "remote" else LOCAL_LIGHT
-    dark = REMOTE_DARK if signature == "remote" else LOCAL_DARK
+    if signature == "remote":
+        light, dark = REMOTE_LIGHT, REMOTE_DARK
+    else:
+        light = local_asset(readme_path, "opc-fish-project-signature.svg")
+        dark = local_asset(readme_path, "opc-fish-project-signature-web-dark.svg")
     errors = []
     if 'href="https://opc.fish"' not in visible:
         errors.append(f"{label} signature link must be https://opc.fish")
+    anchor = re.search(r'<a\s+href="https://opc\.fish"', visible, re.I)
+    if anchor and visible[: anchor.start()].strip():
+        errors.append(f"{label} signature must be the first content in the file")
+    heading = HEADING.search(visible)
+    if anchor and heading and anchor.start() > heading.start():
+        errors.append(f"{label} signature must come before the title")
     if 'media="(prefers-color-scheme: dark)"' not in block or f'srcset="{dark}"' not in block:
         errors.append(f"{label} is missing the dark signature source")
     img = re.search(r"<img\b([^>]*)>", block, re.I)
