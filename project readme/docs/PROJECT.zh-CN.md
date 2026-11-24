@@ -2,7 +2,7 @@
 
 # readme
 
-[English](./README.md) | [**中文**](./README.zh-CN.md)
+[English](./PROJECT.md) | [**中文**](./PROJECT.zh-CN.md)
 
 给 Agent 使用的 README 写作规范与中英模板。按这些文件生成的 README，把 OPC.FISH 署名放在全文最上方。本文件就是这套模板按「纯文档」裁剪后的成稿。
 

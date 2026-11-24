@@ -2,7 +2,7 @@
 
 # readme
 
-[**English**](./README.md) | [中文](./README.zh-CN.md)
+[**English**](./PROJECT.md) | [中文](./PROJECT.zh-CN.md)
 
 Rules and bilingual templates an agent follows when writing a GitHub README. Generated READMEs keep the OPC.FISH signature at the top. This file is the documentation-shaped result of those templates.
 

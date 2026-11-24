@@ -25,8 +25,8 @@ REMOTE_DARK = (
     "https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/"
     "opc-fish-project-signature-web-dark.svg"
 )
-EN_SWITCH = "[**English**](./README.md) | [中文](./README.zh-CN.md)"
-ZH_SWITCH = "[English](./README.md) | [**中文**](./README.zh-CN.md)"
+EN_SWITCH = "[**English**](./{}) | [中文](./{})"
+ZH_SWITCH = "[English](./{}) | [**中文**](./{})"
 PLACEHOLDER = re.compile(r"\{\{([^{}]+)\}\}")
 FENCE = re.compile(r"```.*?```", re.S)
 PICTURE = re.compile(r"<picture>\s*(.*?)\s*</picture>", re.S | re.I)
@@ -61,7 +61,12 @@ def main() -> int:
     elif args.command == "all":
         errors.extend(check_templates())
         errors.extend(
-            check_pair(ROOT / "docs" / "README.md", ROOT / "docs" / "README.zh-CN.md", "local")
+            check_pair(
+                ROOT / "docs" / "PROJECT.md",
+                ROOT / "docs" / "PROJECT.zh-CN.md",
+                "local",
+                switch_filenames=("PROJECT.md", "PROJECT.zh-CN.md"),
+            )
         )
         errors.extend(
             check_pair(
@@ -115,7 +120,13 @@ def check_templates() -> list[str]:
     return errors
 
 
-def check_pair(english_path: Path, chinese_path: Path, signature: str) -> list[str]:
+def check_pair(
+    english_path: Path,
+    chinese_path: Path,
+    signature: str,
+    *,
+    switch_filenames: tuple[str, str] = ("README.md", "README.zh-CN.md"),
+) -> list[str]:
     errors: list[str] = []
     files = {"English": english_path, "Chinese": chinese_path}
     texts: dict[str, str] = {}
@@ -127,9 +138,9 @@ def check_pair(english_path: Path, chinese_path: Path, signature: str) -> list[s
     if len(texts) != 2:
         return errors
 
-    if EN_SWITCH not in texts["English"]:
+    if EN_SWITCH.format(*switch_filenames) not in texts["English"]:
         errors.append(f"{english_path} is missing the English language switch")
-    if ZH_SWITCH not in texts["Chinese"]:
+    if ZH_SWITCH.format(*switch_filenames) not in texts["Chinese"]:
         errors.append(f"{chinese_path} is missing the Chinese language switch")
 
     for label, text in texts.items():

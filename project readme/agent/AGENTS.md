@@ -13,6 +13,6 @@ Write or update a target repository's README from the facts in that repository.
 python3 scripts/check_readme.py pair /path/to/README.md /path/to/README.zh-CN.md --signature remote
 ```
 
-`../examples/sample-cli/` is a finished CLI pair next to a command that runs. `../docs/` is the finished documentation shape.
+`../examples/sample-cli/` is a finished CLI pair next to a command that runs. [English](../docs/PROJECT.md) and [中文](../docs/PROJECT.zh-CN.md) show the finished documentation shape.
 
 Do not copy this file, the instruction file, or the templates into the target repository. Record the spec version in the delivery notes.
