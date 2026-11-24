@@ -11,7 +11,7 @@ No banners, badge walls, or decorative animation.
 
 <!--
 OPTIONAL: Pre-release or important notice. Use a GitHub native alert only for a pre-release warning, a breaking-change caution, or a required upgrade note — not for ordinary summary text.
-To enable: remove the surrounding comment markers, keep one alert type, and fill verified text. Otherwise delete this entire block.
+For a pre-release, enable WARNING in both languages. Otherwise keep one alert only when a caution is needed. Remove the comment markers and the instructions from enabled blocks, and delete unused blocks in full.
 
 > [!WARNING]
 > {{IMPORTANT_WARNING}}
@@ -21,18 +21,8 @@ To enable: remove the surrounding comment markers, keep one alert type, and fill
 -->
 
 <!--
-OPTIONAL: Highlights visual or demo. Enable only if this release already has a real screenshot, GIF, or verified command output.
-To enable: remove the surrounding comment markers and fill with existing assets or verified output. Otherwise delete this entire block.
-Do not invent or generate a visual, and do not fabricate output or benchmark numbers.
-Use a descriptive alt, not "screenshot". Prefer an existing project path or a stable URL already used by the project.
-Keep the visual compact so breaking changes stay close to the top.
-
-![{{DEMO_ALT_TEXT}}]({{DEMO_IMAGE_PATH_OR_URL}})
--->
-
-<!--
 OPTIONAL: Breaking Changes. Enable only when this release contains incompatible changes verified in commits, PRs, or docs.
-Lead with what changed incompatibly and who is affected, then give migration steps. Do not bury this section below feature lists.
+Place this section immediately after the summary and any required alert. Explain what changed incompatibly and who is affected, then give migration steps.
 If migration steps cannot be fully verified, keep {{TODO: ...}} and mention it in the delivery notes.
 To enable: remove the surrounding comment markers and fill verified items. Otherwise delete this entire block.
 
@@ -44,6 +34,16 @@ To enable: remove the surrounding comment markers and fill verified items. Other
 
 1. {{MIGRATION_STEP_1}}
 2. {{MIGRATION_STEP_2}}
+-->
+
+<!--
+OPTIONAL: Highlights visual or demo. Enable only if this release already has a real screenshot, GIF, or verified command output.
+To enable: remove the surrounding comment markers and fill with existing assets or verified output. Otherwise delete this entire block.
+Do not invent or generate a visual, and do not fabricate output or benchmark numbers.
+Use a descriptive alt, not "screenshot". Prefer an existing project path or a stable URL already used by the project.
+Keep the visual compact and place it after Breaking Changes when that section is present.
+
+![{{DEMO_ALT_TEXT}}]({{DEMO_IMAGE_PATH_OR_URL}})
 -->
 
 <!--
@@ -181,7 +181,7 @@ To enable: remove the surrounding comment markers and fill verified links. Other
 
 <!--
 OPTIONAL: 预发布或重要提示。仅在预发布警示、破坏性变更提醒或必须说明的升级注意事项时，使用 GitHub 原生提示块；不要把普通摘要放进提示块。
-启用：去掉包围的注释标记，只保留一种适用的提示类型，并填入已核实的文字。不需要则整块删除。
+预发布时，中英文都必须启用 WARNING。其他版本确有警示需求时，只保留一种适用的提示类型。启用时删除注释标记和说明，再填入已核实的文字。不需要则整块删除。
 
 > [!WARNING]
 > {{IMPORTANT_WARNING}}
@@ -191,18 +191,8 @@ OPTIONAL: 预发布或重要提示。仅在预发布警示、破坏性变更提�
 -->
 
 <!--
-OPTIONAL: 亮点视觉或演示。仅当本次发布已有真实截图、GIF 或可核实的命令输出时启用。
-启用：去掉包围的注释标记，填入已有素材或已核实的输出。不需要则整块删除。
-不要编造或生成视觉内容，也不要虚构输出或基准数据。
-使用描述性 alt，不要只写“截图”。优先使用项目中已有路径，或项目已在使用的稳定 URL。
-展示须保持紧凑，避免把破坏性变更推远。
-
-![{{DEMO_ALT_TEXT}}]({{DEMO_IMAGE_PATH_OR_URL}})
--->
-
-<!--
 OPTIONAL: 破坏性变更。仅当本版本确有已在提交、PR 或文档中证实的不兼容改动时启用。
-先写清不兼容的改动及影响对象，再给出迁移步骤。不要把本节放在新功能列表后面。
+本节紧跟摘要及必要警示。先写清不兼容的改动及影响对象，再给出迁移步骤。
 若迁移步骤无法完全核实，保留 {{TODO: ...}} 并在交付说明中列出。
 启用：去掉包围的注释标记，填入已核实的条目。不需要则整块删除。
 
@@ -214,6 +204,16 @@ OPTIONAL: 破坏性变更。仅当本版本确有已在提交、PR 或文档中�
 
 1. {{MIGRATION_STEP_1}}
 2. {{MIGRATION_STEP_2}}
+-->
+
+<!--
+OPTIONAL: 亮点视觉或演示。仅当本次发布已有真实截图、GIF 或可核实的命令输出时启用。
+启用：去掉包围的注释标记，填入已有素材或已核实的输出。不需要则整块删除。
+不要编造或生成视觉内容，也不要虚构输出或基准数据。
+使用描述性 alt，不要只写“截图”。优先使用项目中已有路径，或项目已在使用的稳定 URL。
+展示须保持紧凑，有破坏性变更时放在该节之后。
+
+![{{DEMO_ALT_TEXT}}]({{DEMO_IMAGE_PATH_OR_URL}})
 -->
 
 <!--

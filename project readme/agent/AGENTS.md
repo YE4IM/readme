@@ -7,7 +7,7 @@ Write or update a target repository's README from the facts in that repository.
 1. Read `README-AGENT-INSTRUCTIONS.md` in this directory. Use the version printed at the top.
 2. Fill `../templates/README.template.md` and `../templates/README.zh-CN.template.md`. Delete every unused OPTIONAL block.
 3. Write `README.md` and `README.zh-CN.md` in the target repository. Keep the language-switch links pointed at those final names.
-4. From the kit directory, run:
+4. From the kit directory, run the check for the signature used in both READMEs. The default remote SVG URLs use `--signature remote`. If you copied both SVGs into the target repository and referenced them under `./assets/`, use `--signature local`.
 
 ```bash
 python3 scripts/check_readme.py pair /path/to/README.md /path/to/README.zh-CN.md --signature remote

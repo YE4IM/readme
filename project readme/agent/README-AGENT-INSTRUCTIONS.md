@@ -39,9 +39,9 @@
 别人这样使用本仓库：
 
 - 在本仓库阅读规范，或克隆后按某一次提交固定规范文本。生成稿里的署名图地址故意跟着 `main`：这两张 SVG 更新后，已经写好的 README 会一起换成新图。
-- 若某个项目要冻结署名，把浅色和深色两张 SVG 复制进该仓库，改成相对路径，并在交付说明里写明。
+- 若某个项目要冻结署名，把浅色和深色两张 SVG 复制进该仓库，在两份 README 中改用 `./assets/` 下的相对路径，并在交付说明里写明。
 - 不要把本文件或 `*.template.md` 复制进目标仓库。
-- 成稿写完后，在 `project readme` 目录运行 `python3 scripts/check_readme.py pair <README.md> <README.zh-CN.md> --signature remote`。交付说明写上规范版本 1.5.0。
+- 成稿写完后，在 `project readme` 目录运行 `python3 scripts/check_readme.py pair <README.md> <README.zh-CN.md> --signature remote`，将两个文件参数替换成成稿路径。默认远程署名用 `--signature remote`。若已将两张 SVG 固定到目标仓库并通过 `./assets/` 引用，改用 `--signature local`。交付说明写上规范版本 1.5.0。
 
 ---
 
@@ -237,6 +237,7 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 <a href="https://opc.fish"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
 ```
 
+- 若使用仓库内固定署名，仅将上述两处远程 SVG 地址替换为 `./assets/` 下对应文件的相对路径，并用 `--signature local` 验证。
 - 中文成稿可以把 alt 写成 `OPC.FISH 项目署名`。
 - 署名图地址跟着 `main`。`YE4IM/readme` 现为公开仓库，未登录即可加载。若该地址以后不可公开，仍然保留这块 HTML，并在交付说明中写明图片目前无法在仓库外加载。
 - 在非 GitHub 的预览里，两张图可能同时出现。GitHub 会按浅色/深色主题只显示一张。
@@ -312,6 +313,6 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 - [ ] 中英视觉层级一致；目录与锚点已按各自标题本地化；短文档无多余 TOC
 - [ ] 面向用户；贡献者细节指向 CONTRIBUTING 或开发文档
 - [ ] 交付说明列出已写章节、省略原因、主展示选择、验证情况与 `{{TODO}}`
-- [ ] 两份文件最上方、标题之前均有 OPC.FISH 署名：浅色 SVG、深色 SVG、宽度 720 与 `https://opc.fish` 未被改写，且未写入目录
-- [ ] 已在 `project readme` 目录运行 `python3 scripts/check_readme.py pair <README.md> <README.zh-CN.md> --signature remote`，结果为 OK
+- [ ] 两份文件最上方、标题之前均有 OPC.FISH 署名：两份文件使用相同的浅色和深色 SVG 来源（默认远程或仓库内固定资源），显示宽度为 720，链接指向 `https://opc.fish`，目录中无署名条目
+- [ ] 已在 `project readme` 目录运行第 1 节的 `check_readme.py pair` 命令，按成稿署名选择 `--signature remote` 或 `--signature local`，结果为 OK
 - [ ] 交付说明写了规范版本 1.5.0
