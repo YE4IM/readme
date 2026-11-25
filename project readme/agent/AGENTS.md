@@ -250,12 +250,12 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 
 - 放在标题之前，作为文件的第一块内容。不要把它移到许可证之后或全文末尾。
 - 两份语言文件使用同一组图、同一个链接。不要重画、换色、裁切、换图或改链接。alt 可以按语言改写。
-- 点击图片打开 `https://opc.fish`。
+- 悬停提示显示 `OPC.FISH Project.`，点击图片打开 `https://opc.fish`。
 - 浅色用透明底、墨色字的 `opc-fish-project-signature.svg`。深色用透明底、浅色字的 `opc-fish-project-signature-web-dark.svg`。显示宽度 720。不要另做一版，也不要改这两张图的颜色。
 - 交付稿只保留下面这一块，不要把本段说明留在用户可见的 README 里：
 
 ```html
-<a href="https://opc.fish"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
 ```
 
 - 若使用仓库内固定署名，仅将上述两处远程 SVG 地址替换为 `./assets/` 下对应文件的相对路径，并用 `--signature local` 验证。
