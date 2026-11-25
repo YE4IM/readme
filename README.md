@@ -1,4 +1,4 @@
-<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH 项目署名" width="720"></picture></a>
+<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
 
 # readme
 
@@ -6,9 +6,11 @@
 
 Writing guides and bilingual Markdown templates for agents preparing GitHub project READMEs, release notes, and changelogs.
 
+[Go to Quick Start](#quick-start)
+
 ## Overview
 
-Choose a guide based on what you need to publish. You can read the guides and templates directly on GitHub or in a local checkout.
+Choose a guide for what you want to publish. You can read the guides and templates on GitHub or in a local checkout. No installation is required.
 
 | Deliverable | Writing guide | Templates |
 | --- | --- | --- |
@@ -18,9 +20,11 @@ Choose a guide based on what you need to publish. You can read the guides and te
 
 ## Quick Start
 
-1. Give your agent access to the target repository and point it to the writing guide in the table.
-2. Ask the agent to verify the facts in the target repository, fill the matching templates, and remove unused sections.
-3. For a project README, save the English and Chinese drafts as `README.md` and `README-zh-CN.md` in the target repository. See the finished examples for the expected structure. [English](./project%20readme/docs/project.md) · [中文](./project%20readme/docs/project-zh-CN.md)
+1. Open the guide for your deliverable and share it with an agent that can read the target repository.
+2. Ask the agent to verify the project facts, use the matching template, and remove unused sections.
+3. Save a project README as `README.md` and `README-zh-CN.md`, paste a single bilingual release note into GitHub Releases, or add the version entry to your project changelog.
+
+See the finished project README examples for the expected layout. [English](./project%20readme/docs/project.md) · [中文](./project%20readme/docs/project-zh-CN.md)
 
 ## Checks
 
