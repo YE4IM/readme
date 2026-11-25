@@ -28,7 +28,7 @@ The README guide and templates apply to every GitHub project maintained by this 
 
 See the finished project README examples for the expected layout. [English](./project%20readme/docs/project.md) · [中文](./project%20readme/docs/project-zh-CN.md)
 
-See the two bilingual Release examples. [Stable patch](./releases%20readme/examples/patch.md) · [Initial release](./releases%20readme/examples/initial.md)
+See the examples for a stable patch and an initial release. [Stable patch](./releases%20readme/examples/patch.md) · [Initial release](./releases%20readme/examples/initial.md)
 
 The CHANGELOG examples show an unreleased entry, a maintenance-line patch, and an initial release. [English](./changelog%20readme/examples/CHANGELOG.md) · [中文](./changelog%20readme/examples/CHANGELOG-zh-CN.md)
 
