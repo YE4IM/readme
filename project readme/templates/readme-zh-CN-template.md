@@ -3,6 +3,7 @@
 这是维护者署名，不是项目 Logo、徽章或演示。不要把它移到标题下面，也不要重画、裁切或替换。
 交付时删除本注释。两张图的地址和链接保持原样。
 alt 可以按语言改写。宽度保持 720。
+可发布成稿须替换代码围栏内的模板字段并清除编辑用 TODO。本页锚点和官方译版文档可以使用等价地址。
 -->
 
 <a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH 项目署名" width="720"></picture></a>
@@ -120,7 +121,7 @@ OPTIONAL: 项目状态。仅当仓库或官方文档明确说明成熟度或维�
 ```
 
 <!--
-INSTALL_SNIPPET_LANGUAGE：shell 命令用 bash；安装步骤不是 shell 时写成真实语言名。没有命令就删除代码块。
+INSTALL_SNIPPET_LANGUAGE：按实际 shell 或编程语言填写，例如 bash 或 powershell。没有命令就删除代码块。
 只写仓库确实支持的安装方法。默认安装命令必须展开，不要把本节包进 <details>。
 若这是纯文档项目：删除命令块，说明克隆仓库或在线阅读即可、无需安装；除非仓库里确实有文档构建命令。
 若尚无经证实的安装途径：删除本节，或留下 {{TODO: 仓库中未找到安装说明}} 并在交付说明中列出。
@@ -139,6 +140,8 @@ OPTIONAL: 额外安装方法或次要的较长输出。只折叠次要内容，�
 </details>
 -->
 
+<!-- 纯文档项目可删除不适用的环境要求与安装。保持快速开始展开，可写成「打开规范 → 选择模板 → 查看成稿」的文字步骤。没有命令或执行结果时，删除相应围栏和结果字段。 -->
+
 ## 快速开始
 
 {{QUICK_START_CONTEXT}}
@@ -151,7 +154,7 @@ OPTIONAL: 额外安装方法或次要的较长输出。只折叠次要内容，�
 
 <!--
 写从干净环境到一次成功运行的最短路径。本节必须展开。
-QUICK_START_SNIPPET_LANGUAGE：shell 用 bash。库项目改成真实语言名，不要留着 bash。
+QUICK_START_SNIPPET_LANGUAGE：按实际 shell 或编程语言填写，例如 powershell 或 python。
 使用真实命令顺序，不要省略必要的工作目录或前置条件。
 若未能实际执行这些步骤，在此直说（例如：“以下命令来自仓库，尚未在本环境验证。”）。
 若期望结果未知，删除 {{QUICK_START_EXPECTED_RESULT}}，不要编造输出。
@@ -248,7 +251,7 @@ OPTIONAL: 测试。仅当仓库中有真实测试命令时启用。
 
 ## 测试
 
-```bash
+```{{TEST_SNIPPET_LANGUAGE}}
 {{TEST_COMMAND}}
 ```
 -->
@@ -329,10 +332,9 @@ OPTIONAL: 相关项目。仅当维护者已标明官方相关仓库时启用。
 
 ## 许可证
 
-{{LICENSE_NAME}}。详见 [{{LICENSE_FILE_NAME}}]({{LICENSE_FILE_PATH}})。
+{{LICENSE_NAME}}。{{LICENSE_SOURCE}}
 
 <!--
-仅当仓库中存在许可证文件或明确的许可证声明时写入本节。
-若没有许可证，删除整节，不要假设为 MIT 或任何其他许可证。
+在 LICENSE_SOURCE 链接适用的许可证文件。只有明确声明时注明来源，许可证文件链接可省略。两种依据都没有时删去本节。子包另有许可时写明可核实的适用范围。
 -->
 

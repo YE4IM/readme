@@ -1,28 +1,28 @@
 """Regression checks for rendering bilingual release templates."""
 
 import re
+import runpy
 import unittest
 from pathlib import Path
 
 
 TEMPLATE_DIR = Path(__file__).resolve().parents[1]
+CHECK = runpy.run_path(str(TEMPLATE_DIR.parent / "scripts" / "check-release-docs.py"))
 COMMENTS = re.compile(r"<!--(.*?)-->", re.DOTALL)
 PLACEHOLDERS = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
+TEMPLATE = (TEMPLATE_DIR / "release-template.md").read_text(encoding="utf-8")
 SHARED_FACTS = {
     "BREAKING_CHANGE_AREA": "CLI",
 }
 
 
-def render_prerelease(template, facts):
+def render_template(template, facts):
     def render_comment(match):
         comment = match[1].strip()
         if not comment.startswith("OPTIONAL:"):
             return ""
         _, _, body = comment.partition("\n\n")
         names = PLACEHOLDERS.findall(body)
-        if "IMPORTANT_WARNING" in names:
-            body = body.split("\n\n> [!IMPORTANT]", 1)[0]
-            names = PLACEHOLDERS.findall(body)
         return body if names and facts.keys() >= set(names) else ""
 
     document = COMMENTS.sub(render_comment, template)
@@ -31,8 +31,54 @@ def render_prerelease(template, facts):
 
 
 class ReleaseTemplateTests(unittest.TestCase):
+    def assert_example(self, name, english, chinese):
+        halves = [
+            render_template(template, facts)
+            for template, facts in zip(TEMPLATE.split("\n---\n"), (english, chinese))
+        ]
+        rendered = "\n\n---\n\n".join(halves)
+        sample = (TEMPLATE_DIR / "examples" / f"{name}.md").read_text(encoding="utf-8")
+        self.assertEqual(rendered, sample.strip())
+        self.assertNotIn("[!WARNING]", rendered)
+        self.assertNotIn("{{", rendered)
+        self.assertNotIn("<!--", rendered)
+
+    def test_stable_patch_only_enables_fixed_and_real_compare(self):
+        compare = "https://example.com/example/compare/v1.9.3...v1.9.4"
+        self.assert_example(
+            "patch",
+            {"RELEASE_SUMMARY": "CSV exports now finish when a row contains an empty field.",
+             "FIXED_1": "Keep empty fields in the exported row without stopping the export.",
+             "COMPARE_URL": compare},
+            {"RELEASE_SUMMARY": "行内存在空字段时，CSV 导出现在也能完成。",
+             "FIXED_1": "导出保留行内空字段，并继续处理剩余数据。",
+             "COMPARE_URL": compare},
+        )
+
+    def test_initial_release_uses_visible_download_steps_without_compare(self):
+        download = "https://example.com/example/releases/v1.0.0/example-installer"
+        self.assert_example(
+            "initial",
+            {"RELEASE_SUMMARY": "The first desktop release opens CSV files for preview.",
+             "ADDED_1": "Preview local CSV files in a desktop window.",
+             "INSTALLATION_INSTRUCTIONS": (
+                 f"1. [Download the desktop installer]({download}).\n"
+                 "2. Open the installer and follow the prompts."
+             )},
+            {"RELEASE_SUMMARY": "首个桌面版本支持打开并预览 CSV 文件。",
+             "ADDED_1": "在桌面窗口中预览本地 CSV 文件。",
+             "INSTALLATION_INSTRUCTIONS": (
+                 f"1. [下载桌面安装包]({download})。\n"
+                 "2. 打开安装包并按提示安装。"
+             )},
+        )
+        text = (TEMPLATE_DIR / "examples" / "initial.md").read_text(encoding="utf-8")
+        self.assertNotIn("/compare/", text)
+        self.assertNotIn("<details>", text)
+        self.assertNotIn("```", text)
+
     def test_prerelease_warning_and_migration_precede_release_screenshot(self):
-        english_release, chinese_release = (TEMPLATE_DIR / "release-template.md").read_text(encoding="utf-8").split("\n---\n")
+        english_release, chinese_release = TEMPLATE.split("\n---\n")
         for language, template, heading, summary, warning, change, steps in (
             (
                 "en", english_release, "Breaking Changes",
@@ -54,13 +100,12 @@ class ReleaseTemplateTests(unittest.TestCase):
                 "RELEASE_SUMMARY": summary,
                 "IMPORTANT_WARNING": warning,
                 "BREAKING_CHANGE": change,
-                "MIGRATION_STEP_1": steps[0],
-                "MIGRATION_STEP_2": steps[1],
+                "MIGRATION_STEPS": "\n".join(f"{n}. {step}" for n, step in enumerate(steps, 1)),
             }
             with self.subTest(language=language):
-                screenshot = "docs/output-preview.png"
+                screenshot = "https://example.com/example/blob/v2.0.0-rc.1/docs/output-preview.png"
                 facts.update(DEMO_ALT_TEXT=summary, DEMO_IMAGE_PATH_OR_URL=screenshot)
-                rendered = render_prerelease(template, facts)
+                rendered = render_template(template, facts)
                 expected = [
                     summary,
                     f"> [!WARNING]\n> {warning}",
@@ -77,6 +122,67 @@ class ReleaseTemplateTests(unittest.TestCase):
                 self.assertEqual(headings, expected_headings)
                 for residue in ("<!--", "{{", "OPTIONAL:", "[!IMPORTANT]"):
                     self.assertNotIn(residue, rendered)
+
+    def test_stable_alert_single_step_and_pending_migration(self):
+        templates = TEMPLATE.split("\n---\n")
+        for template in templates:
+            for migration in ("1. Use the new option.", "{{TODO: Verify the replacement option.}}"):
+                with self.subTest(migration=migration):
+                    rendered = render_template(template, {
+                        "RELEASE_SUMMARY": "The CLI uses a new flag.",
+                        "IMPORTANT_NOTE": "Review the CLI flags before upgrading.",
+                        "BREAKING_CHANGE_AREA": "CLI",
+                        "BREAKING_CHANGE": "Existing scripts need an update.",
+                        "MIGRATION_STEPS": migration,
+                    })
+                    self.assertIn("> [!IMPORTANT]", rendered)
+                    self.assertNotIn("[!WARNING]", rendered)
+                    self.assertIn("Existing scripts need an update.", rendered)
+                    self.assertIn(migration, rendered)
+
+
+    def test_stable_release_uses_stable_baseline_and_keeps_rc_migration(self):
+        sample = (TEMPLATE_DIR / "examples" / "stable-after-rc.md").read_text(encoding="utf-8")
+        halves = sample.split("\n---\n")
+        self.assertEqual(len(halves), 2)
+        for half in halves:
+            self.assertIn("/compare/v1.9.3...v2.0.0)", half)
+            self.assertNotIn("/compare/v1.9.4...v2.0.0)", half)
+            self.assertNotIn("/compare/v2.0.0-rc.1...v2.0.0)", half)
+            self.assertIn("1. ", half)
+            self.assertIn("--format", half)
+            self.assertIn("--output", half)
+        self.assertEqual(CHECK["check_release"](sample), [])
+        without_migration = re.sub(r"(?m)^1\. .*$", "", sample)
+        self.assertEqual(len(CHECK["check_release"](without_migration)), 2)
+        self.assertTrue(CHECK["check_release"](sample, prerelease=True))
+
+
+    def test_equivalent_links_guidance_preserves_the_language_switch_rule(self):
+        guide = (TEMPLATE_DIR / "release-agent-instructions.md").read_text(encoding="utf-8")
+        rule = next(line for line in guide.splitlines() if "等价地址" in line)
+        self.assertNotIn("语言切换", rule)
+        self.assertIn("本页锚点", rule)
+        self.assertIn("本地化文档", rule)
+
+    def test_wrong_heading_levels_cannot_hide_missing_migration(self):
+        sample = (TEMPLATE_DIR / "examples" / "stable-after-rc.md").read_text(encoding="utf-8")
+        invalid = re.sub(r"(?m)^1\. .*$", "", sample.replace("## ", "### "))
+        errors = CHECK["check_release"](invalid)
+        for language in ("English", "Chinese"):
+            self.assertIn(f"{language} release sections must use level-two headings", errors)
+
+    def test_code_examples_allow_literal_fields_and_check_editorial_fields(self):
+        for example in ("`{{USER_ID}}`", "```text\n{{USER_ID}}\n```"):
+            half = "Summary.\n\n" + example
+            body = half + "\n\n---\n\n" + half
+            check = CHECK["check_release"]
+            self.assertEqual(check(body), [])
+            self.assertTrue(check(body.replace("USER_ID", "ADDED_1"), draft=True))
+            todo = body.replace("USER_ID", "TODO: verify")
+            self.assertTrue(check(todo))
+            self.assertEqual(check(todo, draft=True), [])
+        self.assertTrue(check("Summary {{USER_ID}}\n\n---\n\n摘要"))
 
 
 if __name__ == "__main__":

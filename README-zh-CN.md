@@ -12,6 +12,8 @@
 
 按要发布的文档选择对应规范。可以直接在 GitHub 上阅读，也可以在本地检出的仓库中查看，无需安装。
 
+本仓库的 README 规范和模板适用于项目所有者的所有 GitHub 项目，包括个人账号下的项目。每份 README 都在标题前放置 OPC.FISH 项目署名。第三方项目遵循其自身的署名规则。
+
 | 交付物 | 写作规范 | 模板 |
 | --- | --- | --- |
 | 项目介绍 `README.md` 和 `README-zh-CN.md` | [项目 README 规范](./project%20readme/agent/AGENTS.md) | [English](./project%20readme/templates/readme-template.md) · [中文](./project%20readme/templates/readme-zh-CN-template.md) |
@@ -26,12 +28,28 @@
 
 项目 README 的成稿结构可参考示例。[English](./project%20readme/docs/project.md) · [中文](./project%20readme/docs/project-zh-CN.md)
 
+参见 Release 正式补丁与首次发布示例。[正式补丁](./releases%20readme/examples/patch.md) · [首次发布](./releases%20readme/examples/initial.md)
+
+双语 CHANGELOG 示例展示了未发布项、维护线补丁和首次发布。[English](./changelog%20readme/examples/CHANGELOG.md) · [中文](./changelog%20readme/examples/CHANGELOG-zh-CN.md)
+
+同一组版本的对照示例展示了正式版和逐版记录 RC 的 CHANGELOG 各自选择的基线。[正式版 Release](./releases%20readme/examples/stable-after-rc.md) · [English CHANGELOG](./changelog%20readme/examples/CHANGELOG-rc-history.md) · [中文 CHANGELOG](./changelog%20readme/examples/CHANGELOG-rc-history-zh-CN.md)
+
 ## 检查
 
-在本仓库根目录使用 Python 3 运行以下命令，检查配套模板和 README 成稿示例。
+从本仓库根目录运行以下命令。第一条检查双语 README 模板、本仓库的 README 成稿和配套示例。其余三条用固定样本验证检查器及 Release、CHANGELOG 模板的渲染。
 
 ```bash
 python3 'project readme/scripts/check-readme.py' all
+python3 -B 'project readme/scripts/test-readme-checks.py'
 python3 'releases readme/scripts/test-release-templates.py'
 python3 'changelog readme/scripts/test-changelog-templates.py'
+```
+
+审阅自己的成稿时，可用以下命令指定实际文件。Release 预发布稿加上 `--prerelease`。待核对草稿可加上 `--draft` 来保留编辑用 TODO。仍需按规范人工核实发布证据、比较范围、链接和命令，并在 GitHub 预览特殊锚点与页面布局。
+
+
+```bash
+python3 'project readme/scripts/check-readme.py' pair /path/to/README.md /path/to/README-zh-CN.md --signature remote
+python3 scripts/check-release-docs.py release /path/to/release.md
+python3 scripts/check-release-docs.py changelog /path/to/CHANGELOG.md /path/to/CHANGELOG-zh-CN.md
 ```

@@ -1,15 +1,13 @@
 # GitHub README 标准模板 — Agent 执行规范
 
-版本 1.5.0（2026-11-24）
-
 ## Quick workflow
 
 This file lives in `agent/`. The kit is the parent directory, `project readme`. The same repository also has `releases readme` and `changelog readme`. Use this file only for README work.
 
-Write or update a target repository's README from the facts in that repository.
+Use this README kit for all GitHub projects maintained by this repository’s owner, including projects under a personal account. Put the OPC.FISH project signature before the title of every README. Verify the target repository’s ownership before applying the signature. Write or update the README using verified facts from that repository.
 
 1. Read the rules below and verify the facts in the target repository.
-2. Fill `../templates/readme-template.md` and `../templates/readme-zh-CN-template.md`. Delete every unused OPTIONAL block.
+2. For a new README pair, use the matching templates and delete unused OPTIONAL blocks. For a targeted update, start from the existing pair, verify the changed facts, and update the corresponding sections in both languages.
 3. Write `README.md` and `README-zh-CN.md` in the target repository. Keep the language-switch links pointed at those final names.
 4. From the kit directory, run the check for the signature used in both READMEs. The default remote SVG URLs use `--signature remote`. If you copied both SVGs into the target repository and referenced them under `./assets/`, use `--signature local`.
 
@@ -19,11 +17,14 @@ python3 scripts/check-readme.py pair /path/to/README.md /path/to/README-zh-CN.md
 
 See the finished bilingual documentation example in [English](../docs/project.md) and [中文](../docs/project-zh-CN.md).
 
-Do not copy this file or the templates into the target repository. Record the spec version in the delivery notes.
+Do not copy this file or the templates into the target repository.
 
 ---
 
-本文件集中提供 README 写作流程和执行规范。本文件在 `agent/`。模板在上一级的 `templates/`。整套 README 材料在上一级目录 `project readme`。同仓库另有 `releases readme` 与 `changelog readme`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。生成或更新 README 时，先读完本文件，再填写：
+本文件集中提供 README 写作流程和执行规范。本文件在 `agent/`。模板在上一级的 `templates/`。整套 README 材料在上一级目录 `project readme`。同仓库另有 `releases readme` 与 `changelog readme`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。本套 README 规范、模板与检查脚本适用于本仓库所有者维护的所有 GitHub 项目，包括个人账号下的项目。每份 README 都在标题前放置 OPC.FISH 项目署名。套用之前先核实目标仓库归属；第三方项目应遵循其自身的 README 与署名规则。
+
+- 局部更新以现有双语文件为起点，核对改动的来源，只修改相关段落，保留其余人工编写的内容；同步另一语言并验证受影响的命令、链接及锚点。
+新建时使用下列模板。
 
 - `../templates/readme-template.md` → 输出为仓库中的 **`README.md`**（英文主文件）
 - `../templates/readme-zh-CN-template.md` → 输出为仓库中的 **`README-zh-CN.md`**（中文独立文件）
@@ -51,8 +52,8 @@ Do not copy this file or the templates into the target repository. Record the sp
    - 文档站点、社区（Discord、Slack、论坛）等外部链接
 3. **未知就不写。** 查不到或不确定时：删除该可选章节；若位置几乎必需但事实未知，在稿中用 `{{TODO: 缺少什么、为什么不能确定}}` 标记，并在交付说明里汇总未知项。禁止用“可能”“大概”“通常是 `npm install`”填空。没有演示素材时省略展示，或改用已核实的代码/输入输出，不要补造视觉内容。
 4. **按项目类型裁剪。** 只启用对该类型用户有用的章节与一种主展示方式。不要为了模板完整或“更好看”而堆砌。README 面向使用者，短、可执行、可验证优先于“看起来全面”。
-5. **双语同步事实，不要逐字强制一致。** 英文与中文必须共用同一套事实、命令、版本号、文件路径、URL、徽章和演示资源。行文按各自语言习惯书写，不要为了对齐句子而写出别扭译文。章节标题可按语言习惯措辞，但信息集合与视觉层级必须对等：一边出现的事实、命令、链接和首屏元素，另一边也要有（或指向同等位置）。
-6. **严禁密钥。** 不得写入真实 API key、token、密码、私钥、证书，或连接字符串中的密钥部分。示例只用明显占位符（如 `YOUR_API_KEY`、`$API_TOKEN`）。若仓库里已经出现疑似密钥，不要复制进 README，并在交付说明中提醒维护者轮换。
+5. **双语同步事实，不要逐字强制一致。** 英文与中文必须共用同一套事实、命令、版本号、文件路径、共享引用、徽章和演示资源。行文按各自语言习惯书写，不要为了对齐句子而写出别扭译文。章节标题可按语言习惯措辞，但信息集合与视觉层级必须对等：一边出现的事实、命令、链接和首屏元素，另一边也要有（或指向同等位置）。
+6. **严禁密钥。** 不得写入真实 API key、token、密码、私钥、证书，或连接字符串中的密钥部分。示例只用明显占位符（如 `YOUR_API_KEY`、`YOUR_API_TOKEN`、`$API_TOKEN`）。若仓库里已经出现疑似密钥，不要复制进 README，并在交付说明中提醒维护者轮换。
 7. **主文件是英文，中文是独立文件。** `README.md` 为 GitHub 默认主 README（英文）；`README-zh-CN.md` 为单独的中文文件。两份文件在标题之下必须有相对路径的中英切换，当前语言加粗。署名在标题之前。
 8. **示例与命令必须可执行或标明未验证。** 不要写找不到入口的伪命令，也不要改写未经证实的参数。
 9. **全文最上方保留 OPC.FISH 署名。** 放在标题之前。使用第 5.5 节规定的浅色 SVG、深色 SVG 和 `https://opc.fish` 链接。这是维护者署名，不是可删的装饰，也不要换成项目自己的 Logo。
@@ -62,7 +63,7 @@ Do not copy this file or the templates into the target repository. Record the sp
 - 在本仓库阅读规范，或克隆后按某一次提交固定规范文本。生成稿里的署名图地址故意跟着 `main`：这两张 SVG 更新后，已经写好的 README 会一起换成新图。
 - 若某个项目要冻结署名，把浅色和深色两张 SVG 复制进该仓库，在两份 README 中改用 `./assets/` 下的相对路径，并在交付说明里写明。
 - 不要把本文件或 `*-template.md` 复制进目标仓库。
-- 成稿写完后，在 `project readme` 目录运行 `python3 scripts/check-readme.py pair <README.md> <README-zh-CN.md> --signature remote`，将两个文件参数替换成成稿路径。默认远程署名用 `--signature remote`。若已将两张 SVG 固定到目标仓库并通过 `./assets/` 引用，改用 `--signature local`。交付说明写上规范版本 1.5.0。
+- 成稿写完后，在 `project readme` 目录运行 `python3 scripts/check-readme.py pair <README.md> <README-zh-CN.md> --signature remote`，将两个文件参数替换成成稿路径。默认远程署名用 `--signature remote`。若已将两张 SVG 固定到目标仓库并通过 `./assets/` 引用，改用 `--signature local`。
 
 ---
 
@@ -70,13 +71,15 @@ Do not copy this file or the templates into the target repository. Record the sp
 
 1. **扫描仓库，列出事实清单**：项目名称、已有描述、项目类型、许可证文件、安装入口、最小可运行示例、测试命令、配置项**名称**、文档入口、已在用的徽章及其 URL、已有 Logo/截图/GIF/演示链接、可核实的命令输出或产物。
 2. **判定类型并裁剪**：CLI 工具、库/SDK、Web 或带界面的服务、自动化工具、模板/Skills、纯文档，或混合。按第 4、5 节取舍章节与展示方式。不要默认解开全部 OPTIONAL 块，也不要叠多种装饰。
-3. **验证 Quick Start（能跑则跑）**：按准备写入的步骤，在干净环境走通“安装 → 一次成功调用/运行”。失败则不要把该命令写成官方步骤；改为记录实际可用的命令，或采用仓库中的命令但明确标明“未在本环境验证”并写出失败原因。不要把未核实的输出或基准数字写进首屏演示。
+3. **验证 Quick Start（能跑则跑）**：按准备写入的步骤，在干净环境走通“安装 → 一次成功调用/运行”，纯文档则走通阅读路径并核对入口。失败则不要把该命令写成官方步骤；改为记录实际可用的命令，或采用仓库中的命令但明确标明“未在本环境验证”并写出失败原因。不要把未核实的输出或基准数字写进首屏演示。
 4. 用英文模板起草 `README.md`。散文占位符写成英文；命令、路径、URL、版本、许可证名称、徽章与演示资源等与中文稿共用。
 5. 基于**同一份事实清单**起草 `README-zh-CN.md`。先同步事实与视觉结构，再组织中文表述，不要把英文逐句硬译后再回头改命令。
 6. **对照检查**：链接能解析、两边命令一致、无密钥、无无证据章节、语言切换互指正确、未启用的 OPTIONAL 整块已删、短文档没有硬加 TOC、首屏没有把安装和快速开始挤到过远、徽章不超过 4 枚且均已核实、图片有描述性 alt、中英视觉层级一致且锚点已按各自标题本地化、两份文件最上方的 OPC.FISH 署名图片与链接均未被改写。
-7. **交付说明**应包含：使用的规范版本、写了哪些章节、省略了哪些及原因、选择了哪种主展示、哪些命令已验证、哪些是 `{{TODO}}`、自检脚本的结果。署名块不计入“主展示”。
+7. **交付说明**应包含：写了哪些章节、省略了哪些及原因、选择了哪种主展示、哪些命令已验证、哪些是 `{{TODO}}`、自检脚本的结果。署名块不计入“主展示”。
 
 ---
+
+交付说明标明「可发布成稿」或「待核对草稿」。次要未知内容可省略；项目用途或必要操作步骤等关键事实缺失时交付草稿。可发布成稿须清除所有编辑用 `TODO` 和模板占位符。检查草稿时可传 `--draft`，允许编辑用 `TODO`，其余检查仍执行。
 
 ## 3. 章节清单
 
@@ -92,7 +95,7 @@ Do not copy this file or the templates into the target repository. Record the sp
 | 安装 | 经证实的安装方法。多种包管理器只写仓库确实支持或文档已写明的；额外平台步骤可折进 `<details>`，**默认安装命令必须展开**。纯文档项目见第 4 节。 |
 | Quick Start | 从零到一次成功运行的最短路径。命令可复制；能写期望结果就写真实的，未知则省略。本节必须展开，不可放进 `<details>`。 |
 | 用法 | 核心用法与最常见工作流。细节链接到完整文档，避免把全部 API 贴进 README。 |
-| 许可证 | **仅当**仓库中有许可证文件或明确声明时：写许可证名称，并相对链接到该文件。没有许可证就删除本节，不要猜测为 MIT。 |
+| 许可证 | 有适用的许可证文件时写名称并链接该文件。只有明确声明时写明声明来源，许可证文件链接可省略。无文件与明确声明时省略本节。各子包许可不同时标明可核实的适用范围。 |
 
 若某一“必需”项在仓库中确实不适用（例如纯文档无需安装、尚未选择许可证），删除该节或改成一句实话（如“本仓库是文档/规范，克隆或在线阅读即可，无需安装”），不要编造。
 
@@ -194,7 +197,7 @@ Do not copy this file or the templates into the target repository. Record the sp
 **纯文档 / 规范 / 内容仓库**
 
 - 内容突出：文档覆盖范围、如何阅读或导航、如何预览/构建（仅当仓库确有该命令）、如何提议修改。
-- 展示优先：覆盖范围与阅读导航。不要为了“好看”补软件截图或安装步骤。若克隆或在线打开即可阅读，写明这一点。
+- 展示优先：覆盖范围与阅读导航。不要为了“好看”补软件截图或安装步骤。若克隆或在线打开即可阅读，写明这一点。省略不适用的环境要求和安装；快速开始用展开的文字步骤，如「打开规范 → 选择模板 → 查看成稿」，有确实需要的检查命令时另列。参见[英文成稿](../docs/project.md)和[中文成稿](../docs/project-zh-CN.md)。
 
 **混合项目**
 
@@ -269,7 +272,7 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 
 - **多种安装方法互相矛盾**：以当前默认可验证的文档或脚本为准。其他方法只有在验证后（或仓库明确并列支持时）才写；次要方法可放进 `<details>`，不要因此打乱首屏和快速开始。
 - **旧 README 与代码不一致**：以代码、包配置和能跑通的命令为准，并在交付说明中指出差异。
-- **没有许可证文件**：删除 License 节，不要猜测。可在交付说明中建议维护者补充许可证。
+- **许可依据有差异**：按第 3 节核对适用的许可证文件或明确声明，尤其是独立子包的许可范围。
 - **徽章状态不确定**：不放该徽章。无法确认仍有效的旧 badge URL 一律省略。即使有多枚有效徽章，默认也只选不超过 4 个最有信息价值的。
 - **缺少一句话描述**：只能根据仓库已有描述、文档标题或显而易见且可证实的用途来写。仍不够明确时，用 `{{TODO: 一句话说明待维护者确认}}`，不要撰写营销文案。
 - **没有 Logo、截图、动图或演示地址**：省略该展示，或改用已核实的代码/输入输出。不要生成 Logo、不要伪造界面或终端画面、不要编造输出或基准数据。
@@ -295,16 +298,19 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 
 若 README 不在仓库根目录，相对路径按实际位置调整，但文件名仍必须是 `README.md` 与 `README-zh-CN.md`。
 
+检查器校验常见 Markdown 相对链接、ATX 或 Setext 标题锚点和显式 HTML 锚点。含复杂 Markdown、GitHub 特殊路径或渲染生成的锚点，交付前在目标 GitHub 页面预览核对。
+
 目录锚点按各语言标题生成。英文 `# Quick Start` 对应 `#quick-start`。中文 `# 快速开始` 对应 `#快速开始`，不要写成拼音。GitHub 会把重复标题加上 `-1`。
 
 ---
 
 ## 8. 占位符约定
 
-- 模板使用显式 `{{PLACEHOLDER_NAME}}`。交付给用户的 README 中不应残留未替换的占位符，除非是有意留下的 `{{TODO: ...}}`。
-- **两边必须相同**的值：项目名称、命令、代码片段中的标识符、文件路径、URL、版本号、徽章 URL、许可证名称、环境变量名称、配置键名、演示资源路径、文首署名的两张图片地址、宽度 720 与 `https://opc.fish`。安装和快速开始的代码块语言名也相同，shell 写 `bash`，库的示例写真实语言名。
+- 模板使用显式 `{{PLACEHOLDER_NAME}}`。交付给用户的 README 中不应残留未替换的占位符。编辑用 `{{TODO: ...}}` 仅可留在待核对草稿。
+- **两边必须相同**的值：项目名称、命令、代码片段中的标识符、共享资源路径和 URL、版本号、徽章 URL、许可证名称、环境变量名称、配置键名、演示资源路径、文首署名的两张图片地址、宽度 720 与 `https://opc.fish`。安装和快速开始的代码块语言名也相同，按实际执行环境或编程语言标记，例如 Bash 用 `bash`、PowerShell 用 `powershell`。
+- 产物、PR、Issue、校验文件等共享引用指向同一目标；本页锚点、适用的语言切换链接和同主题的官方本地化文档可使用等价地址，例如英文 `#quick-start` 对应中文 `#快速开始`，英文迁移指南可对应同主题的官方中文版。
 - **按文件语言分别填写**的值：一句话说明、概述、功能描述、用法说明、注意事项、图片 alt、`<details>` 的摘要、提示块正文等散文。
-- 代码块、命令、文件名保持原样，不要翻译命令或标志。
+- 可执行命令、参数和文件名保持原样；代码注释与示例输出可按语言改写。围栏和行内代码里的模板字段也须替换。脚本按块比较常见中英文标题下安装与快速开始的代码围栏语言及 shell 命令，允许本地化注释、独立输出围栏与带提示符示例中的输出；内联命令和其他语言的代码内容由审阅者对照。
 - 目录锚点按各语言标题生成，不要共用另一语言的锚点。
 
 ---
@@ -323,7 +329,7 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 
 - [ ] 只包含有证据的章节；未启用的 OPTIONAL 已整块删除（不是“注释着留下来”）
 - [ ] 未编造许可证、功能、命令、状态、徽章、Logo、截图、输出或基准数据
-- [ ] 中英事实、命令、链接、版本、徽章与演示资源一致，行文不必逐字对应
+- [ ] 中英事实、命令、链接目标、版本、徽章与演示资源对等，行文不必逐字对应
 - [ ] 语言切换为相对链接，且指向 `README.md` / `README-zh-CN.md`
 - [ ] 无密钥或真实凭证；示例为明显占位符
 - [ ] Quick Start 已验证，或已标明未验证及原因；核心安装与快速开始均未折叠
@@ -333,7 +339,7 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 - [ ] 图片有描述性 alt，仓库内图优先相对路径；主题变体仅在两种资源都已存在时使用
 - [ ] 中英视觉层级一致；目录与锚点已按各自标题本地化；短文档无多余 TOC
 - [ ] 面向用户；贡献者细节指向 CONTRIBUTING 或开发文档
+- [ ] 已标明交付状态，可发布成稿已清除编辑用 `TODO`
 - [ ] 交付说明列出已写章节、省略原因、主展示选择、验证情况与 `{{TODO}}`
 - [ ] 两份文件最上方、标题之前均有 OPC.FISH 署名：两份文件使用相同的浅色和深色 SVG 来源（默认远程或仓库内固定资源），显示宽度为 720，链接指向 `https://opc.fish`，目录中无署名条目
 - [ ] 已在 `project readme` 目录运行第 1 节的 `check-readme.py pair` 命令，按成稿署名选择 `--signature remote` 或 `--signature local`，结果为 OK
-- [ ] 交付说明写了规范版本 1.5.0

@@ -8,7 +8,7 @@ Rules and bilingual templates an agent follows when writing a GitHub README. Gen
 
 ## Overview
 
-Instruction version 1.5.0. This file is in `project readme/docs/`. The repository also contains `releases readme` and `changelog readme` for other deliverables. There is nothing to install.
+This file is in `project readme/docs/`. The repository also contains `releases readme` and `changelog readme` for other deliverables. There is nothing to install.
 
 The workflow and writing rules are in [AGENTS.md](../agent/AGENTS.md).
 
@@ -20,6 +20,12 @@ The workflow and writing rules are in [AGENTS.md](../agent/AGENTS.md).
 | `scripts/check-readme.py` | Checks a finished pair, and checks that the two templates still match. |
 | `assets/` | Signature images. |
 | `docs/` | This README pair. |
+
+## Quick Start
+
+1. Open the [writing guide](../agent/AGENTS.md).
+2. Choose the [English template](../templates/readme-template.md) or the [Chinese template](../templates/readme-zh-CN-template.md).
+3. Read through this example and its [Chinese counterpart](./project-zh-CN.md) to see how a documentation-only project reads.
 
 ## Check
 

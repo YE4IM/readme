@@ -8,7 +8,7 @@
 
 ## 概述
 
-规范版本 1.5.0。本文件在 `project readme/docs/`。同仓库另有 `releases readme` 与 `changelog readme`，分别用于其他交付物。无需安装。
+本文件在 `project readme/docs/`。同仓库另有 `releases readme` 与 `changelog readme`，分别用于其他交付物。无需安装。
 
 Agent 写 README 的工作流程和规范都在 [AGENTS.md](../agent/AGENTS.md)。
 
@@ -20,6 +20,12 @@ Agent 写 README 的工作流程和规范都在 [AGENTS.md](../agent/AGENTS.md)�
 | `scripts/check-readme.py` | 检查一份成稿，并检查两份模板是否仍然对齐。 |
 | `assets/` | 署名图片。 |
 | `docs/` | 这对仓库说明。 |
+
+## 快速开始
+
+1. 打开[写作规范](../agent/AGENTS.md)。
+2. 选择[英文模板](../templates/readme-template.md)或[中文模板](../templates/readme-zh-CN-template.md)。
+3. 阅读本成稿和[英文成稿](./project.md)，了解纯文档项目的写法。
 
 ## 检查
 

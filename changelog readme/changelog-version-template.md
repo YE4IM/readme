@@ -3,27 +3,33 @@ Reusable template: one published-version section for a repository CHANGELOG (Eng
 Fill only verified facts, then paste the section into CHANGELOG.md or the repo's existing English changelog file.
 Do not copy this filename into the changelog body.
 To enable an OPTIONAL block: remove the surrounding comment markers, keep the section content, and delete the instruction text. Otherwise delete the entire block (including any empty heading).
-Do not leave unreplaced placeholders except an intentional {{TODO: ...}}.
+Remove all editorial TODOs and template fields from publishable copy. Keep {{TODO: ...}} only in a draft marked as pending verification.
+The version heading defaults to plain text. Follow existing inline links or reference definitions and verify the destination. Keep the comparison link in one place. Use the publication event and time zone defined in the guide.
+Local anchors and official translated docs may use equivalent destinations.
 Follow changelog-agent-instructions.md in this directory for scope, evidence, bilingual alignment, and cleanup rules.
 -->
 
-## [{{VERSION}}] - {{RELEASE_DATE}}
+## {{VERSION}} - {{RELEASE_DATE}}
 
 {{RELEASE_SUMMARY}}
 
 <!--
-OPTIONAL: Pre-release or important notice. For a pre-release, keep WARNING in both language versions of a bilingual changelog. Explain that this is a pre-release for testing and feedback and advise against production use unless the maintainer has verified written guidance stating otherwise. For a stable release, keep one alert only if users need to see a breaking-change or upgrade caution first.
+OPTIONAL: Pre-release warning. Enable WARNING in both languages for a pre-release. Explain the testing purpose and the production guidance.
 
 > [!WARNING]
 > {{IMPORTANT_WARNING}}
+-->
+
+<!--
+OPTIONAL: Stable release upgrade notice. Enable IMPORTANT in both languages when users need a breaking-change or upgrade caution first.
 
 > [!IMPORTANT]
 > {{IMPORTANT_NOTE}}
 -->
 
 <!--
-OPTIONAL: 破坏性变更。必须紧跟摘要（及必要警示）之后。
-迁移步骤无法完全核实时，保留 {{TODO: ...}} 并在交付说明中列出。
+OPTIONAL: Breaking changes. Place this directly after the summary and any required warning.
+Fill the migration field with one or more numbered steps. If migration steps cannot be verified, fill the migration field with {{TODO: ...}} in the draft and list it in the delivery notes.
 
 ### Breaking Changes
 
@@ -31,12 +37,11 @@ OPTIONAL: 破坏性变更。必须紧跟摘要（及必要警示）之后。
 
 **Migration:**
 
-1. {{MIGRATION_STEP_1}}
-2. {{MIGRATION_STEP_2}}
+{{MIGRATION_STEPS}}
 -->
 
 <!--
-OPTIONAL: 仅当确有已落地的用户可见新能力时启用。
+OPTIONAL: User-visible capabilities that shipped in this version.
 
 ### Added
 
@@ -44,7 +49,7 @@ OPTIONAL: 仅当确有已落地的用户可见新能力时启用。
 -->
 
 <!--
-OPTIONAL: 仅当确有行为、性能、体验或可靠性改进时启用。不要编造数据。
+OPTIONAL: Verified changes to behavior, performance, usability, or reliability. Use measured data where available.
 
 ### Changed
 
@@ -52,7 +57,7 @@ OPTIONAL: 仅当确有行为、性能、体验或可靠性改进时启用。不�
 -->
 
 <!--
-OPTIONAL: 仅当确有修复时启用。写清现象与触发条件，有编号则引用。
+OPTIONAL: Verified fixes. Describe the symptoms and conditions, and cite the relevant issue or PR when available.
 
 ### Fixed
 
@@ -60,7 +65,7 @@ OPTIONAL: 仅当确有修复时启用。写清现象与触发条件，有编号�
 -->
 
 <!--
-OPTIONAL: 仅当确有安全修复或已公开公告时启用。不写利用步骤，不编造 CVE。
+OPTIONAL: Verified security fixes or advisories cleared for disclosure. Use impact, fix versions, and links that maintainers have published or explicitly approved.
 
 ### Security
 
@@ -68,7 +73,7 @@ OPTIONAL: 仅当确有安全修复或已公开公告时启用。不写利用步�
 -->
 
 <!--
-OPTIONAL: 仅当确有弃用或移除时启用。
+OPTIONAL: Verified deprecations or removals.
 
 ### Deprecated & Removed
 
@@ -76,7 +81,7 @@ OPTIONAL: 仅当确有弃用或移除时启用。
 -->
 
 <!--
-OPTIONAL: 仅当维护性变更对使用者或集成方有必要知晓时启用。
+OPTIONAL: Maintenance changes that users or integrators need to know about.
 
 ### Maintenance & Dependencies
 
@@ -84,17 +89,15 @@ OPTIONAL: 仅当维护性变更对使用者或集成方有必要知晓时启用�
 -->
 
 <!--
-OPTIONAL: 仅当升级途径需要单独说明时启用。主命令必须展开。未验证须标明。
+OPTIONAL: Installation or upgrade instructions. Use a verified download or store link, numbered steps, or fenced commands with the correct language. Keep the primary path visible and label commands you could not run.
 
 ### Installation & Upgrade
 
-```bash
-{{UPGRADE_COMMAND}}
-```
+{{INSTALLATION_INSTRUCTIONS}}
 -->
 
 <!--
-OPTIONAL: 仅当该版本已确认仍有未解决问题时启用。
+OPTIONAL: Confirmed open issues affecting this version.
 
 ### Known Issues
 
@@ -102,7 +105,7 @@ OPTIONAL: 仅当该版本已确认仍有未解决问题时启用。
 -->
 
 <!--
-OPTIONAL: 仅当能核实某 handle 在该版本范围内确有贡献时启用。
+OPTIONAL: Verified contributor handles for this version.
 
 ### Contributors
 
@@ -110,9 +113,9 @@ Thanks to {{CONTRIBUTORS}} for contributing to this release.
 -->
 
 <!--
-OPTIONAL: 仅当上一 Tag 存在且 Compare URL 可核实时启用。
-典型形式：https://github.com/<owner>/<repo>/compare/<previous-tag>...<current-tag>
-可见文字不要编造区间。首次发布不要虚构上一版本。
+OPTIONAL: Use a verified comparison against the comparable baseline selected under section 4 for the same package, release line or stable upgrade path.
+Typical URL: https://github.com/<owner>/<repo>/compare/<previous-tag>...<current-tag>
+Omit this section if the heading already links to the comparison or this is the first release.
 
 ### Full Changelog
 
