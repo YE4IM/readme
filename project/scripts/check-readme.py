@@ -434,11 +434,13 @@ def html_attributes(tag: str) -> dict[str, str]:
 
 def signature_errors(label: str, text: str, signature: str, readme_path: Path) -> list[str]:
     text = re.sub(r"\A(?:\s|<!--.*?-->)*", "", text.lstrip("\ufeff"), flags=re.S)
-    centered = re.match(r'''\A<p\s+align=(?:"center"|'center')\s*>(.*?)</p>''', text, re.S | re.I)
-    anchor = SIGNATURE_LINK.match(centered[1] if centered else text)
+    paragraph = re.match(r"\A<p(\s[^>]*)?>(.*?)</p>", text, re.S | re.I)
+    anchor = SIGNATURE_LINK.match(paragraph[2] if paragraph else text)
     if not anchor or html_attributes(anchor[1]).get("href") != "https://opc.fish":
         return [f"{label} must begin with the signature picture linked to https://opc.fish"]
     errors = []
+    if not paragraph or html_attributes(paragraph[1] or "").get("align", "").lower() != "center":
+        errors.append(f'{label} signature must be centered in <p align="center">')
     if html_attributes(anchor[1]).get("title") != "OPC.FISH Project.":
         errors.append(f"{label} signature needs the OPC.FISH Project. link title")
     if signature == "remote":

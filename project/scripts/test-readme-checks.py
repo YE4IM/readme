@@ -49,6 +49,18 @@ class ReadmeCheckTests(unittest.TestCase):
         unlinked = ENGLISH.replace("><picture>", "></a><picture>", 1).replace("</picture></a>", "</picture>", 1)
         self.assertTrue(CHECK["signature_errors"]("English", unlinked, "local", example))
 
+    def test_signature_requires_a_centered_paragraph(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        unwrapped = en.replace('<p align="center">\n', "", 1).replace("\n</p>", "", 1)
+        left_aligned = en.replace('align="center"', 'align="left"', 1)
+        self.assertEqual(self.check_pair(en, zh), [])
+        for variant in (unwrapped, left_aligned):
+            with self.subTest(opening_line=variant.splitlines()[0]):
+                self.assertEqual(self.check_pair(variant, zh), [
+                    'English signature must be centered in <p align="center">',
+                ])
+
     def test_local_signature_files_must_exist(self):
         with TemporaryDirectory() as directory:
             example = Path(directory) / "README.md"
