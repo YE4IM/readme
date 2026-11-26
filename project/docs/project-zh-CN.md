@@ -8,7 +8,7 @@
 
 ## 概述
 
-本文件在 `project readme/docs/`。同仓库另有 `releases readme` 与 `changelog readme`，分别用于其他交付物。无需安装。
+本文件在 `project/docs/`。同仓库另有 `releases` 与 `changelog`，分别用于其他交付物。无需安装。
 
 Agent 写 README 的工作流程和规范都在 [project-agent-instructions.md](../project-agent-instructions.md)。这是完整规范，正文只有中文。
 
@@ -29,7 +29,7 @@ Agent 写 README 的工作流程和规范都在 [project-agent-instructions.md](
 
 ## 检查
 
-在 `project readme` 目录运行：
+在 `project` 目录运行：
 
 ```bash
 python3 scripts/check-readme.py all

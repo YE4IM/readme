@@ -1,8 +1,8 @@
 # GitHub README 标准模板 — Agent 执行规范
 
-本文件集中提供 README 写作流程和执行规范。这是给 Agent 的完整规范，正文只有中文，不另写英文规范，也不做中英对照。本文件是 `project readme/project-agent-instructions.md`。模板在同目录的 `templates/`。整套 README 材料在 `project readme`。同仓库另有 `releases readme` 与 `changelog readme`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。本套 README 规范、模板与检查脚本适用于本仓库所有者维护的所有 GitHub 项目，包括个人账号下的项目。每份 README 都在标题前放置 OPC.FISH 项目署名。套用之前先核实目标仓库归属；第三方项目应遵循其自身的 README 与署名规则。
+本文件集中提供 README 写作流程和执行规范。这是给 Agent 的完整规范，正文只有中文，不另写英文规范，也不做中英对照。本文件是 `project/project-agent-instructions.md`。模板在同目录的 `templates/`。整套 README 材料在 `project`。同仓库另有 `releases` 与 `changelog`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。本套 README 规范、模板与检查脚本适用于本仓库所有者维护的所有 GitHub 项目，包括个人账号下的项目。每份 README 都在标题前放置 OPC.FISH 项目署名。套用之前先核实目标仓库归属；第三方项目应遵循其自身的 README 与署名规则。
 
-本文件只用于项目 README。同仓库的 `releases readme` 与 `changelog readme` 分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。
+本文件只用于项目 README。同仓库的 `releases` 与 `changelog` 分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。
 
 - 局部更新前先运行成稿检查保存基线。交付时用同一命令区分本次新增、已修复与仍存在的旧问题；修复本次引入或影响本次内容的问题。范围外旧问题记入交付说明，已有错误仍须如实报告。
 - 局部更新以现有双语文件为起点，核对改动的来源，只修改相关段落，保留其余人工编写的内容；同步另一语言并验证受影响的命令、链接及锚点。
@@ -49,7 +49,7 @@
 - 在本仓库阅读规范，或克隆后按某一次提交固定规范文本。生成稿里的署名图地址故意跟着 `main`：这两张 SVG 更新后，已经写好的 README 会一起换成新图。
 - 若某个项目要冻结署名，把浅色和深色两张 SVG 复制进该仓库，在两份 README 中改用 `./assets/` 下的相对路径，并在交付说明里写明。
 - 不要把本文件或 `*-template.md` 复制进目标仓库。
-- 成稿写完后，在 `project readme` 目录运行 `python3 scripts/check-readme.py pair <README.md> <README-zh-CN.md> --signature remote`，将两个文件参数替换成成稿路径。默认远程署名用 `--signature remote`。若已将两张 SVG 固定到目标仓库并通过 `./assets/` 引用，改用 `--signature local`。
+- 成稿写完后，在 `project` 目录运行 `python3 scripts/check-readme.py pair <README.md> <README-zh-CN.md> --signature remote`，将两个文件参数替换成成稿路径。默认远程署名用 `--signature remote`。若已将两张 SVG 固定到目标仓库并通过 `./assets/` 引用，改用 `--signature local`。
 
 ---
 
@@ -330,4 +330,4 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 - [ ] 已标明交付状态，可发布成稿已清除编辑用 `TODO`
 - [ ] 交付说明列出已写章节、省略原因、主展示选择、验证情况与 `{{TODO}}`
 - [ ] 两份文件最上方、标题之前均有 OPC.FISH 署名：两份文件使用相同的浅色和深色 SVG 来源（默认远程或仓库内固定资源），显示宽度为 720，链接指向 `https://opc.fish`，目录中无署名条目
-- [ ] 已在 `project readme` 目录运行第 1 节的 `check-readme.py pair` 命令，按成稿署名选择 `--signature remote` 或 `--signature local`，新建成稿结果为 OK；局部更新已按检查基线说明结果
+- [ ] 已在 `project` 目录运行第 1 节的 `check-readme.py pair` 命令，按成稿署名选择 `--signature remote` 或 `--signature local`，新建成稿结果为 OK；局部更新已按检查基线说明结果

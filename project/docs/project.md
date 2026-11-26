@@ -8,7 +8,7 @@ Rules and bilingual templates an agent follows when writing a GitHub README. Gen
 
 ## Overview
 
-This file is in `project readme/docs/`. The repository also contains `releases readme` and `changelog readme` for other deliverables. There is nothing to install.
+This file is in `project/docs/`. The repository also contains `releases` and `changelog` for other deliverables. There is nothing to install.
 
 The workflow and writing rules are in the Chinese guide [project-agent-instructions.md](../project-agent-instructions.md). That file is the complete specification.
 
@@ -29,7 +29,7 @@ The workflow and writing rules are in the Chinese guide [project-agent-instructi
 
 ## Check
 
-From `project readme`:
+From `project`:
 
 ```bash
 python3 scripts/check-readme.py all

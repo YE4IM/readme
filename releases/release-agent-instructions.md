@@ -228,7 +228,7 @@ GitHub Release 标题默认使用真实发布标识（通常是完整 Tag），�
 - **首次发布没有上一版本时：** 不要虚构 `v0.0.0` 或任意起点 Tag。删除 Compare 链接，或改为指向真实的 Tag 页面 / 提交历史；并在交付说明中写明这是 Initial Release。正文仍然不要写版本号标题。
 - **PR、Issue 与提交引用必须可核实。** 使用仓库中真实存在的 `#123` 或完整引用；提交哈希须真实，且缩写长度保持一致。找不到对应编号就不要编一个，也不要把无关 Issue 挂上去。
 - **贡献者 `@handle` 必须可核实。** 只感谢在本 Tag 范围内确有贡献的 GitHub 用户。不要猜测显示名背后的账号，不要把未参与本版本的人写进去。
-对照示例中，稳定版 `v2.0.0` 公开于 11 月 26 日。虽然 `v1.9.4` 维护线补丁于 11 月 25 日发布，`v2.0.0` 的既定升级路径仍从 `v1.9.3` 开始，Release 保留在 `v2.0.0-rc.1` 引入的参数迁移。逐版记录 RC 的 CHANGELOG 比较 `v2.0.0-rc.1...v2.0.0` 并指向完整迁移说明。参见[双语 Release 示例](./examples/stable-after-rc.md)与[中文 CHANGELOG](../changelog%20readme/examples/CHANGELOG-rc-history-zh-CN.md)。示例数据与地址均为虚构。
+对照示例中，稳定版 `v2.0.0` 公开于 11 月 26 日。虽然 `v1.9.4` 维护线补丁于 11 月 25 日发布，`v2.0.0` 的既定升级路径仍从 `v1.9.3` 开始，Release 保留在 `v2.0.0-rc.1` 引入的参数迁移。逐版记录 RC 的 CHANGELOG 比较 `v2.0.0-rc.1...v2.0.0` 并指向完整迁移说明。参见[双语 Release 示例](./examples/stable-after-rc.md)与[中文 CHANGELOG](../changelog/examples/CHANGELOG-rc-history-zh-CN.md)。示例数据与地址均为虚构。
 
 
 ---

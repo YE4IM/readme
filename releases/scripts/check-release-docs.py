@@ -53,7 +53,7 @@ def visible_markdown(text):
     return "".join(visible)
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 @lru_cache(maxsize=None)
@@ -191,7 +191,7 @@ def warning_errors(part):
 
 def check_release(text, *, draft=False, prerelease=False):
     visible = visible_markdown(text)
-    errors = residue_errors(text, visible, "releases readme/release-template.md", draft=draft)
+    errors = residue_errors(text, visible, "releases/release-template.md", draft=draft)
     visible, reference_errors = reference_links(visible)
     errors.extend(reference_errors)
     parts = re.split(r"(?m)^[ \t]*---[ \t]*$", visible)
@@ -227,7 +227,7 @@ def heading_label(title):
 
 def changelog_entries(text, *, draft, shared_definitions=None):
     visible = visible_markdown(text)
-    errors = residue_errors(text, visible, "changelog readme/changelog-version-template.md", draft=draft)
+    errors = residue_errors(text, visible, "changelog/changelog-version-template.md", draft=draft)
     entries = []
     seen_versions = set()
     visible, reference_errors = reference_links(visible, shared_definitions)

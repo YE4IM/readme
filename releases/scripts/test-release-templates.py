@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 TEMPLATE_DIR = Path(__file__).resolve().parents[1]
-CHECK = runpy.run_path(str(TEMPLATE_DIR.parent / "scripts" / "check-release-docs.py"))
+CHECK = runpy.run_path(str(TEMPLATE_DIR / "scripts" / "check-release-docs.py"))
 COMMENTS = re.compile(r"<!--(.*?)-->", re.DOTALL)
 PLACEHOLDERS = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
 TEMPLATE = (TEMPLATE_DIR / "release-template.md").read_text(encoding="utf-8")

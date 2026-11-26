@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 TEMPLATE_DIR = Path(__file__).resolve().parents[1]
-CHECK = runpy.run_path(str(TEMPLATE_DIR.parent / "scripts" / "check-release-docs.py"))
+CHECK = runpy.run_path(str(TEMPLATE_DIR / "scripts" / "check-release-docs.py"))
 COMMENTS = re.compile(r"<!--(.*?)-->", re.DOTALL)
 PLACEHOLDERS = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
 SHARED_FACTS = {
@@ -271,7 +271,7 @@ class ChangelogTemplateTests(unittest.TestCase):
             zh.write_text(source.replace("Summary.", "摘要。"))
             combined.write_text(en.read_text() + "\n\n---\n\n" + zh.read_text())
             def run(*args):
-                return subprocess.run([sys.executable, "-B", str(TEMPLATE_DIR.parent / "scripts/check-release-docs.py"),
+                return subprocess.run([sys.executable, "-B", str(TEMPLATE_DIR / "scripts/check-release-docs.py"),
                                        "changelog", *args], capture_output=True, text=True)
             for args in ((en,), (en, zh), (combined, "--bilingual")):
                 result = run(*args)
