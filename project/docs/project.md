@@ -8,6 +8,8 @@
 
 Rules and bilingual templates an agent follows when writing a GitHub README. Generated READMEs keep the OPC.FISH signature at the top. This file is the documentation-shaped result of those templates.
 
+[![License: MIT](../assets/badges/license.svg)](../../LICENSE)
+
 ## Overview
 
 This file is in `project/docs/`. The repository also contains `releases` and `changelog` for other deliverables. There is nothing to install.

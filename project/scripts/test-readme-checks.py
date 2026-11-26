@@ -3,6 +3,7 @@
 import runpy
 import unittest
 from pathlib import Path
+from shutil import copytree
 from tempfile import TemporaryDirectory
 
 
@@ -32,6 +33,7 @@ class ReadmeCheckTests(unittest.TestCase):
             for name, text in zip(SWITCH_NAMES, (english, chinese)):
                 (root / name).write_text(text, encoding="utf-8")
             (root / "assets").mkdir()
+            copytree(ROOT / "assets" / "badges", root / "assets" / "badges")
             for asset in (ROOT / "assets").glob("*.svg"):
                 (root / "assets" / asset.name).write_bytes(asset.read_bytes())
             return CHECK["check_pair"](
@@ -304,14 +306,61 @@ $ example --output json
         self.assertEqual(self.check_pair(en + "\n" + allowed, zh), [])
         self.assertEqual(CHECK["secret_errors"]("English", "The token is read from the environment. secret: none"), [])
 
-    def test_badge_limit_is_a_hard_limit(self):
+    def test_badge_rows(self):
+        with TemporaryDirectory() as directory:
+            readme = Path(directory) / "README.md"
+            rows = {}
+            for kind, value in (("License", "MIT"), ("Version", "1.5.0-rc.1"),
+                                ("Language", "TypeScript"), ("Platform", "Browser Extension"),
+                                ("Source", "Repository")):
+                image = kind.lower() + ".svg"
+                (readme.parent / image).write_text(CHECK["badge_svg"](kind, value))
+                rows[kind] = f"[![{kind}: {value}]({image})](https://example.org/repo)"
+            license, version, language, platform, source = rows.values()
+            four = " ".join([license, version, language, platform])
+            header = "# Example\n\n[**English**](./README.md) | [中文](./README-zh-CN.md)\n\nDescription.\n\n"
+
+            def problems(row):
+                return CHECK["check_badges"]("English", readme, header + row)[1]
+
+            for row in (license, source, four, version + " " + platform,
+                        license + "\n\n[![Demo](demo.png)](demo.html)"):
+                self.assertEqual(problems(row), [])
+            invalid = [
+                "", four + " " + source, license + " " + license, language + " " + version,
+                license + " " + source, license + "  " + version, license + "\n" + version,
+                license + "\n\n" + version, platform.replace("Browser Extension", "Chrome"),
+                license.replace("License:", "CI:"), source.replace("Repository", "Repo"),
+                source.replace("https://example.org/repo", "./"),
+                "<!-- " + license + " -->", chr(96) + license + chr(96),
+                "## Overview\n\n" + license,
+            ]
+            for row in invalid:
+                with self.subTest(row=row):
+                    self.assertTrue(problems(row))
+            for kind, background, foreground in [
+                ("License", "#2359D1", "#FFFFFF"), ("Version", "#FF895A", "#382A26"),
+                ("Language", "#FFB3B8", "#382A26"), ("Platform", "#DFE89A", "#382A26"),
+                ("Source", "#555555", "#FFFFFF"),
+            ]:
+                asset = readme.parent / (kind.lower() + ".svg")
+                original = asset.read_text()
+                self.assertIn(f'fill="{background}"', original)
+                self.assertIn(f'fill="{foreground}">', original)
+                asset.write_text(original.replace(background, "#000000"))
+                self.assertTrue(problems(rows[kind]))
+                asset.write_text(original)
+
+    def test_bilingual_badge_markdown_and_hidden_examples(self):
         en = ENGLISH.replace("../assets/", "./assets/")
         zh = CHINESE.replace("../assets/", "./assets/")
-        badge = "[![Status](https://example.com/b{}.svg)](https://example.com)"
-        five = "\n" + " ".join(badge.format(n) for n in range(5)) + "\n"
-        self.assertIn("English has 5 badges; the limit is 4", self.check_pair(en + five, zh))
-        four = "\n" + " ".join(badge.format(n) for n in range(4)) + "\n"
-        self.assertEqual(self.check_pair(en + four, zh), [])
+        row = next(line for line in en.splitlines() if line.startswith("[![License:"))
+        mismatch = zh.replace(row, row.replace("../../LICENSE", "../.././LICENSE"))
+        self.assertIn("badge Markdown differs between English and Chinese", self.check_pair(en, mismatch))
+        for example in ("<!-- " + row + " -->", chr(96) + row + chr(96), "~~~md\n" + row + "\n~~~"):
+            self.assertTrue(any("found 0" in e for e in self.check_pair(en.replace(row, example), zh)))
+            self.assertEqual(self.check_pair(en + "\n" + example, zh), [])
+
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from html import escape
 import os
 import re
 import sys
@@ -59,6 +60,46 @@ SECRET_PATTERNS = (
 EXAMPLE_SECRETS = {"YOUR_API_KEY", "YOUR_API_TOKEN", "YOUR_TOKEN", "YOUR_PASSWORD", "YOUR_SECRET"}
 
 
+# Insertion order is the display order. Source is the exclusive fallback.
+BADGE_COLORS = {
+    "License": ("#2359D1", "#FFFFFF"),
+    "Version": ("#FF895A", "#382A26"),
+    "Language": ("#FFB3B8", "#382A26"),
+    "Platform": ("#DFE89A", "#382A26"),
+    "Source": ("#555555", "#FFFFFF"),
+}
+PLATFORMS = {
+    "Browser Extension", "Web", "Windows", "macOS", "Linux", "Desktop", "iOS",
+    "Android", "Mobile", "CLI", "Editor Extension", "IDE Plugin", "Design Tool Plugin",
+    "Office Add-in", "Server", "Embedded",
+}
+
+
+def badge_svg(kind: str, value: str) -> str:
+    if (not value.strip() or value != value.strip() or not value.isprintable()
+            or any(char in value for char in "[]")):
+        raise ValueError("badge values must be printable text suitable for Markdown alt text")
+    if kind == "Platform" and value not in PLATFORMS:
+        raise ValueError("unsupported Platform value: " + value)
+    if kind == "Source" and value != "Repository":
+        raise ValueError("Source must display Repository")
+    bg, fg = BADGE_COLORS[kind]
+    left = 10 + 7 * len(kind)
+    right = 10 + 7 * sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in value)
+    width = left + right
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="20" role="img"'
+        f' aria-label="{kind}: {escape(value)}">\n'
+        f'  <clipPath id="r"><rect width="{width}" height="20" rx="3"/></clipPath>\n'
+        f'  <g clip-path="url(#r)"><rect width="{left}" height="20" fill="#382A26"/>'
+        f'<rect x="{left}" width="{right}" height="20" fill="{bg}"/></g>\n'
+        '  <g font-family="DejaVu Sans Mono,monospace" font-size="11" text-anchor="middle">\n'
+        f'    <text x="{left / 2:g}" y="14" fill="#FFFFFF">{kind}</text>\n'
+        f'    <text x="{left + right / 2:g}" y="14" fill="{fg}">{escape(value)}</text>\n'
+        '  </g>\n</svg>\n'
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check README template output.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -73,7 +114,17 @@ def main() -> int:
 
     pair.add_argument("--draft", action="store_true", help="allow editorial TODO markers")
 
+    badge = sub.add_parser("badge", help="render a standard flat badge SVG to stdout")
+    badge.add_argument("kind", choices=BADGE_COLORS)
+    badge.add_argument("value")
+
     args = parser.parse_args()
+    if args.command == "badge":
+        try:
+            sys.stdout.write(badge_svg(args.kind, args.value))
+        except ValueError as error:
+            parser.error(str(error))
+        return 0
     errors: list[str] = []
     if args.command == "templates":
         errors.extend(check_templates())
@@ -110,6 +161,9 @@ def check_templates(directory: Path = ROOT / "templates") -> list[str]:
         ("Chinese template", chinese, chinese_path),
     ):
         errors.extend(signature_errors(label, text, "remote", path))
+        visible = document_views(text)[1]
+        if not re.search(r"(?m)^\{\{ONE_LINE_DESCRIPTION\}\}\s+\{\{BADGE_ROW\}\}$", visible):
+            errors.append(f"{label} needs a visible badge row after its description")
         if text.count("> [!NOTE]") != 1 or text.count("> [!WARNING]") != 1:
             errors.append(f"{label} should keep NOTE and WARNING in separate blocks")
     return errors
@@ -164,6 +218,7 @@ def check_pair(
         instructions.update(normalize_comment(comment) for comment in COMMENT.findall(source))
     errors.extend(command_errors(texts["English"], texts["Chinese"]))
 
+    badge_rows = []
     for label, text in texts.items():
         prose, visible, uncommented = document_views(text)
         errors.extend(language_switch_errors(label, visible, files, switch_filenames))
@@ -177,11 +232,12 @@ def check_pair(
         errors.extend(comment_errors(label, prose, instructions))
         errors.extend(secret_errors(label, text))
         errors.extend(signature_errors(label, text, signature, files[label]))
-        badges = len(re.findall(r"\[!\[", INLINE_CODE.sub(mask, visible)))
-        if badges > 4:
-            errors.append(f"{label} has {badges} badges; the limit is 4")
-        errors.extend(badge_layout_errors(label, visible))
+        row, problems = check_badges(label, files[label], visible)
+        badge_rows.append(row)
+        errors.extend(problems)
         errors.extend(folded_section_errors(label, uncommented))
+    if badge_rows[0] != badge_rows[1]:
+        errors.append("badge Markdown differs between English and Chinese")
     return errors
 
 
@@ -298,30 +354,64 @@ def link_errors(path: Path, visible: str) -> list[str]:
     return errors
 
 
-BADGE = re.compile(r"\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\)")
-BADGE_LINE = re.compile(r"^(?:\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\)\s*)+$")
+LINKED_IMAGE = re.compile(r"\[!\[([^\]\n]*)\]\(([^()\s]+)\)\]\(([^()\s]+)\)")
+BADGE_ALT = re.compile(r"(License|Version|Language|Platform|Source): (.+)")
 
 
-def badge_layout_errors(label: str, visible: str) -> list[str]:
-    """Badge-only lines render differently across renderers (some stack them). Keep them on one line."""
-    lines_in_run = 0
-    badges_in_run = 0
-    for raw in visible.splitlines():
-        line = raw.strip()
-        if not line:
+def check_badges(label: str, path: Path, visible: str) -> tuple[str, list[str]]:
+    # The first prose paragraph after the switch is the project description.
+    # A logo can precede it; linked screenshots elsewhere are ordinary exhibits.
+    markdown = INLINE_CODE.sub(lambda m: "inline-code", visible)
+    switch = SWITCH[label].search(markdown)
+    header = markdown[switch.end():] if switch else markdown
+    paragraphs = [p for p in re.split(r"\n[ \t]*\n", header.strip("\n")) if p.strip()]
+    intro = 0
+    if paragraphs and re.match(r"(?:<[^>]+>\s*)*<img\b|\[?!\[", paragraphs[0].lstrip(), re.I):
+        intro = 1
+    row = ""
+    if intro + 1 < len(paragraphs) and not SECTION_HEADING.match(paragraphs[intro]):
+        row = paragraphs[intro + 1]
+    badges = list(LINKED_IMAGE.finditer(row))
+    errors = []
+    if not 1 <= len(badges) <= 4:
+        errors.append(f"{label} needs 1–4 badges after its description (found {len(badges)})")
+    if badges and row != " ".join(m[0] for m in badges):
+        errors.append(f"{label} badges must share one line separated by single spaces")
+    kinds = []
+    for match in badges:
+        alt, image, target = match.groups()
+        field = BADGE_ALT.fullmatch(alt)
+        if not field:
+            errors.append(f"{label} invalid badge label: {alt}")
             continue
-        found = BADGE.findall(line)
-        if found and BADGE_LINE.match(line):
-            lines_in_run += 1
-            badges_in_run += len(found)
-            continue
-        if lines_in_run >= 2 and badges_in_run >= 2:
-            return [f"{label} badges must share one line so they sit side by side"]
-        lines_in_run = 0
-        badges_in_run = 0
-    if lines_in_run >= 2 and badges_in_run >= 2:
-        return [f"{label} badges must share one line so they sit side by side"]
-    return []
+        kind, value = field.groups()
+        kinds.append(kind)
+        try:
+            expected = badge_svg(kind, value)
+            asset = urlsplit(image)
+            if (asset.scheme or asset.netloc or asset.path.startswith("/") or asset.fragment
+                    or asset.query or not asset.path.endswith(".svg")):
+                raise ValueError("use a relative path to the standard SVG")
+            svg = path.parent / unquote(asset.path)
+            if not svg.is_file():
+                raise ValueError("badge SVG file is missing")
+            if svg.read_text(encoding="utf-8") != expected:
+                raise ValueError("SVG differs from the standard rendering")
+            dest = urlsplit(target)
+            if dest.scheme and (dest.scheme not in {"https", "http"} or not dest.hostname):
+                raise ValueError("invalid badge destination")
+            if kind == "Source" and not (dest.scheme == "https" and dest.hostname and dest.path.strip("/")):
+                raise ValueError("Source must link to the repository homepage")
+        except (ValueError, OSError) as error:
+            errors.append(f"{label} {kind} badge: {error}")
+    if kinds != sorted(set(kinds), key=list(BADGE_COLORS).index):
+        errors.append(f"{label} badge categories must be unique and in standard order")
+    if "Source" in kinds and len(badges) != 1:
+        errors.append(f"{label} Source must be the only badge")
+    for match in LINKED_IMAGE.finditer(markdown.replace(row, "", 1) if row else markdown):
+        if BADGE_ALT.fullmatch(match[1]) or "shields.io/" in match[2]:
+            errors.append(f"{label} badge outside the required row: {match[1]}")
+    return row, errors
 
 
 def placeholder_names(text: str) -> set[str]:

@@ -8,7 +8,7 @@
 
 Writing guides and bilingual Markdown templates for agents preparing GitHub project READMEs, release notes, and changelogs.
 
-[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: MIT](./project/assets/badges/license.svg)](./LICENSE)
 
 [Go to Quick Start](#quick-start)
 
@@ -50,7 +50,7 @@ python3 project/scripts/test-readme-checks.py
 python3 project/scripts/check-readme.py pair /path/to/README.md /path/to/README-zh-CN.md --signature remote
 ```
 
-The first two commands check the templates and bundled README pairs, then run the regression tests. For your own pair, use `--signature remote` for the shared images or `--signature local` for copies in the target repository. Add `--draft` to allow editorial TODOs. The checker compares Installation and Quick Start commands and checks relative links, anchors, template residue, common secret patterns, badges, the signature and folded core steps. Verify project facts, commands and rendered layout. Check that reference-style links such as `[guide][install]` have definitions. For targeted edits, run the same check before and after and report existing failures separately.
+The first two commands check the templates and bundled README pairs, then run the regression tests. For your own pair, use `--signature remote` for the shared images or `--signature local` for copies in the target repository. Add `--draft` to allow editorial TODOs. The checker compares Installation and Quick Start commands and checks relative links, anchors, template residue, common secret patterns, the required row of 1–4 matching badges, the signature and folded core steps. Verify project facts, commands and rendered layout. Check that reference-style links such as `[guide][install]` have definitions. For targeted edits, run the same check before and after and report existing failures separately.
 
 ### Release notes
 

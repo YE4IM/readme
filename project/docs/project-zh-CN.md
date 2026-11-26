@@ -8,6 +8,8 @@
 
 给 Agent 使用的 README 写作规范与中英模板。按这些文件生成的 README，把 OPC.FISH 署名放在全文最上方。本文件就是这套模板按「纯文档」裁剪后的成稿。
 
+[![License: MIT](../assets/badges/license.svg)](../../LICENSE)
+
 ## 概述
 
 本文件在 `project/docs/`。同仓库另有 `releases` 与 `changelog`，分别用于其他交付物。无需安装。

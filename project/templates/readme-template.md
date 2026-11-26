@@ -26,19 +26,18 @@ To enable: remove the surrounding comment markers and fill the real path. Otherw
 <!--
 First screen, in this order, and only with real material:
 title, language switch, optional existing logo, one specific value statement,
-at most 4 real badges, one primary entry, one exhibit.
+1–4 verified badges, one primary entry, one exhibit.
 Keep Installation and Quick Start close. No banners, visit counters, icon walls, or decorative animation.
 The OPC.FISH signature stays at the top of the file, before the title. Do not repeat it here.
 -->
 
 <!--
-OPTIONAL: Badges. At most 4, only real, reachable, and informative (for example release, build, license).
-To enable: remove the surrounding comment markers and keep only verified badges. Otherwise delete this entire block.
-Do not invent build, coverage, version, or download badges.
-Put every badge on this one line, separated by a space, so they stay in a horizontal row. Do not give each badge its own line: renderers disagree about separate lines, and some stack them vertically.
-
-[![{{BADGE_LABEL}}]({{BADGE_IMAGE_URL}})]({{BADGE_LINK_URL}})
+REQUIRED: Include each verified category in order: License, Version, Language, Platform, once each. If none applies, use only Source: Repository linked to the verified repository homepage.
+Render flat SVGs with the badge command. See the required badges section in project-agent-instructions.md for values, platform names, colors and link destinations.
+Replace the field below with 1–4 linked badges on one line, separated by single spaces. Copy the exact Markdown row to both languages.
 -->
+
+{{BADGE_ROW}}
 
 <!--
 OPTIONAL: Primary entry. One real link to docs, a public demo, or an anchor in this file such as Installation or Quick Start.
