@@ -8,6 +8,8 @@
 
 Writing guides and bilingual Markdown templates for agents preparing GitHub project READMEs, release notes, and changelogs.
 
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 [Go to Quick Start](#quick-start)
 
 ## Overview

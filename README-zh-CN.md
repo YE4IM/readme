@@ -8,6 +8,8 @@
 
 为 Agent 提供 GitHub 项目 README、发布说明和变更日志的写作规范与中英 Markdown 模板。
 
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 [跳转到快速开始](#快速开始)
 
 ## 概述
