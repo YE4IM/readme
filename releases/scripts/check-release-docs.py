@@ -11,12 +11,12 @@ from pathlib import Path
 
 HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$", re.M)
 FENCE = re.compile(r"^ {0,3}(\x60{3,}|~{3,})(.*)$")
-ALERT = re.compile(r"^> \[!(WARNING|IMPORTANT)\][ \t]*$", re.M)
+ALERT = re.compile(r"^> \[!(WARNING|IMPORTANT|NOTE)\][ \t]*$", re.M)
 FIELD = re.compile(r"\{\{\s*(TODO(?:\s*[:：][^{}]*)?|[A-Z][A-Z0-9_]*)\s*\}\}")
 BROKEN_SECTION = {"Breaking Changes", "破坏性变更"}
 HIGHLIGHT_SECTION = {"Highlights", "亮点展示"}
 MIGRATION = re.compile(r"(?im)^\s*\*\*(?:Migration|迁移步骤)[:：]\*\*[ \t]*$")
-VERSION_DATE = re.compile(r"^(.+?)(?:[ \t]+[-–—][ \t]+(\d{4}-\d{2}-\d{2})(?:[ \t].*)?|[ \t]+\((\d{4}-\d{2}-\d{2})\))$")
+VERSION_DATE = re.compile(r"^(.+?)(?:[ \t]+[-–—][ \t]+(\d{4}-\d{2}-\d{2})(?:[ \t].*)?|[ \t]+\((\d{4}-\d{2}-\d{2})\)(?:[ \t].*)?)$")
 UNRELEASED = {"unreleased", "未发布"}
 LANGUAGE_TITLE = {"english", "中文", "简体中文", "chinese"}
 
@@ -56,14 +56,30 @@ def visible_markdown(text):
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def normalize_comment(comment):
+    return re.sub(r"\s+", " ", comment).strip()
+
+
 @lru_cache(maxsize=None)
 def template_fields(template):
     return set(FIELD.findall((ROOT / template).read_text(encoding="utf-8")))
 
 
+@lru_cache(maxsize=None)
+def template_comments(template):
+    """Instruction comments from the template; any of them left in a delivery is residue."""
+    text = (ROOT / template).read_text(encoding="utf-8")
+    return {normalize_comment(comment) for comment in re.findall(r"<!--(.*?)-->", text, re.S)}
+
+
 def residue_errors(text, visible, template, *, draft):
     errors = []
-    if re.search(r"(?im)<!--(?:(?!-->).)*?(?:OPTIONAL|REQUIRED)|^[ \t]*OPTIONAL:", text, re.S):
+    instructions = re.search(r"(?im)<!--(?:(?!-->).)*?(?:OPTIONAL|REQUIRED|必需)|^[ \t]*OPTIONAL:", text, re.S)
+    leftover = any(
+        normalize_comment(comment) in template_comments(template)
+        for comment in re.findall(r"<!--(.*?)-->", text, re.S)
+    )
+    if instructions or leftover:
         errors.append("template instructions remain")
     prose = INLINE_CODE.sub(" ", visible)
     checked_fields = set(FIELD.findall(prose)) | template_fields(template)
@@ -114,7 +130,9 @@ CATEGORY = {
 KNOWN_CATEGORIES = set(CATEGORY.values())
 CATEGORY_TITLES = KNOWN_CATEGORIES | set(CATEGORY)
 LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d+[.)])[ \t]+\S", re.M)
-ISSUE = re.compile(r"(?<![A-Za-z0-9_/#])(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#[0-9]+(?![A-Za-z0-9_])")
+# A "#" after "#", a quote, or "=" (as in ##333 or fill="#333") is not an issue reference.
+ISSUE = re.compile(r"(?<![A-Za-z0-9_/#\"'=])(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#[0-9]+(?![A-Za-z0-9_])")
+HANDLE = re.compile(r"(?<![A-Za-z0-9_./-])@[A-Za-z0-9-]+")
 LINK = re.compile(r"\]\(\s*(?:<([^>]+)>|([^\s)]+))")
 IMAGE = re.compile(r"!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))")
 IMG_SRC = re.compile(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", re.I)
@@ -164,7 +182,12 @@ def section_facts(body, category):
     if category == "Highlights":
         shared.extend(angle or plain for angle, plain in IMAGE.findall(prose))
         shared.extend(IMG_SRC.findall(prose))
-    return (category, len(LIST_ITEM.findall(body)), Counter(ISSUE.findall(body)), Counter(shared))
+    # Contributor handles must match on both sides; GitHub usernames are case-insensitive.
+    handles = [handle.lower() for handle in HANDLE.findall(prose)] if category == "Contributors" else []
+    return (
+        category, len(LIST_ITEM.findall(body)), Counter(ISSUE.findall(body)), Counter(shared),
+        Counter(handles),
+    )
 
 
 def structure(part, level):

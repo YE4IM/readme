@@ -61,14 +61,14 @@ class ChangelogTemplateTests(unittest.TestCase):
                 "changelog-version-template.md", "CHANGELOG.md",
                 "CSV exports now finish when a row contains an empty field.",
                 "Keep empty fields in the exported row without stopping the export.",
-                "You can open local CSV files for preview in the first release of this line.",
+                "The initial release opens local CSV files for preview in a desktop window.",
                 "Preview local CSV files in a desktop window.",
             ),
             (
                 "changelog-version-zh-CN-template.md", "CHANGELOG-zh-CN.md",
                 "行内存在空字段时，CSV 导出现在也能完成。",
                 "导出保留行内空字段，并继续处理剩余数据。",
-                "这条发布线的首个版本支持打开并预览本地 CSV 文件。",
+                "首次发布支持在桌面窗口中打开并预览本地 CSV 文件。",
                 "在桌面窗口中预览本地 CSV 文件。",
             ),
         )
@@ -248,6 +248,32 @@ class ChangelogTemplateTests(unittest.TestCase):
         self.assertTrue(check(first.replace("02-01", "02-30")))
         self.assertIn("unrecognized", check(first.replace("(2026-02-01)", "on 2026-02-01"))[0])
         self.assertIn("needs a version", check(first.replace("(2026-02-01)", ""))[0])
+        self.assertIn("needs a version", check(first.replace("(2026-02-01)", "(Feb 1)"))[0])
+
+    def test_version_heading_label_after_either_date_style(self):
+        entries = CHECK["changelog_entries"]
+        expected = [("v2.0.0-rc.1", "2026-11-24")]
+        for heading in ("## v2.0.0-rc.1 - 2026-11-24 Pre-release", "## v2.0.0-rc.1 (2026-11-24) Pre-release",
+                        "## [v2.0.0-rc.1](url) (2026-11-24) Pre-release"):
+            with self.subTest(heading=heading):
+                labels, errors = entries(heading + "\nSummary.", draft=False)
+                self.assertEqual(labels, expected)
+                # The label is parsed; the only complaint is the missing pre-release warning.
+                self.assertEqual(len(errors), 1, errors)
+                self.assertTrue(errors[0].startswith(heading[3:]), errors)
+        documents = [("en", "## v1 (2026-01-01) Stable\nSummary."), ("zh", "## v1 (2026-01-01) 稳定版\n摘要。")]
+        self.assertEqual(CHECK["check_changelog"](documents), [])
+
+    def test_template_header_comments_cannot_remain(self):
+        for filename in ("changelog-version-template.md", "changelog-version-zh-CN-template.md"):
+            template = (TEMPLATE_DIR / filename).read_text(encoding="utf-8")
+            comments = COMMENTS.findall(template)
+            for comment in comments:
+                with self.subTest(filename=filename, comment=comment[:40]):
+                    body = f"<!--\n{comment.strip()}\n-->\n\n## v1.9.3 - 2026-11-20\nSummary."
+                    self.assertIn("template instructions remain", CHECK["changelog_entries"](body, draft=False)[1])
+        self.assertFalse(CHECK["changelog_entries"](
+            "## v1.9.3 - 2026-11-20\n<!-- Internal note. -->\nSummary.", draft=False)[1])
 
     def test_reference_destinations_and_empty_referenced_version(self):
         en = "## [v2] - 2026-01-01\nSummary.\n### Fixed\n- [Patch][file]\n\n[v2]: https://host/compare/a...b\n[file]: https://host/a.zip"

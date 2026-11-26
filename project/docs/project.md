@@ -23,7 +23,7 @@ The workflow and writing rules are in the Chinese guide [project-agent-instructi
 
 ## Quick Start
 
-1. Open the [writing guide](../project-agent-instructions.md). The complete specification is the Chinese file.
+1. Open the [writing guide](../project-agent-instructions.md).
 2. Choose the [English template](../templates/readme-template.md) or the [Chinese template](../templates/readme-zh-CN-template.md).
 3. Read through this example and its [Chinese counterpart](./project-zh-CN.md) to see how a documentation-only project reads.
 
@@ -35,11 +35,11 @@ From `project`:
 python3 scripts/check-readme.py all
 ```
 
-That checks both templates and this README pair. Use Python 3.8 or later for this README check.
+That checks both templates, this README pair, and the repository's root README pair. Use Python 3.8 or later for this README check.
 
 ## Signature
 
-Generated READMEs open with the mark at the top of the file, before the title. The picture links to [opc.fish](https://opc.fish). Both languages use the same two images and the same link. Light mode uses the transparent ink SVG. Dark mode uses the transparent light-on-dark SVG supplied for that pair. Leave both files as they are. It is the maintainer signature, not a project logo.
+Generated READMEs open with the mark at the top of the file, before the title. The picture links to [opc.fish](https://opc.fish). Both languages use the same two images and the same link. Light mode uses the transparent ink SVG. Dark mode uses the transparent light-on-dark SVG. Leave both files as they are. It is the maintainer signature, not a project logo.
 
 The picture on this file uses the assets in this repository. New READMEs use the remote block below. Those image addresses follow `main` on purpose. To freeze them, copy both SVG files into the target repository, switch to relative paths, and say so in the delivery notes.
 

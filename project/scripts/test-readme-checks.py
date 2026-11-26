@@ -232,6 +232,55 @@ $ example --output json
         self.assertEqual(self.check_pair(*rendered), [])
         self.assertTrue(self.check_pair(rendered[0].replace('src="./assets/opc-fish-project-signature.svg" alt="Example', 'src="missing.svg" alt="Example'), rendered[1]))
 
+    def test_core_sections_cannot_be_folded_into_details(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        folded = "<details>\n<summary>Steps</summary>\n\n## Quick Start\n\n1. Run it.\n\n</details>\n\n"
+        errors = self.check_pair(en.replace("## Quick Start", folded.rstrip("\n"), 1), zh)
+        self.assertEqual(errors, ["English folds Quick Start into <details>; Installation and Quick Start must stay expanded"])
+        folded_zh = "<details>\n<summary>安装步骤</summary>\n\n### 安装\n\nRun it.\n\n</details>\n\n"
+        self.assertIn("Chinese folds 安装 into <details>; Installation and Quick Start must stay expanded",
+                      self.check_pair(en, zh.replace("## 检查", folded_zh + "## 检查", 1)))
+        secondary = (
+            "\n<details>\n<summary>Extra platforms</summary>\n\n### Notes\n\n- a\n\n</details>\n"
+            "\n```html\n<details>\n## Quick Start\n</details>\n```\n"
+            "\nUse `<details>` for secondary material.\n"
+        )
+        self.assertEqual(self.check_pair(en + secondary, zh + secondary), [])
+
+    def test_template_instruction_comments_cannot_remain(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        for template in sorted((ROOT / "templates").glob("readme*-template.md")):
+            comments = CHECK["COMMENT"].findall(template.read_text(encoding="utf-8"))
+            for comment in comments:
+                with self.subTest(template=template.name, comment=comment[:40]):
+                    left = f"<!--\n{comment.strip()}\n-->\n\n"
+                    self.assertTrue(any("still contains a template instruction comment" in error
+                                        for error in self.check_pair(left + en, zh)))
+        self.assertEqual(self.check_pair(en + "\n<!-- Reviewed on 2026-11-26. -->\n", zh), [])
+        self.assertEqual(self.check_pair(en + "\nWrite `<!--` to open a comment.\n", zh), [])
+
+    def test_unquoted_secret_assignments_are_caught(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        for snippet in ("~~~bash\nAPI_KEY=sk-live-abcdefghijklmnop\n~~~", "~~~bash\nTOKEN='abcdefgh12345678'\n~~~",
+                        "~~~bash\npassword: hunter2-hunter2-hunter2\n~~~"):
+            with self.subTest(snippet=snippet):
+                self.assertIn("English matches a possible secret assignment", self.check_pair(en + "\n" + snippet, zh))
+        allowed = "~~~bash\nAPI_KEY=YOUR_API_KEY\nexport TOKEN=$API_TOKEN\nPASSWORD=\n~~~"
+        self.assertEqual(self.check_pair(en + "\n" + allowed, zh), [])
+        self.assertEqual(CHECK["secret_errors"]("English", "The token is read from the environment. secret: none"), [])
+
+    def test_badge_limit_is_a_hard_limit(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        badge = "[![Status](https://example.com/b{}.svg)](https://example.com)"
+        five = "\n" + " ".join(badge.format(n) for n in range(5)) + "\n"
+        self.assertIn("English has 5 badges; the limit is 4", self.check_pair(en + five, zh))
+        four = "\n" + " ".join(badge.format(n) for n in range(4)) + "\n"
+        self.assertEqual(self.check_pair(en + four, zh), [])
+
 
 if __name__ == "__main__":
     unittest.main()

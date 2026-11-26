@@ -36,24 +36,32 @@ The same set of releases illustrates which baseline to use for the stable Releas
 
 ## Checks
 
-Run these commands from the repository root. The first checks the README templates, the repository README pair, and the bundled README examples. The other three run regression tests for the README checker and render the Release and CHANGELOG templates against fixtures.
+Run these commands from the repository root. They need Python 3.8 or later and no packages.
+
+### Project README
 
 ```bash
 python3 project/scripts/check-readme.py all
-python3 -B project/scripts/test-readme-checks.py
-python3 releases/scripts/test-release-templates.py
-python3 changelog/scripts/test-changelog-templates.py
+python3 project/scripts/test-readme-checks.py
+python3 project/scripts/check-readme.py pair /path/to/README.md /path/to/README-zh-CN.md --signature remote
 ```
 
-Point these commands at your own Markdown files when reviewing a delivery. Add `--prerelease` to check for the Release warning, or `--draft` to allow editorial TODOs in a draft. Review release evidence, comparison ranges, links, and commands separately, and preview special anchors and layout on GitHub.
+The first command checks the two README templates, this repository's README pair, and the bundled README examples; the second runs the checker's regression tests. For a delivered pair, pass both files and choose `--signature remote` or `--signature local`; add `--draft` to allow editorial TODOs. The checker compares the commands under Installation and Quick Start, relative links and anchors, template residue, secrets, badges, the signature block, and whether core sections stay expanded. Review the project facts, commands, and layout on GitHub yourself. For targeted edits, run the same check before and after, and report existing failures separately.
 
+### Release notes
 
 ```bash
-python3 project/scripts/check-readme.py pair /path/to/README.md /path/to/README-zh-CN.md --signature remote
+python3 releases/scripts/test-release-templates.py
 python3 releases/scripts/check-release-docs.py release /path/to/release.md
+```
+
+The test renders the Release template against its fixtures. The checker requires Breaking Changes before other change categories and compares the category set, item counts, visible alerts, issue references, contributor handles, and recognizable shared download or comparison links, including a Highlights image when that section is enabled. It does not enforce the full Added, Fixed, or Security order. Add `--prerelease` to require the warning, or `--draft` to allow editorial TODOs. Review custom category translations, localized documentation destinations, commands, and factual equivalence against the release evidence.
+
+### Changelog
+
+```bash
+python3 changelog/scripts/test-changelog-templates.py
 python3 changelog/scripts/check-release-docs.py changelog /path/to/CHANGELOG.md /path/to/CHANGELOG-zh-CN.md
 ```
 
-For a single-language changelog, pass one path. For one file containing both languages separated by a standalone `---`, add `--bilingual`. For an established layout outside those formats, review the existing structure manually. Published entries support dash or parenthesized ISO dates and use newest-first order, with ties allowed. A bilingual changelog in one file shares one set of Markdown reference definitions across languages. Define a reused version link once.
-
-The release checks require Breaking Changes before other change categories, and compare the category set, list counts, visible alerts, issue references, and recognizable shared download or comparison links, including a Highlights image when that section is enabled. They do not enforce the full Added, Fixed, or Security order. Review that order against the template, and review custom category translations, localized documentation destinations, commands, and factual equivalence against the release evidence. A changelog that groups versions by release line instead of global publication date fails the newest-first date check. Before publication, record copy readiness separately from publication status. For targeted README edits, run the same check before and after and report existing failures separately.
+Pass one path for a single-language changelog. For one file containing both languages separated by a standalone `---`, add `--bilingual`; a bilingual changelog in one file shares one set of Markdown reference definitions across languages, so define a reused version link once. Add `--draft` to allow editorial TODOs, including a publication-date TODO that is still unverified. The checker applies the same category, alert, contributor-handle, and shared-link comparison as the Release checker, and does not enforce the full Added, Fixed, or Security order. Published entries support dash or parenthesized ISO dates, with an optional label such as `Pre-release` after the date, in newest-first order with ties allowed; a changelog that groups versions by release line instead of global publication date fails that check. Version headings, migration steps, and dates still need your review against the repository. Before publication, record copy readiness separately from publication status.

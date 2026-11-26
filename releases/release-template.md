@@ -1,5 +1,5 @@
 <!--
-Release title (separate GitHub field): use the actual release identifier by default, such as v2.0.0-rc.1 or v2.0.0. Follow an established project title convention and retain the pre-release identity.
+REQUIRED: Release title (separate GitHub field): use the actual release identifier by default, such as v2.0.0-rc.1 or v2.0.0. Follow an established project title convention and retain the pre-release identity.
 Start directly with the English release summary. Do not add a project-name or version-number heading, a date/type line, a previous-release line, "English" / "中文" headings, or in-page language-switch links: the GitHub Release page already shows the title and tag.
 Write the full English notes first, then a --- separator, then the full Chinese notes.
 Keep the opening compact so the summary and any breaking changes stay close.
@@ -161,7 +161,7 @@ Thanks to {{CONTRIBUTORS}} for contributing to this release.
 
 <!--
 OPTIONAL: Full Changelog. Enable when both endpoints and the compare URL match the baseline in section 7 of the guide for the same package and release line or documented stable upgrade path.
-Use a real compare URL (typically https://github.com/<owner>/<repo>/compare/<previous-tag>...<current-tag>). Put the URL in {{COMPARE_URL}}; keep the visible link text as "Full Changelog". Use version numbers where they carry substantive information.
+Use a real compare URL (typically https://github.com/<owner>/<repo>/compare/<previous-tag>...<current-tag>). Put the URL in {{COMPARE_URL}} and keep the visible link text as "Full Changelog".
 Do not invent a range.
 For an initial release, delete this block, or replace the link with a real tag or commit-history URL — do not fabricate a previous version, and do not write version numbers into the visible text.
 To enable: remove the surrounding comment markers and fill verified links. Otherwise delete this entire block.
@@ -173,7 +173,7 @@ To enable: remove the surrounding comment markers and fill verified links. Other
 
 ---
 
-<!-- GitHub 标题默认用真实发布标识，如 v2.0.0-rc.1。按项目标题惯例保留预发布身份。正文保留兼容、迁移、安全和命令所需的真实版本号。交付说明分列文案状态和发布状态。可发布成稿须清除编辑用 TODO。本页锚点和官方译版文档可使用等价地址。 -->
+<!-- 必需：GitHub 标题默认用真实发布标识，如 v2.0.0-rc.1。按项目标题惯例保留预发布身份。正文保留兼容、迁移、安全和命令所需的真实版本号。交付说明分列文案状态和发布状态。可发布成稿须清除编辑用 TODO。本页锚点和官方译版文档可使用等价地址。 -->
 
 {{RELEASE_SUMMARY}}
 

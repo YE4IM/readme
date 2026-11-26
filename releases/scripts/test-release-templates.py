@@ -57,7 +57,7 @@ class ReleaseTemplateTests(unittest.TestCase):
         )
 
     def test_initial_release_uses_visible_download_steps_without_compare(self):
-        download = "https://example.com/example/releases/v1.0.0/example-installer"
+        download = "https://example.com/example/releases/v1.9.3/example-installer"
         self.assert_example(
             "initial",
             {"RELEASE_SUMMARY": "The first desktop release opens CSV files for preview.",
@@ -223,6 +223,70 @@ class ReleaseTemplateTests(unittest.TestCase):
         self.assertEqual(check(en + "\n---\n" + zh), [])
         self.assertTrue(check(en + "\n---\n" + zh.replace("https://host/demo.png", "")))
         self.assertTrue(check(en + "\n---\n" + "已发布。\n\n## 问题修复\n\n- 导出。"))
+
+    def test_version_heading_accepts_a_label_after_either_date_style(self):
+        entries = CHECK["changelog_entries"]
+        expected = ([("v2.0.0", "2026-11-26")], [])
+        for heading in ("## v2.0.0 - 2026-11-26 Stable", "## v2.0.0 (2026-11-26) Stable",
+                        "## v2.0.0 (2026-11-26)", "## v2.0.0 - 2026-11-26"):
+            with self.subTest(heading=heading):
+                self.assertEqual(entries(heading + "\nSummary.", draft=False), expected)
+        self.assertIn("invalid calendar date",
+                      entries("## v2.0.0 (2026-02-30) Stable\nSummary.", draft=False)[1][0])
+
+    def test_note_alerts_are_compared_between_languages(self):
+        check = CHECK["check_release"]
+        note = "Summary.\n\n> [!NOTE]\n> Read this first.\n\n## Fixed\n\n- Export."
+        plain = "摘要。\n\n## 问题修复\n\n- 导出。"
+        self.assertTrue(check(note + "\n---\n" + plain))
+        both = note + "\n---\n" + "摘要。\n\n> [!NOTE]\n> 请先阅读。\n\n## 问题修复\n\n- 导出。"
+        self.assertEqual(check(both), [])
+        entries = CHECK["changelog_entries"]
+        changelog = "## v2 - 2026-11-26\nSummary.\n\n### Fixed\n\n- Export."
+        with_note = changelog.replace("Summary.", "Summary.\n\n> [!NOTE]\n> Read this first.")
+        self.assertEqual(entries(with_note, draft=False), entries(changelog, draft=False))
+        self.assertTrue(CHECK["check_changelog"]([("en", with_note), ("zh", changelog)]))
+
+    def test_contributor_handles_must_match(self):
+        en = "Summary.\n\n## Contributors\n\nThanks to @alice and @bob for contributing to this release."
+        zh = "摘要。\n\n## 贡献者\n\n感谢 @alice、@bob 对本版本的贡献。"
+        check = lambda other: CHECK["check_release"](en + "\n---\n" + other)
+        self.assertEqual(check(zh), [])
+        self.assertEqual(check(zh.replace("@alice", "@Alice")), [])
+        self.assertTrue(check(zh.replace("@bob", "@bob、@carol")))
+        self.assertTrue(check(zh.replace("、@bob", "")))
+        with_mail = en.replace("@alice and @bob", "@alice, @bob (dev@example.com)")
+        with_mail_zh = zh.replace("@alice、@bob", "@alice、@bob（dev@example.com）")
+        self.assertEqual(CHECK["check_release"](with_mail + "\n---\n" + with_mail_zh), [])
+        entry = "## v2 - 2026-11-26\nSummary.\n\n### Contributors\n\nThanks to @alice for contributing to this release."
+        self.assertTrue(CHECK["check_changelog"]([("en", entry), ("zh", entry.replace("@alice", "@alice and @bob"))]))
+
+    def test_template_instruction_comments_cannot_remain(self):
+        check = CHECK["check_release"]
+        template = (TEMPLATE_DIR / "release-template.md").read_text(encoding="utf-8")
+        comments = COMMENTS.findall(template)
+        # The header comments carry no OPTIONAL marker; the verbatim match must still catch them.
+        headers = [comment for comment in comments if not comment.strip().startswith(("OPTIONAL:", "<!--"))]
+        self.assertGreaterEqual(len(headers), 4)
+        body = "Summary.\n\n---\n\n摘要。"
+        for comment in comments:
+            with self.subTest(comment=comment[:40]):
+                self.assertIn("template instructions remain", check(f"<!--{comment}-->\n\n{body}"))
+        for comment in headers:
+            with self.subTest(rewrapped=comment[:40]):
+                rewrapped = "<!--\n  " + comment.strip().replace("\n", " \n") + "  \n-->\n\n"
+                self.assertIn("template instructions remain", check(rewrapped + body))
+        self.assertEqual(check("Summary.\n\n<!-- Internal note: reviewed on 2026-11-26. -->\n\n---\n\n摘要。"), [])
+
+    def test_issue_references_ignore_quoted_hex_colors(self):
+        en = "Fixed.\n\n## Fixed\n\n- Use fill=\"#333\" for the icon."
+        zh = "修复。\n\n## 问题修复\n\n- 图标使用 fill=\"#333\"。"
+        check = lambda other: CHECK["check_release"](en + "\n---\n" + other)
+        self.assertEqual(check(zh), [])
+        self.assertEqual(check(zh.replace("fill=\"#333\"", "fill=#333")), [])
+        self.assertEqual(check(zh.replace("fill=\"#333\"", "深灰色")), [])
+        self.assertEqual(check("修复。\n\n## 问题修复\n\n- 标题里的 ##333 不是事项编号。"), [])
+        self.assertTrue(check("修复。\n\n## 问题修复\n\n- 修复 #12。"))
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ The first desktop release opens CSV files for preview.
 
 ## Installation & Upgrade
 
-1. [Download the desktop installer](https://example.com/example/releases/v1.0.0/example-installer).
+1. [Download the desktop installer](https://example.com/example/releases/v1.9.3/example-installer).
 2. Open the installer and follow the prompts.
 
 ---
@@ -19,5 +19,5 @@ The first desktop release opens CSV files for preview.
 
 ## 安装与升级
 
-1. [下载桌面安装包](https://example.com/example/releases/v1.0.0/example-installer)。
+1. [下载桌面安装包](https://example.com/example/releases/v1.9.3/example-installer)。
 2. 打开安装包并按提示安装。

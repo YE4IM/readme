@@ -24,7 +24,7 @@ CSV exports now finish when a row contains an empty field.
 
 ## v1.9.3 - 2026-11-20
 
-You can open local CSV files for preview in the first release of this line.
+The initial release opens local CSV files for preview in a desktop window.
 
 ### Added
 

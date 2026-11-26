@@ -54,7 +54,7 @@ SECRET_PATTERNS = (
     re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
     re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}"),
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
-    re.compile(r"(?i)\b(api[_-]?key|token|password|secret)\b\s*[:=]\s*(['\"])([A-Za-z0-9_-]{12,})\2"),
+    re.compile(r"(?i)\b(api[_-]?key|token|password|secret)\b\s*[:=]\s*(['\"]?)([A-Za-z0-9_-]{12,})\2"),
 )
 EXAMPLE_SECRETS = {"YOUR_API_KEY", "YOUR_API_TOKEN", "YOUR_TOKEN", "YOUR_PASSWORD", "YOUR_SECRET"}
 
@@ -157,8 +157,11 @@ def check_pair(
         return errors
 
     fields = set()
+    instructions = set()
     for template in (ROOT / "templates").glob("readme*-template.md"):
-        fields.update(placeholder_names(template.read_text(encoding="utf-8")))
+        source = template.read_text(encoding="utf-8")
+        fields.update(placeholder_names(source))
+        instructions.update(normalize_comment(comment) for comment in COMMENT.findall(source))
     errors.extend(command_errors(texts["English"], texts["Chinese"]))
 
     for label, text in texts.items():
@@ -171,13 +174,14 @@ def check_pair(
         for _, _, language, lines in fenced_blocks(uncommented):
             snippet = "\n".join([language, *lines])
             errors.extend(placeholder_errors(label, snippet, fields=fields, draft=draft))
-        errors.extend(comment_errors(label, prose))
+        errors.extend(comment_errors(label, prose, instructions))
         errors.extend(secret_errors(label, text))
         errors.extend(signature_errors(label, text, signature, files[label]))
         badges = len(re.findall(r"\[!\[", INLINE_CODE.sub(mask, visible)))
         if badges > 4:
-            errors.append(f"{label} has {badges} badges; the default limit is 4")
+            errors.append(f"{label} has {badges} badges; the limit is 4")
         errors.extend(badge_layout_errors(label, visible))
+        errors.extend(folded_section_errors(label, visible))
     return errors
 
 
@@ -299,7 +303,7 @@ BADGE_LINE = re.compile(r"^(?:\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\)\s*)+$")
 
 
 def badge_layout_errors(label: str, visible: str) -> list[str]:
-    """Several badges on separate lines stack vertically. Keep them on one line."""
+    """Badge-only lines render differently across renderers (some stack them). Keep them on one line."""
     lines_in_run = 0
     badges_in_run = 0
     for raw in visible.splitlines():
@@ -343,13 +347,37 @@ def placeholder_errors(
     return errors
 
 
-def comment_errors(label: str, visible: str) -> list[str]:
-    errors = []
-    for comment in COMMENT.findall(visible):
-        if re.search(r"OPTIONAL|REQUIRED|To enable|启用：|整块删除", comment):
-            errors.append(f"{label} still contains a template instruction comment")
-            break
-    return errors
+def normalize_comment(comment: str) -> str:
+    return re.sub(r"\s+", " ", comment).strip()
+
+
+def comment_errors(label: str, prose: str, instructions: set[str]) -> list[str]:
+    """Flag instruction comments copied from the templates, matched verbatim or by keyword."""
+    for comment in COMMENT.findall(prose):
+        if normalize_comment(comment) in instructions or re.search(
+            r"OPTIONAL|REQUIRED|必需|To enable|启用：|整块删除", comment
+        ):
+            return [f"{label} still contains a template instruction comment"]
+    return []
+
+
+def folded_section_errors(label: str, visible: str) -> list[str]:
+    """Installation and Quick Start must stay expanded, never inside <details>."""
+    depth = 0
+    for line in visible.splitlines():
+        stripped = line.lstrip()
+        if re.match(r"<details\b", stripped, re.I):
+            depth += 1
+        elif re.match(r"</details\s*>", stripped, re.I):
+            depth = max(depth - 1, 0)
+        elif depth:
+            heading = SECTION_HEADING.match(line)
+            if heading and heading[2].strip().casefold() in COMMAND_HEADINGS:
+                return [
+                    f"{label} folds {heading[2].strip()} into <details>; "
+                    "Installation and Quick Start must stay expanded"
+                ]
+    return []
 
 
 def secret_errors(label: str, text: str) -> list[str]:

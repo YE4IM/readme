@@ -117,7 +117,7 @@ OPTIONAL: 仅当能核实某 handle 在该版本范围内确有贡献时启用�
 <!--
 OPTIONAL: 仅当规范第 4 节选定的可比基线与目标版本和 Compare URL 均可核实时启用；若标题已含同一比较链接，删除本节。
 典型形式为 https://github.com/<owner>/<repo>/compare/<previous-tag>...<current-tag>。
-可见文字不要编造区间。首次发布不要虚构上一版本。
+可见文字不要编造对比区间。首次发布不要虚构上一版本。
 
 ### 完整变更日志
 

@@ -30,10 +30,10 @@ The OPC.FISH signature stays at the top of the file, before the title. Do not re
 -->
 
 <!--
-OPTIONAL: Badges. Default: at most 4, only real, reachable, and informative (for example release, build, license).
+OPTIONAL: Badges. At most 4, only real, reachable, and informative (for example release, build, license).
 To enable: remove the surrounding comment markers and keep only verified badges. Otherwise delete this entire block.
 Do not invent build, coverage, version, or download badges.
-Put every badge on this one line, separated by a space, so they sit in a horizontal row. Do not give each badge its own line.
+Put every badge on this one line, separated by a space, so they stay in a horizontal row. Do not give each badge its own line: renderers disagree about separate lines, and some stack them vertically.
 
 [![{{BADGE_LABEL}}]({{BADGE_IMAGE_URL}})]({{BADGE_LINK_URL}})
 -->
