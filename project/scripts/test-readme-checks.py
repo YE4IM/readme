@@ -341,9 +341,9 @@ $ example --output json
     def test_static_badge_urls(self):
         for kind, value, expected in (
             ("License", "Apache-2.0", "License-Apache--2.0-2359D1"),
-            ("Version", "1.0-rc.1+test_2", "Version-1.0--rc.1%2Btest__2-FF895A"),
-            ("Language", "C#", "Language-C%23-FFB3B8"),
-            ("Platform", "Browser Extension", "Platform-Browser%20Extension-DFE89A"),
+            ("Version", "1.0-rc.1+test_2", "Version-1.0--rc.1%2Btest__2-A34422"),
+            ("Language", "C#", "Language-C%23-993D58"),
+            ("Platform", "Browser Extension", "Platform-Browser%20Extension-566520"),
             ("Source", "Repository", "Source-Repository-555555"),
         ):
             with self.subTest(kind=kind):

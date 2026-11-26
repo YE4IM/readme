@@ -33,7 +33,7 @@ The OPC.FISH signature stays at the top of the file, before the title. Do not re
 
 <!--
 REQUIRED: Include each verified category in order: License, Version, Language, Platform, once each. If none applies, use only Source: Repository linked to the verified repository homepage.
-Use static Shields.io flat badges with the image URL format in the guide. See the required badges section in project-agent-instructions.md for values, platform names, colors and link destinations.
+Use static Shields.io flat badges with the specified background colors so both the label and value appear in white. See the required badges section in project-agent-instructions.md for values, platform names, colors and link destinations.
 Replace the field below with 1–4 linked badges on one line, separated by single spaces. Copy the exact Markdown row to both languages.
 -->
 

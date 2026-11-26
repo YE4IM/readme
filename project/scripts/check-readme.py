@@ -62,9 +62,9 @@ EXAMPLE_SECRETS = {"YOUR_API_KEY", "YOUR_API_TOKEN", "YOUR_TOKEN", "YOUR_PASSWOR
 # Insertion order is the display order. Source is the exclusive fallback.
 BADGE_COLORS = {
     "License": "2359D1",
-    "Version": "FF895A",
-    "Language": "FFB3B8",
-    "Platform": "DFE89A",
+    "Version": "A34422",
+    "Language": "993D58",
+    "Platform": "566520",
     "Source": "555555",
 }
 PLATFORMS = {
