@@ -12,7 +12,7 @@ JSON 输出现在以换行符结尾。从上一稳定版升级时，请参阅[�
 
 ### 完整变更日志
 
-[完整变更日志](https://example.com/example/compare/v2.0.0-rc.1...v2.0.0)
+- [完整变更日志](https://example.com/example/compare/v2.0.0-rc.1...v2.0.0)
 
 ## v1.9.4 - 2026-11-25
 
@@ -24,7 +24,7 @@ JSON 输出现在以换行符结尾。从上一稳定版升级时，请参阅[�
 
 ### 完整变更日志
 
-[完整变更日志](https://example.com/example/compare/v1.9.3...v1.9.4)
+- [完整变更日志](https://example.com/example/compare/v1.9.3...v1.9.4)
 
 ## v2.0.0-rc.1 - 2026-11-24
 
@@ -43,7 +43,7 @@ CLI 引入新的输出参数。
 
 ### 完整变更日志
 
-[完整变更日志](https://example.com/example/compare/v1.9.3...v2.0.0-rc.1)
+- [完整变更日志](https://example.com/example/compare/v1.9.3...v2.0.0-rc.1)
 
 ## v1.9.3 - 2026-11-20
 

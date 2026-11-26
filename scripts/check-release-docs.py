@@ -14,6 +14,7 @@ FENCE = re.compile(r"^ {0,3}(\x60{3,}|~{3,})(.*)$")
 ALERT = re.compile(r"^> \[!(WARNING|IMPORTANT)\][ \t]*$", re.M)
 FIELD = re.compile(r"\{\{\s*(TODO(?:\s*[:：][^{}]*)?|[A-Z][A-Z0-9_]*)\s*\}\}")
 BROKEN_SECTION = {"Breaking Changes", "破坏性变更"}
+HIGHLIGHT_SECTION = {"Highlights", "亮点展示"}
 MIGRATION = re.compile(r"(?im)^\s*\*\*(?:Migration|迁移步骤)[:：]\*\*[ \t]*$")
 VERSION_DATE = re.compile(r"^(.+?)(?:[ \t]+[-–—][ \t]+(\d{4}-\d{2}-\d{2})(?:[ \t].*)?|[ \t]+\((\d{4}-\d{2}-\d{2})\))$")
 UNRELEASED = {"unreleased", "未发布"}
@@ -87,7 +88,11 @@ def section_errors(visible, level, *, draft):
         if not body:
             errors.append(f"{heading} has no visible content")
         if heading in BROKEN_SECTION:
-            if index:
+            earlier = [
+                previous for previous, _body in list(sections(visible, level))[:index]
+                if previous not in HIGHLIGHT_SECTION
+            ]
+            if earlier:
                 errors.append(f"{heading} must precede other categories")
             migration = MIGRATION.search(body)
             steps = body[migration.end():] if migration else body
@@ -99,7 +104,8 @@ def section_errors(visible, level, *, draft):
 
 
 CATEGORY = {
-    "破坏性变更": "Breaking Changes", "新增功能": "Added", "行为变更": "Changed",
+    "破坏性变更": "Breaking Changes", "亮点展示": "Highlights",
+    "新增功能": "Added", "行为变更": "Changed",
     "优化与改进": "Changed", "问题修复": "Fixed", "安全修复": "Security",
     "弃用与移除": "Deprecated & Removed", "维护与依赖更新": "Maintenance & Dependencies",
     "安装与升级": "Installation & Upgrade", "已知问题": "Known Issues",
@@ -110,6 +116,8 @@ CATEGORY_TITLES = KNOWN_CATEGORIES | set(CATEGORY)
 LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d+[.)])[ \t]+\S", re.M)
 ISSUE = re.compile(r"(?<![A-Za-z0-9_/#])(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#[0-9]+(?![A-Za-z0-9_])")
 LINK = re.compile(r"\]\(\s*(?:<([^>]+)>|([^\s)]+))")
+IMAGE = re.compile(r"!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))")
+IMG_SRC = re.compile(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", re.I)
 ASSET = re.compile(r"/(?:releases/(?:download|tag)|compare|pull|issues)/|\.(?:zip|gz|exe|msi|dmg|apk|deb|rpm|whl|sha256)(?:[?#]|$)", re.I)
 
 
@@ -153,6 +161,9 @@ def section_facts(body, category):
         ASSET.search(url) or category == "Full Changelog"
         or (category == "Installation & Upgrade" and not documentation_link(url))
     )]
+    if category == "Highlights":
+        shared.extend(angle or plain for angle, plain in IMAGE.findall(prose))
+        shared.extend(IMG_SRC.findall(prose))
     return (category, len(LIST_ITEM.findall(body)), Counter(ISSUE.findall(body)), Counter(shared))
 
 

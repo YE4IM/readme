@@ -20,10 +20,13 @@ class ReadmeCheckTests(unittest.TestCase):
             kit = Path(directory)
             root = kit / "docs"
             root.mkdir()
-            for subdir in ("agent", "templates"):
+            for subdir in ("templates",):
                 (kit / subdir).mkdir()
                 for source in (ROOT / subdir).glob("*.md"):
                     (kit / subdir / source.name).write_bytes(source.read_bytes())
+            guide = ROOT / "project-agent-instructions.md"
+            if guide.exists():
+                (kit / guide.name).write_bytes(guide.read_bytes())
             for name, text in zip(SWITCH_NAMES, (english, chinese)):
                 (root / name).write_text(text, encoding="utf-8")
             (root / "assets").mkdir()

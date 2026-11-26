@@ -12,7 +12,7 @@ JSON output now ends with a newline. If you are upgrading from the previous stab
 
 ### Full Changelog
 
-[Full Changelog](https://example.com/example/compare/v2.0.0-rc.1...v2.0.0)
+- [Full Changelog](https://example.com/example/compare/v2.0.0-rc.1...v2.0.0)
 
 ## v1.9.4 - 2026-11-25
 
@@ -24,7 +24,7 @@ CSV exports now finish when a row contains an empty field.
 
 ### Full Changelog
 
-[Full Changelog](https://example.com/example/compare/v1.9.3...v1.9.4)
+- [Full Changelog](https://example.com/example/compare/v1.9.3...v1.9.4)
 
 ## v2.0.0-rc.1 - 2026-11-24
 
@@ -43,7 +43,7 @@ The CLI introduces a new output flag.
 
 ### Full Changelog
 
-[Full Changelog](https://example.com/example/compare/v1.9.3...v2.0.0-rc.1)
+- [Full Changelog](https://example.com/example/compare/v1.9.3...v2.0.0-rc.1)
 
 ## v1.9.3 - 2026-11-20
 

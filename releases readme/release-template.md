@@ -44,7 +44,9 @@ OPTIONAL: Highlights visual or demo. Enable only if this release already has a r
 To enable: remove the surrounding comment markers and fill with existing assets or verified output. Otherwise delete this entire block.
 Do not invent or generate a visual, and do not fabricate output or benchmark numbers.
 Use descriptive alt text. Check images and documentation links in the target release preview. If preview is unavailable, prefer verified URLs pinned to the release tag or commit, or verified release attachments.
-Keep the visual compact and place it after Breaking Changes when that section is present.
+This is not a change category. Keep the heading. Place it after Breaking Changes when that section is present, and before any other change category. Otherwise place it after the summary and any required alert. Enable it in both languages with the same image.
+
+## Highlights
 
 ![{{DEMO_ALT_TEXT}}]({{DEMO_IMAGE_PATH_OR_URL}})
 -->
@@ -211,7 +213,9 @@ OPTIONAL: 亮点视觉或演示。仅当本次发布已有真实截图、GIF 或
 启用：去掉包围的注释标记，填入已有素材或已核实的输出。不需要则整块删除。
 不要编造或生成视觉内容，也不要虚构输出或基准数据。
 使用描述性 alt。在目标 Release 预览中核对图片与文档链接；无预览时优先使用固定到该版 Tag 或提交的已核实地址，或该版附件链接。
-展示须保持紧凑，有破坏性变更时放在该节之后。
+这不是变更分类。保留下面的标题。有破坏性变更时放在该节之后、其他变更分类之前；否则放在摘要和必要警示之后。两侧都启用时使用同一张图。
+
+## 亮点展示
 
 ![{{DEMO_ALT_TEXT}}]({{DEMO_IMAGE_PATH_OR_URL}})
 -->

@@ -103,6 +103,8 @@ To enable: remove the surrounding comment markers and fill the real status. Othe
 {{PROJECT_STATUS}}
 -->
 
+<!-- 默认保留。大多数项目需要本节。不适用则整节删除，不要留空标题。纯文档项目通常删除本节。 -->
+
 ## Requirements
 
 {{REQUIREMENTS}}
@@ -111,6 +113,8 @@ To enable: remove the surrounding comment markers and fill the real status. Othe
 List only runtimes, tools, and minimum versions confirmed by the repo or verified installs.
 If none are required (common for docs-only projects), replace this section with one factual sentence, or delete it. Do not invent version floors.
 -->
+
+<!-- 默认保留。大多数项目需要本节。不适用则整节删除，不要留空标题。纯文档项目通常删除本节。 -->
 
 ## Installation
 
@@ -171,6 +175,8 @@ To enable: remove the surrounding comment markers and fill verified items. Other
 - {{FEATURE_1}}
 - {{FEATURE_2}}
 -->
+
+<!-- 默认保留。大多数项目需要本节。不适用则整节删除，不要留空标题。 -->
 
 ## Usage
 
@@ -328,6 +334,8 @@ To enable: remove the surrounding comment markers and fill real links. Otherwise
 
 {{RELATED_PROJECTS}}
 -->
+
+<!-- 默认保留。大多数项目需要本节。没有许可证文件、也没有明确声明时整节删除，不要留空标题。 -->
 
 ## License
 

@@ -119,8 +119,10 @@ class ReleaseTemplateTests(unittest.TestCase):
                 positions = [rendered.index(item) for item in expected]
                 self.assertEqual(positions, sorted(positions))
                 headings = re.findall(r"^#{2,3} .+$", rendered, re.MULTILINE)
-                expected_headings = [f"## {heading}"]
+                highlight = "## Highlights" if language == "en" else "## 亮点展示"
+                expected_headings = [f"## {heading}", highlight]
                 self.assertEqual(headings, expected_headings)
+                self.assertLess(rendered.index(f"## {heading}"), rendered.index(highlight))
                 for residue in ("<!--", "{{", "OPTIONAL:", "[!IMPORTANT]"):
                     self.assertNotIn(residue, rendered)
 
@@ -212,6 +214,15 @@ class ReleaseTemplateTests(unittest.TestCase):
             self.assertTrue(check(bad), bad)
         en += "\n\n[Migration](https://host/docs/en/guide)"
         self.assertEqual(check(zh + "\n\n[迁移](https://host/docs/zh/guide)"), [])
+
+
+    def test_highlight_image_must_match_on_both_sides(self):
+        en = "Shipped.\n\n## Highlights\n\n![Demo](https://host/demo.png)\n\n## Fixed\n\n- Export."
+        zh = "已发布。\n\n## 亮点展示\n\n![演示](https://host/demo.png)\n\n## 问题修复\n\n- 导出。"
+        check = CHECK["check_release"]
+        self.assertEqual(check(en + "\n---\n" + zh), [])
+        self.assertTrue(check(en + "\n---\n" + zh.replace("https://host/demo.png", "")))
+        self.assertTrue(check(en + "\n---\n" + "已发布。\n\n## 问题修复\n\n- 导出。"))
 
 
 if __name__ == "__main__":

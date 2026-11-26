@@ -16,7 +16,7 @@
 
 | 交付物 | 写作规范 | 模板 |
 | --- | --- | --- |
-| 项目介绍 `README.md` 和 `README-zh-CN.md` | [项目 README 规范](./project%20readme/agent/AGENTS.md) | [English](./project%20readme/templates/readme-template.md) · [中文](./project%20readme/templates/readme-zh-CN-template.md) |
+| 项目介绍 `README.md` 和 `README-zh-CN.md` | [项目 README 规范](./project%20readme/project-agent-instructions.md) | [English](./project%20readme/templates/readme-template.md) · [中文](./project%20readme/templates/readme-zh-CN-template.md) |
 | 单次 GitHub Release 的一篇双语正文 | [发布说明规范](./releases%20readme/release-agent-instructions.md) | [双语发布说明模板](./releases%20readme/release-template.md) |
 | 按版本记录的项目整体变更日志 | [变更日志规范](./changelog%20readme/changelog-agent-instructions.md) | [English](./changelog%20readme/changelog-version-template.md) · [中文](./changelog%20readme/changelog-version-zh-CN-template.md) |
 
@@ -56,4 +56,4 @@ python3 scripts/check-release-docs.py changelog /path/to/CHANGELOG.md /path/to/C
 
 单语言 CHANGELOG 传一个文件路径。单篇双语且两部分用独立一行的 `---` 分隔时，再加 `--bilingual`。其他既有布局按项目格式人工审阅。已发布版本支持短横线或括号包围的 ISO 日期，按日期从新到旧排列，允许同日多个版本。 单篇双语 CHANGELOG 的两部分共用整篇文件的引用式链接定义；同一版本链接只需定义一次。
 
-发布文档检查器对照标准分类顺序、列表条数、可见警示、事项编号和可识别的共享下载或比较链接。自定义分类译名、本地化文档目标、命令与事实含义仍需结合发布证据核对。发布前分列文案就绪状态和实际公开状态。局部修改 README 时，改前改后运行同一条检查命令，在交付说明中单列已有问题。
+发布文档检查器强制「Breaking Changes / 破坏性变更」出现在其他变更分类标题之前，并比较两侧分类集合、列表条数、可见警示、事项编号和可识别的共享下载或比较链接；两侧都启用亮点展示时，还会比较该节的图片地址。Added、Fixed、Security 等的完整先后不由脚本强制，仍按模板人工核对。按版本线分段、而不是按公开发布日全局从新到旧排列的变更日志，会报顺序错误。自定义分类译名、本地化文档目标、命令与事实含义仍需结合发布证据核对。发布前分列文案就绪状态和实际公开状态。局部修改 README 时，改前改后运行同一条检查命令，在交付说明中单列已有问题。

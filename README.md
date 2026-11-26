@@ -16,7 +16,7 @@ The README guide and templates apply to every GitHub project maintained by this 
 
 | Deliverable | Writing guide | Templates |
 | --- | --- | --- |
-| Project introduction in `README.md` and `README-zh-CN.md` | [Project README guide](./project%20readme/agent/AGENTS.md) | [English](./project%20readme/templates/readme-template.md) · [中文](./project%20readme/templates/readme-zh-CN-template.md) |
+| Project introduction in `README.md` and `README-zh-CN.md` | [Project README guide](./project%20readme/project-agent-instructions.md) | [English](./project%20readme/templates/readme-template.md) · [中文](./project%20readme/templates/readme-zh-CN-template.md) |
 | A single bilingual description for one GitHub Release | [Release notes guide](./releases%20readme/release-agent-instructions.md) | [Bilingual release template](./releases%20readme/release-template.md) |
 | A project-wide changelog with version entries | [Changelog guide](./changelog%20readme/changelog-agent-instructions.md) | [English](./changelog%20readme/changelog-version-template.md) · [中文](./changelog%20readme/changelog-version-zh-CN-template.md) |
 
@@ -56,4 +56,4 @@ python3 scripts/check-release-docs.py changelog /path/to/CHANGELOG.md /path/to/C
 
 For a single-language changelog, pass one path. For one file containing both languages separated by a standalone `---`, add `--bilingual`. For an established layout outside those formats, review the existing structure manually. Published entries support dash or parenthesized ISO dates and use newest-first order, with ties allowed. A bilingual changelog in one file shares one set of Markdown reference definitions across languages. Define a reused version link once.
 
-The release checks compare standard category order, list counts, visible alerts, issue references and recognizable shared download or comparison links. Review custom category translations, localized documentation destinations, commands and factual equivalence against the release evidence. Before publication, record copy readiness separately from publication status. For targeted README edits, run the same check before and after and report existing failures separately.
+The release checks require Breaking Changes before other change categories, and compare the category set, list counts, visible alerts, issue references, and recognizable shared download or comparison links, including a Highlights image when that section is enabled. They do not enforce the full Added, Fixed, or Security order. Review that order against the template, and review custom category translations, localized documentation destinations, commands, and factual equivalence against the release evidence. A changelog that groups versions by release line instead of global publication date fails the newest-first date check. Before publication, record copy readiness separately from publication status. For targeted README edits, run the same check before and after and report existing failures separately.

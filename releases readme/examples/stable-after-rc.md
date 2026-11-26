@@ -17,7 +17,7 @@ The CLI now uses the new output flag, and JSON output ends with a newline.
 
 ## Full Changelog
 
-[Full Changelog](https://example.com/example/compare/v1.9.3...v2.0.0)
+- [Full Changelog](https://example.com/example/compare/v1.9.3...v2.0.0)
 
 ---
 
@@ -40,4 +40,4 @@ CLI 现已使用新的输出参数，JSON 输出也会以换行符结尾。
 
 ## 完整变更日志
 
-[完整变更日志](https://example.com/example/compare/v1.9.3...v2.0.0)
+- [完整变更日志](https://example.com/example/compare/v1.9.3...v2.0.0)

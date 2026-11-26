@@ -1,36 +1,19 @@
 # GitHub README 标准模板 — Agent 执行规范
 
-## Quick workflow
+本文件集中提供 README 写作流程和执行规范。这是给 Agent 的完整规范，正文只有中文，不另写英文规范，也不做中英对照。本文件是 `project readme/project-agent-instructions.md`。模板在同目录的 `templates/`。整套 README 材料在 `project readme`。同仓库另有 `releases readme` 与 `changelog readme`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。本套 README 规范、模板与检查脚本适用于本仓库所有者维护的所有 GitHub 项目，包括个人账号下的项目。每份 README 都在标题前放置 OPC.FISH 项目署名。套用之前先核实目标仓库归属；第三方项目应遵循其自身的 README 与署名规则。
 
-This file lives in `agent/`. The kit is the parent directory, `project readme`. The same repository also has `releases readme` and `changelog readme`. Use this file only for README work.
-
-Use this README kit for all GitHub projects maintained by this repository’s owner, including projects under a personal account. Put the OPC.FISH project signature before the title of every README. Verify the target repository’s ownership before applying the signature. Write or update the README using verified facts from that repository.
-
-1. Read the rules below and verify the facts in the target repository.
-2. For a new README pair, use the matching templates and delete unused OPTIONAL blocks. For a targeted update, start from the existing pair, verify the changed facts, and update the corresponding sections in both languages.
-3. Write `README.md` and `README-zh-CN.md` in the target repository. Keep the language-switch links pointed at those final names.
-4. From the kit directory, run the check for the signature used in both READMEs. The default remote SVG URLs use `--signature remote`. If you copied both SVGs into the target repository and referenced them under `./assets/`, use `--signature local`.
-
-```bash
-python3 scripts/check-readme.py pair /path/to/README.md /path/to/README-zh-CN.md --signature remote
-```
-
-See the finished bilingual documentation example in [English](../docs/project.md) and [中文](../docs/project-zh-CN.md).
-
-Do not copy this file or the templates into the target repository.
-
----
-
-本文件集中提供 README 写作流程和执行规范。本文件在 `agent/`。模板在上一级的 `templates/`。整套 README 材料在上一级目录 `project readme`。同仓库另有 `releases readme` 与 `changelog readme`，分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。本套 README 规范、模板与检查脚本适用于本仓库所有者维护的所有 GitHub 项目，包括个人账号下的项目。每份 README 都在标题前放置 OPC.FISH 项目署名。套用之前先核实目标仓库归属；第三方项目应遵循其自身的 README 与署名规则。
+本文件只用于项目 README。同仓库的 `releases readme` 与 `changelog readme` 分别约束 GitHub Release 正文和项目整体 CHANGELOG，不要混用版式。
 
 - 局部更新前先运行成稿检查保存基线。交付时用同一命令区分本次新增、已修复与仍存在的旧问题；修复本次引入或影响本次内容的问题。范围外旧问题记入交付说明，已有错误仍须如实报告。
 - 局部更新以现有双语文件为起点，核对改动的来源，只修改相关段落，保留其余人工编写的内容；同步另一语言并验证受影响的命令、链接及锚点。
+- 检查草稿时使用 `--draft`，允许编辑用 `{{TODO: ...}}`，其余检查仍执行。可发布成稿必须清除全部编辑用 TODO 和模板占位符。
+- 章节表里标成大多数项目需要的节，不适用时整节删除或改成一句实话，不要编造，也不要留空标题。
 例如仅更新安装参数时，先记录既有失效链接；更新两份 README 后检查参数与运行结果。如果仍只报同一个无关旧链接，在交付说明保留原错误及本次验证结果。
 
 新建时使用下列模板。
 
-- `../templates/readme-template.md` → 输出为仓库中的 **`README.md`**（英文主文件）
-- `../templates/readme-zh-CN-template.md` → 输出为仓库中的 **`README-zh-CN.md`**（中文独立文件）
+- `templates/readme-template.md` → 输出为仓库中的 **`README.md`**（英文主文件）
+- `templates/readme-zh-CN-template.md` → 输出为仓库中的 **`README-zh-CN.md`**（中文独立文件）
 
 不要把 `*-template.md` 这个文件名写进仓库，也不要把语言切换链接改成模板文件名。模板内部的中英切换已经指向最终文件：
 
@@ -100,7 +83,7 @@ Do not copy this file or the templates into the target repository.
 | 用法 | 核心用法与最常见工作流。细节链接到完整文档，避免把全部 API 贴进 README。 |
 | 许可证 | 有适用的许可证文件时写名称并链接该文件。只有明确声明时写明声明来源，许可证文件链接可省略。无文件与明确声明时省略本节。各子包许可不同时标明可核实的适用范围。 |
 
-若某一“必需”项在仓库中确实不适用（例如纯文档无需安装、尚未选择许可证），删除该节或改成一句实话（如“本仓库是文档/规范，克隆或在线阅读即可，无需安装”），不要编造。
+要求、安装、用法、许可证在大多数项目中需要，模板里默认保留。不适用则整节删除（纯文档通常删掉要求和安装），或改成一句实话（如“本仓库是文档/规范，克隆或在线阅读即可，无需安装”），不要编造，也不要留空标题。
 
 ### 条件章节（无证据必须整块删除，不可无证填写）
 
@@ -200,7 +183,7 @@ Do not copy this file or the templates into the target repository.
 **纯文档 / 规范 / 内容仓库**
 
 - 内容突出：文档覆盖范围、如何阅读或导航、如何预览/构建（仅当仓库确有该命令）、如何提议修改。
-- 展示优先：覆盖范围与阅读导航。不要为了“好看”补软件截图或安装步骤。若克隆或在线打开即可阅读，写明这一点。省略不适用的环境要求和安装；快速开始用展开的文字步骤，如「打开规范 → 选择模板 → 查看成稿」，有确实需要的检查命令时另列。参见[英文成稿](../docs/project.md)和[中文成稿](../docs/project-zh-CN.md)。
+- 展示优先：覆盖范围与阅读导航。不要为了“好看”补软件截图或安装步骤。若克隆或在线打开即可阅读，写明这一点。省略不适用的环境要求和安装；快速开始用展开的文字步骤，如「打开规范 → 选择模板 → 查看成稿」，有确实需要的检查命令时另列。参见[英文成稿](docs/project.md)和[中文成稿](docs/project-zh-CN.md)。
 
 **混合项目**
 
@@ -242,7 +225,8 @@ Do not copy this file or the templates into the target repository.
 - 图片使用描述性 alt 文本，说明图里是什么，不要只写 “screenshot” 或 “logo”。
 - 仓库内图片优先使用相对路径，避免依赖不稳定的外部图床。
 - 确保在浅色、深色主题和窄屏下仍可读：不要让关键信息只出现在过宽的图或必须横向滚动的表里。
-- **仅当仓库已同时具备浅色/深色资源时**，才使用主题适配（例如 `#gh-light-mode-only` / `#gh-dark-mode-only`）。缺一种不要编造或生成另一张。
+- **仅当仓库已同时具备浅色和深色两套内容图时**，才使用 GitHub 主题碎片 `#gh-light-mode-only` / `#gh-dark-mode-only`。它们跟随用户在 GitHub 上选择的主题。缺一种不要编造或生成另一张。
+- 这套碎片只用于内容图。文首署名不使用它们，署名的主题机制见第 5.5 节。
 
 ### 5.4 双语视觉一致
 
@@ -267,7 +251,8 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 - 若使用仓库内固定署名，仅将上述两处远程 SVG 地址替换为 `./assets/` 下对应文件的相对路径，并用 `--signature local` 验证。
 - 中文成稿可以把 alt 写成 `OPC.FISH 项目署名`。
 - 署名图地址跟着 `main`。`YE4IM/readme` 现为公开仓库，未登录即可加载。若该地址以后不可公开，仍然保留这块 HTML，并在交付说明中写明图片目前无法在仓库外加载。
-- 在非 GitHub 的预览里，两张图可能同时出现。GitHub 会按浅色/深色主题只显示一张。
+- 署名使用 `<picture>` 和 `prefers-color-scheme: dark`，跟随系统配色。这不一定等于用户在 GitHub 上单独选择的浅色或深色主题，所以不要把署名改成 `#gh-light-mode-only` / `#gh-dark-mode-only`。
+- 在非 GitHub 的预览里，两张署名图可能同时出现。
 
 ---
 
@@ -339,7 +324,7 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 - [ ] 首屏简洁：有具体价值说明；徽章不超过 4 枚且均已核实，多枚在同一行横向排列；至多一种真实主展示；没有把快速开始推远
 - [ ] 功能写成具体收益且不夸大；段落短；比较用表，步骤用编号；提示块仅用于真正重要的事项
 - [ ] 无滥用的 emoji、分隔线、居中排版、大横幅、访问计数器、图标墙或装饰动画
-- [ ] 图片有描述性 alt，仓库内图优先相对路径；主题变体仅在两种资源都已存在时使用
+- [ ] 图片有描述性 alt，仓库内图优先相对路径；内容图仅在浅色和深色资源都存在时使用 `#gh-light-mode-only` / `#gh-dark-mode-only`；署名仍用 `<picture>` 与 `prefers-color-scheme`
 - [ ] 中英视觉层级一致；目录与锚点已按各自标题本地化；短文档无多余 TOC
 - [ ] 面向用户；贡献者细节指向 CONTRIBUTING 或开发文档
 - [ ] 已标明交付状态，可发布成稿已清除编辑用 `TODO`
