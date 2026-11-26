@@ -20,11 +20,11 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 REMOTE_LIGHT = (
-    "https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/"
+    "https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/"
     "opc-fish-project-signature.svg"
 )
 REMOTE_DARK = (
-    "https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/"
+    "https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/"
     "opc-fish-project-signature-web-dark.svg"
 )
 PLACEHOLDER = re.compile(r"\{\{([^{}]+)\}\}")

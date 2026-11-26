@@ -245,7 +245,7 @@ GitHub 锚点由标题生成：英文转为小写，空格变成连字符，去�
 - 交付稿只保留下面这一块，不要把本段说明留在用户可见的 README 里：
 
 ```html
-<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project%20readme/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
 ```
 
 - 若使用仓库内固定署名，仅将上述两处远程 SVG 地址替换为 `./assets/` 下对应文件的相对路径，并用 `--signature local` 验证。
