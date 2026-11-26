@@ -1,4 +1,6 @@
+<p align="center">
 <a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/opc-fish-project-signature-web-dark.svg"><img src="../assets/opc-fish-project-signature.svg" alt="OPC.FISH 项目署名" width="720"></picture></a>
+</p>
 
 # readme
 
@@ -39,12 +41,14 @@ python3 scripts/check-readme.py all
 
 ## 署名
 
-生成的 README 在全文最上方、标题之前放上下面这组 SVG。点击图片打开 [opc.fish](https://opc.fish)。中英文使用同一组图、同一个链接。浅色主题用透明底、墨色字的那张。深色主题用透明底、浅色字的那张。两张图都保持原文件，不要改颜色。它是维护者署名，不是项目 Logo。
+生成的 README 在全文最上方、标题之前居中显示下面的署名。点击图片打开 [opc.fish](https://opc.fish)。中英文使用同一组图、同一个链接。浅色主题用透明底、墨色字的那张。深色主题用透明底、浅色字的那张。两张图都保持原文件，不要改颜色。它是维护者署名，不是项目 Logo。
 
 本文件顶部用的是仓库里的这两张图。新的 README 使用下面这块远程地址。图片地址故意跟着 `main`。若要冻结，把两张 SVG 复制进目标仓库，改成相对路径，并在交付说明里写明。
 
 ```html
+<p align="center">
 <a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature.svg" alt="OPC.FISH 项目署名" width="720"></picture></a>
+</p>
 ```
 
 ## 许可证

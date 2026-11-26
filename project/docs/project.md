@@ -1,4 +1,6 @@
+<p align="center">
 <a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/opc-fish-project-signature-web-dark.svg"><img src="../assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+</p>
 
 # readme
 
@@ -39,12 +41,14 @@ That checks both templates, this README pair, and the repository's root README p
 
 ## Signature
 
-Generated READMEs open with the mark at the top of the file, before the title. The picture links to [opc.fish](https://opc.fish). Both languages use the same two images and the same link. Light mode uses the transparent ink SVG. Dark mode uses the transparent light-on-dark SVG. Leave both files as they are. It is the maintainer signature, not a project logo.
+Generated READMEs open with the mark centered at the top of the file, before the title. The picture links to [opc.fish](https://opc.fish). Both languages use the same two images and the same link. Light mode uses the transparent ink SVG. Dark mode uses the transparent light-on-dark SVG. Leave both files as they are. It is the maintainer signature, not a project logo.
 
 The picture on this file uses the assets in this repository. New READMEs use the remote block below. Those image addresses follow `main` on purpose. To freeze them, copy both SVG files into the target repository, switch to relative paths, and say so in the delivery notes.
 
 ```html
+<p align="center">
 <a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+</p>
 ```
 
 ## License
