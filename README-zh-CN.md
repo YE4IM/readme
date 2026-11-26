@@ -8,7 +8,7 @@
 
 为 Agent 提供 GitHub 项目 README、发布说明和变更日志的写作规范与中英 Markdown 模板。
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37)](./LICENSE)
 
 [跳转到快速开始](#快速开始)
 
@@ -34,7 +34,7 @@
 
 **徽章配色示例**
 
-![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-D9381E?style=flat&labelColor=1F2A37) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-0E8274?style=flat&labelColor=1F2A37) ![Platform: Web](https://img.shields.io/badge/Platform-Web-C6286B?style=flat&labelColor=1F2A37)
 
 撰写 GitHub Release 时，先核对目标 Tag 或提交，以及同一发布线的对比范围。GitHub 标题默认使用已核实的发布标识，有既定命名惯例时沿用。正文从摘要起笔，先写英文，再用独立一行的 `---` 分隔中文。预发布时，两种语言都要有警示。[正式补丁](./releases/examples/patch.md) · [首次发布](./releases/examples/initial.md)
 

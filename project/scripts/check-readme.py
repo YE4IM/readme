@@ -61,10 +61,10 @@ EXAMPLE_SECRETS = {"YOUR_API_KEY", "YOUR_API_TOKEN", "YOUR_TOKEN", "YOUR_PASSWOR
 
 # Insertion order is the display order. Source is the exclusive fallback.
 BADGE_COLORS = {
-    "License": "2359D1",
-    "Version": "A34422",
-    "Language": "993D58",
-    "Platform": "566520",
+    "License": "2563EB",
+    "Version": "D9381E",
+    "Language": "0E8274",
+    "Platform": "C6286B",
     "Source": "555555",
 }
 PLATFORMS = {
@@ -83,7 +83,7 @@ def badge_url(kind: str, value: str) -> str:
     if kind == "Source" and value != "Repository":
         raise ValueError("Source must display Repository")
     message = quote(value.replace("-", "--").replace("_", "__"), safe="")
-    return f"https://img.shields.io/badge/{kind}-{message}-{BADGE_COLORS[kind]}?style=flat&labelColor=382A26"
+    return f"https://img.shields.io/badge/{kind}-{message}-{BADGE_COLORS[kind]}?style=flat&labelColor=1F2A37"
 
 
 def main() -> int:

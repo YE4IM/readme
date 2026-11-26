@@ -8,7 +8,7 @@
 
 Rules and bilingual templates an agent follows when writing a GitHub README. Generated READMEs keep the OPC.FISH signature at the top. This file is the documentation-shaped result of those templates.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26)](../../LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37)](../../LICENSE)
 
 ## Overview
 
@@ -43,7 +43,7 @@ That checks both templates, this README pair, and the repository's root README p
 
 ## Badge color examples
 
-![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-D9381E?style=flat&labelColor=1F2A37) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-0E8274?style=flat&labelColor=1F2A37) ![Platform: Web](https://img.shields.io/badge/Platform-Web-C6286B?style=flat&labelColor=1F2A37)
 
 ## Signature
 

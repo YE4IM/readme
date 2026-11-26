@@ -8,7 +8,7 @@
 
 给 Agent 使用的 README 写作规范与中英模板。按这些文件生成的 README，把 OPC.FISH 署名放在全文最上方。本文件就是这套模板按「纯文档」裁剪后的成稿。
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26)](../../LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37)](../../LICENSE)
 
 ## 概述
 
@@ -43,7 +43,7 @@ python3 scripts/check-readme.py all
 
 ## 徽章配色示例
 
-![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-D9381E?style=flat&labelColor=1F2A37) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-0E8274?style=flat&labelColor=1F2A37) ![Platform: Web](https://img.shields.io/badge/Platform-Web-C6286B?style=flat&labelColor=1F2A37)
 
 ## 署名
 

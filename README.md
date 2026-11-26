@@ -8,7 +8,7 @@
 
 Writing guides and bilingual Markdown templates for agents preparing GitHub project READMEs, release notes, and changelogs.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37)](./LICENSE)
 
 [Go to Quick Start](#quick-start)
 
@@ -34,7 +34,7 @@ For project READMEs, center the OPC.FISH signature above the title in both files
 
 **Badge color examples**
 
-![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+![License: MIT](https://img.shields.io/badge/License-MIT-2563EB?style=flat&labelColor=1F2A37) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-D9381E?style=flat&labelColor=1F2A37) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-0E8274?style=flat&labelColor=1F2A37) ![Platform: Web](https://img.shields.io/badge/Platform-Web-C6286B?style=flat&labelColor=1F2A37)
 
 For a GitHub Release, verify the target tag or commit and the comparison range on the same release line. Use the verified release identifier as the GitHub title unless the project has an established title convention. Start the body with a summary, then write the English and Chinese sections in that order, separated by a standalone `---`. Include the pre-release warning in both languages when applicable. [Stable patch](./releases/examples/patch.md) · [Initial release](./releases/examples/initial.md)
 

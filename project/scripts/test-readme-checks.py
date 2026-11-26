@@ -331,7 +331,7 @@ $ example --output json
             "## Overview\n\n" + license,
             license.replace(CHECK["badge_url"]("License", "MIT"), "./badges/license.svg"),
             license.replace("img.shields.io", "example.org"), license.replace("-MIT-", "-ISC-"),
-            license.replace("2359D1", "000000"), license.replace("382A26", "ffffff"),
+            license.replace("2563EB", "000000"), license.replace("1F2A37", "ffffff"),
             license.replace("style=flat", "style=plastic"), license.replace("?style", "?logo=git&style"),
         ]
         for row in invalid:
@@ -340,15 +340,15 @@ $ example --output json
 
     def test_static_badge_urls(self):
         for kind, value, expected in (
-            ("License", "Apache-2.0", "License-Apache--2.0-2359D1"),
-            ("Version", "1.0-rc.1+test_2", "Version-1.0--rc.1%2Btest__2-A34422"),
-            ("Language", "C#", "Language-C%23-993D58"),
-            ("Platform", "Browser Extension", "Platform-Browser%20Extension-566520"),
+            ("License", "Apache-2.0", "License-Apache--2.0-2563EB"),
+            ("Version", "1.0-rc.1+test_2", "Version-1.0--rc.1%2Btest__2-D9381E"),
+            ("Language", "C#", "Language-C%23-0E8274"),
+            ("Platform", "Browser Extension", "Platform-Browser%20Extension-C6286B"),
             ("Source", "Repository", "Source-Repository-555555"),
         ):
             with self.subTest(kind=kind):
                 self.assertEqual(CHECK["badge_url"](kind, value),
-                                 f"https://img.shields.io/badge/{expected}?style=flat&labelColor=382A26")
+                                 f"https://img.shields.io/badge/{expected}?style=flat&labelColor=1F2A37")
 
     def test_bilingual_badge_markdown_and_hidden_examples(self):
         en = ENGLISH.replace("../assets/", "./assets/")
