@@ -216,6 +216,42 @@ class ReleaseTemplateTests(unittest.TestCase):
         self.assertEqual(check(zh + "\n\n[迁移](https://host/docs/zh/guide)"), [])
 
 
+    def test_highlights_follow_breaking_changes_when_both_are_present(self):
+        def release(order):
+            parts = []
+            for summary, highlights, breaking in (("Summary.", "Highlights", "Breaking Changes"),
+                                                  ("摘要。", "亮点展示", "破坏性变更")):
+                fixed = "Fixed" if highlights == "Highlights" else "问题修复"
+                blocks = {"highlight": f"## {highlights}\n\n![CLI](demo.png)",
+                          "breaking": f"## {breaking}\n\n1. Update the flag.",
+                          "fixed": f"## {fixed}\n\n- CLI."}
+                parts.append("\n\n".join([summary] + [blocks[key] for key in order]))
+            return CHECK["check_release"]("\n\n---\n\n".join(parts))
+
+        self.assertEqual(release(["highlight"]), [])
+        self.assertEqual(release(["breaking", "highlight"]), [])
+        self.assertTrue(release(["highlight", "breaking"]))
+        self.assertTrue(release(["fixed", "highlight"]))
+        self.assertEqual(release(["breaking", "highlight", "fixed"]), [])
+
+    def test_localized_install_guides_and_extensionless_downloads(self):
+        def check(en_url, zh_url, labels):
+            en = f"Summary.\n\n## Installation & Upgrade\n\n1. [{labels[0]}]({en_url})."
+            zh = f"摘要。\n\n## 安装与升级\n\n1. [{labels[1]}]({zh_url})。"
+            return CHECK["check_release"](en + "\n\n---\n\n" + zh)
+
+        guides = ("Installation guide", "安装指南")
+        self.assertEqual(check("https://host/en/install", "https://host/zh/install", guides), [])
+        self.assertEqual(check("https://host/en/install", "https://host/zh/install", ("Install", "安装")), [])
+        self.assertEqual(check("https://host/docs/en/install", "https://host/docs/zh/install", ("Download", "下载")), [])
+        installer = "https://host/releases/v2/example-installer"
+        self.assertTrue(check(installer, installer.replace("/v2/", "/v1/"), ("Linux", "Linux")))
+        for url in ("https://host/releases/v2/example-installer", "https://host/v2/cli", "https://host/v2/app.zip"):
+            with self.subTest(url=url):
+                labels = ("Download", "下载")
+                self.assertEqual(check(url, url, labels), [])
+                self.assertTrue(check(url, url.replace("/v2/", "/v1/"), labels))
+
     def test_highlight_image_must_match_on_both_sides(self):
         en = "Shipped.\n\n## Highlights\n\n![Demo](https://host/demo.png)\n\n## Fixed\n\n- Export."
         zh = "已发布。\n\n## 亮点展示\n\n![演示](https://host/demo.png)\n\n## 问题修复\n\n- 导出。"

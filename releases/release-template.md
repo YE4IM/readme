@@ -115,7 +115,7 @@ OPTIONAL: Installation & Upgrade. Enable only when the repo has a verified insta
 Write only methods the repository actually supports. Keep the primary path visible. Use a fenced command, a download or store link, numbered steps, or a combination. If an installer is the only upgrade path, show its download link here.
 If the real install or upgrade command requires a version argument, use the repository's actual form; do not invent a version pin, and do not add a version heading just to display the tag.
 If you could not run the command, say so plainly and mention it in the delivery notes.
-If the package or assets are not published yet, leave {{TODO: confirm the install command after this release is published}} rather than pretending it already works.
+If only publication is pending and the channel and primary instructions are verified, write “Once the package is published, …” and record the follow-up check outside the body. If the required command, channel or upgrade path is unknown, keep {{TODO: verify the primary upgrade path}} and deliver a draft.
 Never invent a package name, formula, container tag, or download URL.
 To enable: remove the surrounding comment markers and fill verified content. Otherwise delete this entire block.
 
@@ -284,7 +284,7 @@ OPTIONAL: 安装与升级。仅当仓库确有安装/升级途径，或本次 Re
 只写仓库确实支持的方法。主安装或升级路径必须展开。按渠道填写带围栏的命令、下载或商店链接、编号步骤，也可组合。若安装包是唯一升级途径，在此列主下载链接。
 若真实安装或升级命令需要版本参数，使用仓库既有写法；不要编造版本参数，也不要为了展示 Tag 而另加版本号标题。
 若未能实际执行这些命令，在此直说，并在交付说明中列出。
-若包或附件尚未发布，留下 {{TODO: 待本次发布完成后再确认安装命令}}，不要写成已经可用。
+若仅待公开，且已核实分发渠道和主安装或升级方法，可写“包发布完成后使用……”，在交付说明记录后续核验项。必要命令、分发渠道或主升级路径仍未知时，保留 {{TODO: 核实主升级路径}} 并交付草稿。
 永远不要编造包名、formula、容器标签或下载链接。
 启用：去掉包围的注释标记，填入已核实的内容。不需要则整块删除。
 

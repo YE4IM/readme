@@ -4,7 +4,7 @@ Fill only verified facts, then paste the section into CHANGELOG.md or the repo's
 Do not copy this filename into the changelog body.
 To enable an OPTIONAL block: remove the surrounding comment markers, keep the section content, and delete the instruction text. Otherwise delete the entire block (including any empty heading).
 Remove all editorial TODOs and template fields from publishable copy. Keep {{TODO: ...}} only in a draft marked as pending verification.
-The version heading defaults to plain text. Follow existing inline links or reference definitions and verify the destination. Keep the comparison link in one place. Use the publication event and time zone defined in the guide.
+The version heading defaults to plain text. Follow existing inline links or reference definitions and verify the destination. Keep the comparison link in one place. Use the publication event and time zone defined in the guide. If public tagging is the release event, verify when the tag first became public. Keep a date TODO in the draft if the only evidence is the tag object's creation time.
 Local anchors and official translated docs may use equivalent destinations.
 Follow changelog-agent-instructions.md in this directory for scope, evidence, bilingual alignment, and cleanup rules.
 Group by the verified publication date, newest first; entries published on the same local day may retain project order.
@@ -15,7 +15,7 @@ Group by the verified publication date, newest first; entries published on the s
 {{RELEASE_SUMMARY}}
 
 <!--
-OPTIONAL: Pre-release warning. Enable WARNING in both languages for a pre-release. Explain the testing purpose and the production guidance.
+OPTIONAL: Pre-release warning. Enable WARNING for a pre-release, including a custom version explicitly labeled Pre-release. In bilingual files, match the release status and include the warning in both languages. Explain the testing purpose and the production guidance.
 
 > [!WARNING]
 > {{IMPORTANT_WARNING}}

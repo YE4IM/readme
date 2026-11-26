@@ -10,6 +10,8 @@ You can now set an output delimiter for CSV exports.
 
 - Choose the delimiter when exporting rows.
 
+[Compare unreleased changes](https://example.com/example/compare/v1.9.4...release/1.9)
+
 ## v1.9.4 - 2026-11-25
 
 CSV exports now finish when a row contains an empty field.

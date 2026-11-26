@@ -1,7 +1,7 @@
 The CLI now uses the new output flag, and JSON output ends with a newline.
 
 > [!IMPORTANT]
-> If you are upgrading from the previous stable release, update scripts that set the output format.
+> If your scripts use `--format`, switch to `--output` before running them with this release.
 
 ## Breaking Changes
 
@@ -24,7 +24,7 @@ The CLI now uses the new output flag, and JSON output ends with a newline.
 CLI 现已使用新的输出参数，JSON 输出也会以换行符结尾。
 
 > [!IMPORTANT]
-> 从上一稳定版升级时，请更新指定输出格式的脚本。
+> 如果脚本仍使用 `--format`，请先改用 `--output`，再用此版本运行脚本。
 
 ## 破坏性变更
 

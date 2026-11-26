@@ -264,6 +264,31 @@ class ChangelogTemplateTests(unittest.TestCase):
         documents = [("en", "## v1 (2026-01-01) Stable\nSummary."), ("zh", "## v1 (2026-01-01) 稳定版\n摘要。")]
         self.assertEqual(CHECK["check_changelog"](documents), [])
 
+    def test_explicit_prerelease_status_requires_warnings_and_bilingual_agreement(self):
+        warning = "\n\n> [!WARNING]\n> Testing only."
+        for date in ("- 2026-11-25", "(2026-11-25)"):
+            en = f"## train-42 {date} Pre-release\n\nSummary."
+            zh = f"## train-42 {date} 预发布版\n\n摘要。"
+            with self.subTest(date=date):
+                self.assertTrue(CHECK["check_changelog"]([("en", en)]))
+                self.assertEqual(CHECK["check_changelog"]([("en", en + warning), ("zh", zh + warning)]), [])
+                stable = zh.replace("预发布版", "稳定版")
+                self.assertTrue(CHECK["check_changelog"]([("en", en + warning), ("zh", stable + warning)]))
+                contradictory = en.replace("train-42", "v2.0.0-rc.1").replace("Pre-release", "Stable")
+                self.assertTrue(CHECK["check_changelog"]([("en", contradictory + warning)]))
+                pending = en.replace("2026-11-25", "{{TODO: verify publication date}}")
+                self.assertTrue(CHECK["check_changelog"]([("en", pending)], draft=True))
+                self.assertFalse(CHECK["check_changelog"]([("en", pending + warning)], draft=True))
+                self.assertTrue(CHECK["check_changelog"]([("en", pending + warning)]))
+
+    def test_unreleased_rejects_a_date_in_plain_and_linked_headings(self):
+        for title in ("Unreleased", "未发布", "[Unreleased](https://host/compare/v1...main)"):
+            self.assertEqual(CHECK["check_changelog"]([("file", f"## {title}\n\nPending.")]), [])
+            for date in ("- 2026-11-25", "(2026-11-25)"):
+                with self.subTest(title=title, date=date):
+                    source = f"## {title} {date}\n\nPending."
+                    self.assertTrue(CHECK["check_changelog"]([("file", source)]))
+
     def test_template_header_comments_cannot_remain(self):
         for filename in ("changelog-version-template.md", "changelog-version-zh-CN-template.md"):
             template = (TEMPLATE_DIR / filename).read_text(encoding="utf-8")

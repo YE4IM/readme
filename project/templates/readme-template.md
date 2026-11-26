@@ -159,7 +159,7 @@ To enable: remove the surrounding comment markers and fill verified content. Oth
 Show the shortest path from a clean environment to one successful run. Keep this section expanded.
 QUICK_START_SNIPPET_LANGUAGE uses the actual shell or programming language, e.g. powershell or python.
 Use the real command sequence; do not omit the working directory or prerequisites.
-If you could not run the steps, say so plainly (for example: "These commands were taken from the repo and have not been verified in this environment.").
+If the target platform, dependencies or credentials are unavailable, identify the limitation alongside the repository's documented command. If a command fails in a supported environment, remove it from the instructions and verify a replacement. Deliver a draft if the only starting path still fails.
 If the expected result is unknown, delete {{QUICK_START_EXPECTED_RESULT}} rather than inventing output.
 For services, include how to confirm the process is up only if a real health check or URL exists.
 -->

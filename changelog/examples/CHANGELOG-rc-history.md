@@ -4,7 +4,7 @@
 
 ## v2.0.0 - 2026-11-26
 
-JSON output now ends with a newline. If you are upgrading from the previous stable version, see the [complete migration instructions](https://example.com/example/releases/tag/v2.0.0).
+JSON output now ends with a newline. If your scripts still use the old output flag, follow the [complete migration instructions](https://example.com/example/releases/tag/v2.0.0).
 
 ### Changed
 

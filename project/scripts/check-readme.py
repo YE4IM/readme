@@ -181,7 +181,7 @@ def check_pair(
         if badges > 4:
             errors.append(f"{label} has {badges} badges; the limit is 4")
         errors.extend(badge_layout_errors(label, visible))
-        errors.extend(folded_section_errors(label, visible))
+        errors.extend(folded_section_errors(label, uncommented))
     return errors
 
 
@@ -361,22 +361,51 @@ def comment_errors(label: str, prose: str, instructions: set[str]) -> list[str]:
     return []
 
 
-def folded_section_errors(label: str, visible: str) -> list[str]:
-    """Installation and Quick Start must stay expanded, never inside <details>."""
+DETAILS_TAG = re.compile(r"(<details\b[^>]*>|</details\s*>)", re.I)
+STEP_INTRO = re.compile(r"[:：]$|\b(?:steps? below|command below|as follows|the following command)[.!]?$|(?:步骤如下|命令如下|以下命令)[。！]?$", re.I)
+
+
+def folded_section_errors(label: str, uncommented: str) -> list[str]:
+    """Check core headings and the content a reader can see before opening details."""
+    lines = uncommented.splitlines()
+    for start, end, language, body in reversed(list(fenced_blocks(uncommented))):
+        # Preserve evidence of a visible code step without treating its contents as HTML.
+        has_step = language.lower() not in {"text", "plaintext", "output"} and any(line.strip() for line in body)
+        lines[start:end] = ["code step" if has_step else ""]
+    source = INLINE_CODE.sub("inline code", "\n".join(lines))
+    outside = []
     depth = 0
-    for line in visible.splitlines():
-        stripped = line.lstrip()
-        if re.match(r"<details\b", stripped, re.I):
-            depth += 1
-        elif re.match(r"</details\s*>", stripped, re.I):
-            depth = max(depth - 1, 0)
-        elif depth:
-            heading = SECTION_HEADING.match(line)
-            if heading and heading[2].strip().casefold() in COMMAND_HEADINGS:
-                return [
-                    f"{label} folds {heading[2].strip()} into <details>; "
-                    "Installation and Quick Start must stay expanded"
-                ]
+    for fragment in DETAILS_TAG.split(source):
+        if DETAILS_TAG.fullmatch(fragment):
+            depth = max(depth - 1, 0) if fragment.startswith("</") else depth + 1
+        elif depth == 0:
+            outside.append(fragment)
+            continue
+        outside.append("\n" * fragment.count("\n"))
+
+    lines = source.split("\n")
+    expanded = "".join(outside).split("\n")
+    headings = []
+    for i, line in enumerate(lines):
+        heading = SECTION_HEADING.match(line)
+        if heading:
+            headings.append((i, len(heading[1]), heading[2]))
+        elif i + 1 < len(lines) and SETEXT.fullmatch(line + "\n" + lines[i + 1]):
+            headings.append((i, 1 if lines[i + 1].strip().startswith("=") else 2, line.strip()))
+    for index, (start, level, title) in enumerate(headings):
+        if title.strip().casefold() not in COMMAND_HEADINGS:
+            continue
+        if not expanded[start].strip():
+            return [f"{label} folds {title} into <details>; Installation and Quick Start must stay expanded"]
+        end = next((i for i, next_level, _ in headings[index + 1:]
+                    if next_level <= level and expanded[i].strip()), len(lines))
+        if not DETAILS_TAG.search("\n".join(lines[start + 1:end])):
+            continue
+        # A subheading, divider or introductory line does not supply a step.
+        content = (line.strip() for line in expanded[start + 1:end])
+        if not any(line and not SECTION_HEADING.match(line) and not re.fullmatch(r"[-=* _]+", line)
+                   and not STEP_INTRO.search(line) for line in content):
+            return [f"{label} folds the steps under {title} into <details>"]
     return []
 
 

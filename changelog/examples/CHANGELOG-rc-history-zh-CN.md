@@ -4,7 +4,7 @@
 
 ## v2.0.0 - 2026-11-26
 
-JSON 输出现在以换行符结尾。从上一稳定版升级时，请参阅[完整迁移步骤](https://example.com/example/releases/tag/v2.0.0)。
+JSON 输出现在以换行符结尾。如果脚本仍使用旧的输出参数，请参阅[完整迁移步骤](https://example.com/example/releases/tag/v2.0.0)。
 
 ### 行为变更
 

@@ -17,7 +17,9 @@ SWITCH_NAMES = ("project.md", "project-zh-CN.md")
 class ReadmeCheckTests(unittest.TestCase):
     def check_pair(self, english, chinese, *, draft=False):
         with TemporaryDirectory() as directory:
-            kit = Path(directory)
+            kit = Path(directory) / "project"
+            kit.mkdir()
+            (kit.parent / "LICENSE").write_bytes((ROOT.parent / "LICENSE").read_bytes())
             root = kit / "docs"
             root.mkdir()
             for subdir in ("templates",):
@@ -247,6 +249,24 @@ $ example --output json
             "\nUse `<details>` for secondary material.\n"
         )
         self.assertEqual(self.check_pair(en + secondary, zh + secondary), [])
+
+    def test_primary_steps_must_be_visible_under_an_expanded_heading(self):
+        en = ENGLISH.replace("../assets/", "./assets/").split("## Quick Start")[0]
+        zh = CHINESE.replace("../assets/", "./assets/").split("## 快速开始")[0]
+        command = "~~~sh\ntool run\n~~~"
+        steps = "<details>\n<summary>Steps</summary>\n\n" + command + "\n\n</details>"
+        for heading, translation in (("Quick Start", "快速开始"), ("Installation", "安装")):
+            for outside in ("", "Follow these steps:\n", "Run the following command.\n", "<!-- internal note -->\n"):
+                with self.subTest(heading=heading, outside=outside):
+                    result = self.check_pair(en + f"## {heading}\n\n{outside}{steps}",
+                                             zh + f"## {translation}\n\n{outside}{steps}")
+                    self.assertTrue(any("fold" in error for error in result), result)
+            for outside in (command, "1. Open the guide.", "[Open the guide](./project.md)"):
+                with self.subTest(heading=heading, outside=outside):
+                    self.assertEqual(self.check_pair(en + f"## {heading}\n\n{outside}\n\n{steps}",
+                                                     zh + f"## {translation}\n\n{outside}\n\n{steps}"), [])
+        self.assertTrue(self.check_pair(en + "Quick Start\n-----------\n\n" + steps,
+                                        zh + "快速开始\n--------\n\n" + steps))
 
     def test_template_instruction_comments_cannot_remain(self):
         en = ENGLISH.replace("../assets/", "./assets/")

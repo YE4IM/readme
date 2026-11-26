@@ -14,9 +14,15 @@ FENCE = re.compile(r"^ {0,3}(\x60{3,}|~{3,})(.*)$")
 ALERT = re.compile(r"^> \[!(WARNING|IMPORTANT|NOTE)\][ \t]*$", re.M)
 FIELD = re.compile(r"\{\{\s*(TODO(?:\s*[:：][^{}]*)?|[A-Z][A-Z0-9_]*)\s*\}\}")
 BROKEN_SECTION = {"Breaking Changes", "破坏性变更"}
-HIGHLIGHT_SECTION = {"Highlights", "亮点展示"}
 MIGRATION = re.compile(r"(?im)^\s*\*\*(?:Migration|迁移步骤)[:：]\*\*[ \t]*$")
-VERSION_DATE = re.compile(r"^(.+?)(?:[ \t]+[-–—][ \t]+(\d{4}-\d{2}-\d{2})(?:[ \t].*)?|[ \t]+\((\d{4}-\d{2}-\d{2})\)(?:[ \t].*)?)$")
+DATE_VALUE = r"(?:\d{4}-\d{2}-\d{2}|\{\{\s*TODO(?:\s*[:：][^{}\n]*)?\s*\}\})"
+VERSION_DATE = re.compile(
+    rf"^(?P<version>.+?)[ \t]+(?:[-–—][ \t]+(?P<date>{DATE_VALUE})"
+    rf"|\((?P<parenthesized>{DATE_VALUE})\))(?:[ \t]+(?P<status>.+))?$"
+)
+PRERELEASE_VERSION = re.compile(r"[-.](?:alpha|beta|rc)(?:[.\d-]|$)", re.I)
+PRERELEASE_LABELS = {"pre-release", "prerelease", "pre release", "预发布", "预发布版"}
+STABLE_LABELS = {"stable", "正式版", "稳定版"}
 UNRELEASED = {"unreleased", "未发布"}
 LANGUAGE_TITLE = {"english", "中文", "简体中文", "chinese"}
 
@@ -100,22 +106,22 @@ def sections(visible, level):
 
 def section_errors(visible, level, *, draft):
     errors = []
-    for index, (heading, body) in enumerate(sections(visible, level)):
+    headings = list(sections(visible, level))
+    for index, (heading, body) in enumerate(headings):
         if not body:
             errors.append(f"{heading} has no visible content")
         if heading in BROKEN_SECTION:
-            earlier = [
-                previous for previous, _body in list(sections(visible, level))[:index]
-                if previous not in HIGHLIGHT_SECTION
-            ]
-            if earlier:
-                errors.append(f"{heading} must precede other categories")
+            if index:
+                errors.append(f"{heading} must precede Highlights and other categories")
             migration = MIGRATION.search(body)
             steps = body[migration.end():] if migration else body
             if not re.search(r"(?m)^ {0,3}1[.)][ \t]+\S", steps) and not (
                 draft and re.search(r"\{\{\s*TODO(?:\s*[:：]|\s*\}\})", steps)
             ):
                 errors.append(f"{heading} needs numbered migration steps or a draft TODO")
+        if level == 2 and heading in {"Highlights", "亮点展示"} and index:
+            if index > 1 or headings[0][0] not in BROKEN_SECTION:
+                errors.append(f"{heading} must follow the summary, alerts and any Breaking Changes")
     return errors
 
 
@@ -133,15 +139,29 @@ LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d+[.)])[ \t]+\S", re.M)
 # A "#" after "#", a quote, or "=" (as in ##333 or fill="#333") is not an issue reference.
 ISSUE = re.compile(r"(?<![A-Za-z0-9_/#\"'=])(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#[0-9]+(?![A-Za-z0-9_])")
 HANDLE = re.compile(r"(?<![A-Za-z0-9_./-])@[A-Za-z0-9-]+")
-LINK = re.compile(r"\]\(\s*(?:<([^>]+)>|([^\s)]+))")
+LINK = re.compile(r"(?:\[([^\[\]\n]*))?\]\(\s*(?:<([^>]+)>|([^\s)]+))")
 IMAGE = re.compile(r"!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))")
 IMG_SRC = re.compile(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", re.I)
-ASSET = re.compile(r"/(?:releases/(?:download|tag)|compare|pull|issues)/|\.(?:zip|gz|exe|msi|dmg|apk|deb|rpm|whl|sha256)(?:[?#]|$)", re.I)
+ASSET = re.compile(r"/(?:releases/(?:download|tag)|compare|pull|issues)/|\.(?:zip|gz|xz|exe|msi|dmg|pkg|apk|deb|rpm|whl|sha256)(?:[?#]|$)", re.I)
 
 
-def documentation_link(url):
-    path = url.split("?", 1)[0].split("#", 1)[0].lower()
-    return bool(re.search(r"(?:^|/)(?:docs?|guides?|manual|wiki)(?:/|$)|\.(?:md|html?)$", path))
+DOWNLOAD_LABEL = re.compile(r"\b(?:download|installer|binary|app store|google play)\b|下载|安装包|二进制|应用商店", re.I)
+GUIDE_LABEL = re.compile(r"\b(?:guides?|docs?|documentation|instructions?|manuals?|tutorials?)\b|指南|文档|手册|教程|说明", re.I)
+GUIDE_PATH = re.compile(r"(?:^|/)(?:docs?|guides?|manual|wiki)(?:/|$)|\.(?:md|html?)$", re.I)
+DOWNLOAD_PATH = re.compile(r"/(?:downloads?|releases/[^/]+|artifacts|builds)/|[-/]installer$", re.I)
+
+
+def shared_link(label, url, category):
+    if url.startswith("#"):
+        return False
+    if category == "Full Changelog" or ASSET.search(url):
+        return True
+    if category != "Installation & Upgrade":
+        return False
+    path = url.split("?", 1)[0].split("#", 1)[0]
+    if GUIDE_LABEL.search(label) or GUIDE_PATH.search(path):
+        return False
+    return bool(DOWNLOAD_LABEL.search(label) or DOWNLOAD_PATH.search(path))
 
 
 DEFINITION = re.compile(r"(?m)^ {0,3}\[([^\]\n]+)\]:[ \t]*(?:<([^>\n]+)>|(\S+))[^\n]*$")
@@ -174,11 +194,8 @@ def reference_links(visible, shared_definitions=None):
 
 def section_facts(body, category):
     prose = INLINE_CODE.sub(" ", body)
-    links = [angle or plain for angle, plain in LINK.findall(prose)]
-    shared = [url for url in links if not url.startswith("#") and (
-        ASSET.search(url) or category == "Full Changelog"
-        or (category == "Installation & Upgrade" and not documentation_link(url))
-    )]
+    shared = [angle or plain for label, angle, plain in LINK.findall(prose)
+              if shared_link(label, angle or plain, category)]
     if category == "Highlights":
         shared.extend(angle or plain for angle, plain in IMAGE.findall(prose))
         shared.extend(IMG_SRC.findall(prose))
@@ -248,24 +265,26 @@ def heading_label(title):
     return re.sub(r"^\[([^\]]+)\](?:\(.*\))?$", r"\1", title)
 
 
-def changelog_entries(text, *, draft, shared_definitions=None):
+def inspect_changelog(text, *, draft, shared_definitions=None):
     visible = visible_markdown(text)
     errors = residue_errors(text, visible, "changelog/changelog-version-template.md", draft=draft)
     entries = []
+    layout = []
     seen_versions = set()
     visible, reference_errors = reference_links(visible, shared_definitions)
     errors.extend(reference_errors)
     previous_date = None
     for heading, body in sections(visible, 2):
-        if heading_label(heading).casefold() in UNRELEASED:
-            if entries:
-                errors.append("Unreleased must be the first CHANGELOG entry")
-            label = "Unreleased"
-        else:
-            datestamp = VERSION_DATE.fullmatch(heading)
-            if datestamp:
-                label = heading_label(datestamp[1])
-                stamp = datestamp[2] or datestamp[3]
+        status = ""
+        datestamp = VERSION_DATE.fullmatch(heading)
+        if datestamp:
+            label = heading_label(datestamp["version"])
+            if label.casefold() in UNRELEASED:
+                errors.append(f"{heading}: Unreleased cannot have a publication date")
+            stamp = datestamp["date"] or datestamp["parenthesized"]
+            status = (datestamp["status"] or "").strip("()（）").casefold()
+            # The residue check already rejects a date TODO in publishable copy.
+            if not stamp.startswith("{{"):
                 try:
                     current_date = date.fromisoformat(stamp)
                     if previous_date and current_date > previous_date:
@@ -274,27 +293,44 @@ def changelog_entries(text, *, draft, shared_definitions=None):
                 except ValueError:
                     errors.append(f"{heading} has an invalid calendar date")
                 label = (label, stamp)
-            elif draft and "{{TODO" in heading:
-                label = heading_label(heading.split("{{TODO", 1)[0].rstrip(" -–—"))
-            else:
-                message = "unrecognized version heading format" if re.search(r"\d{4}-\d{2}-\d{2}", heading) else "needs a version and a YYYY-MM-DD date"
-                errors.append(f"{heading}: {message}")
-                label = heading
+        elif heading_label(heading).casefold() in UNRELEASED:
+            if entries:
+                errors.append("Unreleased must be the first CHANGELOG entry")
+            label = "Unreleased"
+        elif draft and "{{TODO" in heading:
+            label = heading_label(heading.split("{{TODO", 1)[0].rstrip(" -–—"))
+        else:
+            message = "unrecognized version heading format" if re.search(r"\d{4}-\d{2}-\d{2}", heading) else "needs a version and a YYYY-MM-DD date"
+            errors.append(f"{heading}: {message}")
+            label = heading
         version = label[0] if isinstance(label, tuple) else label
         if version in seen_versions:
             errors.append(f"duplicate CHANGELOG entry: {heading}")
         if isinstance(label, tuple) and not body:
             errors.append(f"{heading} has no visible content")
-        if re.search(r"[-.](?:alpha|beta|rc)(?:[.\d-]|$)", version, re.I) or "WARNING" in ALERT.findall(body):
+        prerelease = bool(PRERELEASE_VERSION.search(version)) or status in PRERELEASE_LABELS
+        if prerelease and status in STABLE_LABELS:
+            errors.append(f"{heading}: pre-release version has a stable label")
+        if prerelease or "WARNING" in ALERT.findall(body):
             errors.extend(f"{heading}: {error}" for error in warning_errors(body))
         seen_versions.add(version)
         entries.append(label)
+        target = re.match(r"^\[([^\]]+)\](?:\(([^)]+)\))?", heading)
+        url = target[2] if target else None
+        if target and not url:
+            errors.append(f"missing link definition for {target[1]}")
+        layout.append((prerelease, url, structure(body, 3)))
         for subheading in HEADING.finditer(body):
             if subheading[2] in CATEGORY_TITLES and len(subheading[1]) != 3:
                 errors.append(f"{heading}: {subheading[2]} must use a level-three heading")
         errors.extend(section_errors(body, 3, draft=draft))
     if not entries:
         errors.append("expected at least one level-two version or Unreleased heading")
+    return entries, layout, errors
+
+
+def changelog_entries(text, *, draft, shared_definitions=None):
+    entries, _, errors = inspect_changelog(text, draft=draft, shared_definitions=shared_definitions)
     return entries, errors
 
 
@@ -303,19 +339,9 @@ def check_changelog(documents, *, draft=False, shared_definitions=None):
     versions = []
     layouts = []
     for name, text in documents:
-        entries, found = changelog_entries(text, draft=draft, shared_definitions=shared_definitions)
+        entries, layout, found = inspect_changelog(text, draft=draft, shared_definitions=shared_definitions)
         errors.extend(f"{name}: {error}" for error in found)
         versions.append(entries)
-        visible, _ = reference_links(visible_markdown(text), shared_definitions)
-        layout = []
-        for heading, body in sections(visible, 2):
-            target = re.match(r"^\[([^\]]+)\](?:\(([^)]+)\))?", heading)
-            url = None
-            if target:
-                url = target[2]
-                if not url:
-                    errors.append(f"{name}: missing link definition for {target[1]}")
-            layout.append((url, structure(body, 3)))
         layouts.append(layout)
     if len(documents) == 2:
         if versions[0] != versions[1]:
@@ -323,7 +349,7 @@ def check_changelog(documents, *, draft=False, shared_definitions=None):
         elif layouts[0] != layouts[1]:
             for version, en, zh in zip(versions[0], *layouts):
                 if en != zh:
-                    errors.append(f"{version}: CHANGELOG categories, item counts, references, shared links or alerts differ")
+                    errors.append(f"{version}: CHANGELOG release status, categories, item counts, references, shared links or alerts differ")
     return errors
 
 
