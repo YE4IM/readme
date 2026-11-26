@@ -32,6 +32,10 @@ The README guide and templates apply to GitHub projects maintained by this repos
 
 For project READMEs, center the OPC.FISH signature above the title in both files. Below the introduction, use the same row of 1–4 clickable static Shields.io badges. Include each verified category in the order `License`, `Version`, `Language`, and `Platform`. Use `Source: Repository` only if none of those categories can be verified. Check the finished pair before publishing. [Badge rules](./project/project-agent-instructions.md#必填徽章) · [English example](./project/docs/project.md) · [中文示例](./project/docs/project-zh-CN.md)
 
+**Badge color examples**
+
+![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+
 For a GitHub Release, verify the target tag or commit and the comparison range on the same release line. Use the verified release identifier as the GitHub title unless the project has an established title convention. Start the body with a summary, then write the English and Chinese sections in that order, separated by a standalone `---`. Include the pre-release warning in both languages when applicable. [Stable patch](./releases/examples/patch.md) · [Initial release](./releases/examples/initial.md)
 
 The CHANGELOG examples show an unreleased entry, a maintenance-line patch, and an initial release. [English](./changelog/examples/CHANGELOG.md) · [中文](./changelog/examples/CHANGELOG-zh-CN.md)

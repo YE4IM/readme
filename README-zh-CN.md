@@ -32,6 +32,10 @@
 
 编写项目 README 时，两份文件都在标题上方居中显示 OPC.FISH 署名。简介下方使用同一行 1–4 枚可点击的 Shields.io 静态徽章，按 `License`、`Version`、`Language`、`Platform` 的顺序列出有依据的类别。四类均无法核实时，使用 `Source: Repository`。发布前检查双语成稿。[徽章规则](./project/project-agent-instructions.md#必填徽章) · [英文示例](./project/docs/project.md) · [中文示例](./project/docs/project-zh-CN.md)
 
+**徽章配色示例**
+
+![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+
 撰写 GitHub Release 时，先核对目标 Tag 或提交，以及同一发布线的对比范围。GitHub 标题默认使用已核实的发布标识，有既定命名惯例时沿用。正文从摘要起笔，先写英文，再用独立一行的 `---` 分隔中文。预发布时，两种语言都要有警示。[正式补丁](./releases/examples/patch.md) · [首次发布](./releases/examples/initial.md)
 
 双语 CHANGELOG 示例展示了未发布项、维护线补丁和首次发布。[English](./changelog/examples/CHANGELOG.md) · [中文](./changelog/examples/CHANGELOG-zh-CN.md)
