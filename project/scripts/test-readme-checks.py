@@ -3,7 +3,6 @@
 import runpy
 import unittest
 from pathlib import Path
-from shutil import copytree
 from tempfile import TemporaryDirectory
 
 
@@ -33,7 +32,6 @@ class ReadmeCheckTests(unittest.TestCase):
             for name, text in zip(SWITCH_NAMES, (english, chinese)):
                 (root / name).write_text(text, encoding="utf-8")
             (root / "assets").mkdir()
-            copytree(ROOT / "assets" / "badges", root / "assets" / "badges")
             for asset in (ROOT / "assets").glob("*.svg"):
                 (root / "assets" / asset.name).write_bytes(asset.read_bytes())
             return CHECK["check_pair"](
@@ -307,49 +305,50 @@ $ example --output json
         self.assertEqual(CHECK["secret_errors"]("English", "The token is read from the environment. secret: none"), [])
 
     def test_badge_rows(self):
-        with TemporaryDirectory() as directory:
-            readme = Path(directory) / "README.md"
-            rows = {}
-            for kind, value in (("License", "MIT"), ("Version", "1.5.0-rc.1"),
-                                ("Language", "TypeScript"), ("Platform", "Browser Extension"),
-                                ("Source", "Repository")):
-                image = kind.lower() + ".svg"
-                (readme.parent / image).write_text(CHECK["badge_svg"](kind, value))
-                rows[kind] = f"[![{kind}: {value}]({image})](https://example.org/repo)"
-            license, version, language, platform, source = rows.values()
-            four = " ".join([license, version, language, platform])
-            header = "# Example\n\n[**English**](./README.md) | [中文](./README-zh-CN.md)\n\nDescription.\n\n"
+        rows = {}
+        for kind, value in (("License", "MIT"), ("Version", "1.5.0-rc.1"),
+                            ("Language", "TypeScript"), ("Platform", "Browser Extension"),
+                            ("Source", "Repository")):
+            image = CHECK["badge_url"](kind, value)
+            rows[kind] = f"[![{kind}: {value}]({image})](https://example.org/repo)"
+        license, version, language, platform, source = rows.values()
+        four = " ".join([license, version, language, platform])
+        header = "# Example\n\n[**English**](./README.md) | [中文](./README-zh-CN.md)\n\nDescription.\n\n"
 
-            def problems(row):
-                return CHECK["check_badges"]("English", readme, header + row)[1]
+        def problems(row):
+            return CHECK["check_badges"]("English", header + row)[1]
 
-            for row in (license, source, four, version + " " + platform,
-                        license + "\n\n[![Demo](demo.png)](demo.html)"):
-                self.assertEqual(problems(row), [])
-            invalid = [
-                "", four + " " + source, license + " " + license, language + " " + version,
-                license + " " + source, license + "  " + version, license + "\n" + version,
-                license + "\n\n" + version, platform.replace("Browser Extension", "Chrome"),
-                license.replace("License:", "CI:"), source.replace("Repository", "Repo"),
-                source.replace("https://example.org/repo", "./"),
-                "<!-- " + license + " -->", chr(96) + license + chr(96),
-                "## Overview\n\n" + license,
-            ]
-            for row in invalid:
-                with self.subTest(row=row):
-                    self.assertTrue(problems(row))
-            for kind, background, foreground in [
-                ("License", "#2359D1", "#FFFFFF"), ("Version", "#FF895A", "#382A26"),
-                ("Language", "#FFB3B8", "#382A26"), ("Platform", "#DFE89A", "#382A26"),
-                ("Source", "#555555", "#FFFFFF"),
-            ]:
-                asset = readme.parent / (kind.lower() + ".svg")
-                original = asset.read_text()
-                self.assertIn(f'fill="{background}"', original)
-                self.assertIn(f'fill="{foreground}">', original)
-                asset.write_text(original.replace(background, "#000000"))
-                self.assertTrue(problems(rows[kind]))
-                asset.write_text(original)
+        for row in (license, source, four, version + " " + platform,
+                    license + "\n\n[![Demo](demo.png)](demo.html)"):
+            self.assertEqual(problems(row), [])
+        invalid = [
+            "", four + " " + source, license + " " + license, language + " " + version,
+            license + " " + source, license + "  " + version, license + "\n" + version,
+            license + "\n\n" + version, platform.replace("Browser Extension", "Chrome"),
+            license.replace("License:", "CI:"), source.replace("Repository", "Repo"),
+            source.replace("https://example.org/repo", "./"),
+            "<!-- " + license + " -->", chr(96) + license + chr(96),
+            "## Overview\n\n" + license,
+            license.replace(CHECK["badge_url"]("License", "MIT"), "./badges/license.svg"),
+            license.replace("img.shields.io", "example.org"), license.replace("-MIT-", "-ISC-"),
+            license.replace("2359D1", "000000"), license.replace("382A26", "ffffff"),
+            license.replace("style=flat", "style=plastic"), license.replace("?style", "?logo=git&style"),
+        ]
+        for row in invalid:
+            with self.subTest(row=row):
+                self.assertTrue(problems(row))
+
+    def test_static_badge_urls(self):
+        for kind, value, expected in (
+            ("License", "Apache-2.0", "License-Apache--2.0-2359D1"),
+            ("Version", "1.0-rc.1+test_2", "Version-1.0--rc.1%2Btest__2-FF895A"),
+            ("Language", "C#", "Language-C%23-FFB3B8"),
+            ("Platform", "Browser Extension", "Platform-Browser%20Extension-DFE89A"),
+            ("Source", "Repository", "Source-Repository-555555"),
+        ):
+            with self.subTest(kind=kind):
+                self.assertEqual(CHECK["badge_url"](kind, value),
+                                 f"https://img.shields.io/badge/{expected}?style=flat&labelColor=382A26")
 
     def test_bilingual_badge_markdown_and_hidden_examples(self):
         en = ENGLISH.replace("../assets/", "./assets/")

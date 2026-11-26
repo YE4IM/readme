@@ -33,7 +33,7 @@ OPC.FISH 署名留在文件最上方、标题之前，不要在这里再放一�
 
 <!--
 必需：按 License、Version、Language、Platform 的顺序选用所有可核实的类别，每类一枚。四类都无法使用时，只放 Source: Repository，链接到已核实的仓库主页。
-用规范的 badge 命令生成 flat SVG。取值、平台词表、配色及链接目标见 project-agent-instructions.md 的「必填徽章」。
+使用 Shields.io 静态 flat 徽章，按规范构造图片 URL。取值、平台词表、配色及链接目标见 project-agent-instructions.md 的「必填徽章」。
 用一行 1–4 枚可点击徽章替换下方字段，每枚之间用一个空格。中英文逐字复用同一行。
 -->
 

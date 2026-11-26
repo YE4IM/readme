@@ -11,13 +11,12 @@ Usage:
 from __future__ import annotations
 
 import argparse
-from html import escape
 import os
 import re
 import sys
 import unicodedata
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 REMOTE_LIGHT = (
@@ -62,11 +61,11 @@ EXAMPLE_SECRETS = {"YOUR_API_KEY", "YOUR_API_TOKEN", "YOUR_TOKEN", "YOUR_PASSWOR
 
 # Insertion order is the display order. Source is the exclusive fallback.
 BADGE_COLORS = {
-    "License": ("#2359D1", "#FFFFFF"),
-    "Version": ("#FF895A", "#382A26"),
-    "Language": ("#FFB3B8", "#382A26"),
-    "Platform": ("#DFE89A", "#382A26"),
-    "Source": ("#555555", "#FFFFFF"),
+    "License": "2359D1",
+    "Version": "FF895A",
+    "Language": "FFB3B8",
+    "Platform": "DFE89A",
+    "Source": "555555",
 }
 PLATFORMS = {
     "Browser Extension", "Web", "Windows", "macOS", "Linux", "Desktop", "iOS",
@@ -75,7 +74,7 @@ PLATFORMS = {
 }
 
 
-def badge_svg(kind: str, value: str) -> str:
+def badge_url(kind: str, value: str) -> str:
     if (not value.strip() or value != value.strip() or not value.isprintable()
             or any(char in value for char in "[]")):
         raise ValueError("badge values must be printable text suitable for Markdown alt text")
@@ -83,21 +82,8 @@ def badge_svg(kind: str, value: str) -> str:
         raise ValueError("unsupported Platform value: " + value)
     if kind == "Source" and value != "Repository":
         raise ValueError("Source must display Repository")
-    bg, fg = BADGE_COLORS[kind]
-    left = 10 + 7 * len(kind)
-    right = 10 + 7 * sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in value)
-    width = left + right
-    return (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="20" role="img"'
-        f' aria-label="{kind}: {escape(value)}">\n'
-        f'  <clipPath id="r"><rect width="{width}" height="20" rx="3"/></clipPath>\n'
-        f'  <g clip-path="url(#r)"><rect width="{left}" height="20" fill="#382A26"/>'
-        f'<rect x="{left}" width="{right}" height="20" fill="{bg}"/></g>\n'
-        '  <g font-family="DejaVu Sans Mono,monospace" font-size="11" text-anchor="middle">\n'
-        f'    <text x="{left / 2:g}" y="14" fill="#FFFFFF">{kind}</text>\n'
-        f'    <text x="{left + right / 2:g}" y="14" fill="{fg}">{escape(value)}</text>\n'
-        '  </g>\n</svg>\n'
-    )
+    message = quote(value.replace("-", "--").replace("_", "__"), safe="")
+    return f"https://img.shields.io/badge/{kind}-{message}-{BADGE_COLORS[kind]}?style=flat&labelColor=382A26"
 
 
 def main() -> int:
@@ -114,14 +100,14 @@ def main() -> int:
 
     pair.add_argument("--draft", action="store_true", help="allow editorial TODO markers")
 
-    badge = sub.add_parser("badge", help="render a standard flat badge SVG to stdout")
+    badge = sub.add_parser("badge", help="print the static Shields.io image URL")
     badge.add_argument("kind", choices=BADGE_COLORS)
     badge.add_argument("value")
 
     args = parser.parse_args()
     if args.command == "badge":
         try:
-            sys.stdout.write(badge_svg(args.kind, args.value))
+            print(badge_url(args.kind, args.value))
         except ValueError as error:
             parser.error(str(error))
         return 0
@@ -232,7 +218,7 @@ def check_pair(
         errors.extend(comment_errors(label, prose, instructions))
         errors.extend(secret_errors(label, text))
         errors.extend(signature_errors(label, text, signature, files[label]))
-        row, problems = check_badges(label, files[label], visible)
+        row, problems = check_badges(label, visible)
         badge_rows.append(row)
         errors.extend(problems)
         errors.extend(folded_section_errors(label, uncommented))
@@ -358,7 +344,7 @@ LINKED_IMAGE = re.compile(r"\[!\[([^\]\n]*)\]\(([^()\s]+)\)\]\(([^()\s]+)\)")
 BADGE_ALT = re.compile(r"(License|Version|Language|Platform|Source): (.+)")
 
 
-def check_badges(label: str, path: Path, visible: str) -> tuple[str, list[str]]:
+def check_badges(label: str, visible: str) -> tuple[str, list[str]]:
     # The first prose paragraph after the switch is the project description.
     # A logo can precede it; linked screenshots elsewhere are ordinary exhibits.
     markdown = INLINE_CODE.sub(lambda m: "inline-code", visible)
@@ -387,22 +373,15 @@ def check_badges(label: str, path: Path, visible: str) -> tuple[str, list[str]]:
         kind, value = field.groups()
         kinds.append(kind)
         try:
-            expected = badge_svg(kind, value)
-            asset = urlsplit(image)
-            if (asset.scheme or asset.netloc or asset.path.startswith("/") or asset.fragment
-                    or asset.query or not asset.path.endswith(".svg")):
-                raise ValueError("use a relative path to the standard SVG")
-            svg = path.parent / unquote(asset.path)
-            if not svg.is_file():
-                raise ValueError("badge SVG file is missing")
-            if svg.read_text(encoding="utf-8") != expected:
-                raise ValueError("SVG differs from the standard rendering")
+            expected = badge_url(kind, value)
+            if image != expected:
+                raise ValueError(f"expected static Shields.io URL {expected}")
             dest = urlsplit(target)
             if dest.scheme and (dest.scheme not in {"https", "http"} or not dest.hostname):
                 raise ValueError("invalid badge destination")
             if kind == "Source" and not (dest.scheme == "https" and dest.hostname and dest.path.strip("/")):
                 raise ValueError("Source must link to the repository homepage")
-        except (ValueError, OSError) as error:
+        except ValueError as error:
             errors.append(f"{label} {kind} badge: {error}")
     if kinds != sorted(set(kinds), key=list(BADGE_COLORS).index):
         errors.append(f"{label} badge categories must be unique and in standard order")

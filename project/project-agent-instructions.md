@@ -90,12 +90,12 @@
 
 每份 README 在简介下方放 **1–4 枚**可点击徽章。按表中顺序使用所有有依据的常规类别，每类最多一枚。中英文逐字复用同一行 Markdown，相邻徽章用一个空格隔开。文首 OPC.FISH 署名单独保留，不计入数量。
 
-| 标签 | 取值与依据 | 点击目标 | 值区底色 / 文字 |
+| 标签 | 取值与依据 | 点击目标 | 值区底色 |
 |---|---|---|---|
-| `License` | 项目许可证的 SPDX 标识，如 `MIT`、`Apache-2.0` | 适用的许可证文件 | `#2359D1` / `#FFFFFF` |
-| `Version` | 当前检出代码构建或打包时使用的版本号，保留预发布标识。浏览器扩展可读取最终清单的 version 字段。仅用 Git 标签管理版本时，当前提交须对应明确的版本标签 | 版本声明文件或当前提交的版本标签页 | `#FF895A` / `#382A26` |
-| `Language` | 一门主要实现语言，采用官方拼写。优先核对项目声明与核心源码，排除依赖、生成文件和辅助脚本。主语言不明确时省略 | 核心源码目录 | `#FFB3B8` / `#382A26` |
-| `Platform` | 从下表选择主要交付物的适用环境。纯文档、模板或没有明确主要环境时省略 | 项目文档、配置文件或商店页 | `#DFE89A` / `#382A26` |
+| `License` | 项目许可证的 SPDX 标识，如 `MIT`、`Apache-2.0` | 适用的许可证文件 | `#2359D1` |
+| `Version` | 当前检出代码构建或打包时使用的版本号，保留预发布标识。浏览器扩展可读取最终清单的 version 字段。仅用 Git 标签管理版本时，当前提交须对应明确的版本标签 | 版本声明文件或当前提交的版本标签页 | `#FF895A` |
+| `Language` | 一门主要实现语言，采用官方拼写。优先核对项目声明与核心源码，排除依赖、生成文件和辅助脚本。主语言不明确时省略 | 核心源码目录 | `#FFB3B8` |
+| `Platform` | 从下表选择主要交付物的适用环境。纯文档、模板或没有明确主要环境时省略 | 项目文档、配置文件或商店页 | `#DFE89A` |
 
 | 环境 | 固定值与选择规则 |
 |---|---|
@@ -106,16 +106,19 @@
 | 应用插件 | 设计工具插件选 `Design Tool Plugin`，Office 加载项选 `Office Add-in`。 |
 | 服务与设备 | 独立部署的后端服务选 `Server`，嵌入式设备项目选 `Embedded`。 |
 
-四类均无法核实时，只放 `Source: Repository`，链接到已核实的仓库主页，值区为 `#555555` 底、`#FFFFFF` 字。仓库地址也未知时，先补充地址再交付。只使用上述类别。
+四类均无法核实时，只放 `Source: Repository`，链接到已核实的仓库主页，值区为 `#555555` 底。仓库地址也未知时，先补充地址再交付。只使用上述类别。
 
-使用仓库内的 flat SVG，不加 Logo，左侧统一为 `#382A26` 底、`#FFFFFF` 字。从本规范仓库根目录运行以下命令生成标准图片，将输出保存到目标项目的资源目录。事实变化时重新生成。图片使用相对路径，alt 统一写成英文的 `标签: 值`。
+使用 [Shields.io 静态徽章](https://shields.io/badges/static-badge)。左侧底色统一为 `#382A26`，右侧底色按上表选取，文字颜色由 Shields.io 决定。使用 `flat` 样式，省略 Logo。alt 写成英文的 `标签: 值`，点击目标按上表选择。
 
-```bash
-python3 project/scripts/check-readme.py badge License MIT
-python3 project/scripts/check-readme.py badge Platform "Browser Extension"
+图片 URL 统一写作 `https://img.shields.io/badge/标签-值-值区色码?style=flat&labelColor=382A26`。色码使用大写十六进制，省略井号。值中的连字符写作 `--`，下划线写作 `__`，空格写作 `%20`，其他特殊字符按 URL 路径编码。例如 `1.5.0-rc.1` 写作 `1.5.0--rc.1`。也可用 `python3 project/scripts/check-readme.py badge Version 1.5.0-rc.1` 从仓库根目录输出图片 URL。
+
+根 README 示例：
+
+```markdown
+[![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26)](./LICENSE)
 ```
 
-例如根 README 可写 `[![License: MIT](./project/assets/badges/license.svg)](./LICENSE)`。检查器离线核对图片、配色、类别、顺序、数量、平台词表及双语 Markdown。交付前人工核实取值、类别完整性和远程目标可访问性。
+检查器离线核对图片 URL 与 alt 的类别和取值、配色、样式、顺序、数量、平台词表及双语 Markdown。交付前人工核实取值、类别完整性和远程目标可访问性。
 
 ### 条件章节（无证据必须整块删除，不可无证填写）
 
