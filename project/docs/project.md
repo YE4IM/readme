@@ -41,6 +41,10 @@ python3 scripts/check-readme.py all
 
 That checks both templates, this README pair, and the repository's root README pair. Use Python 3.8 or later for this README check.
 
+## Badge color examples
+
+![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+
 ## Signature
 
 Generated READMEs open with the mark centered at the top of the file, before the title. The picture links to [opc.fish](https://opc.fish). Both languages use the same two images and the same link. Light mode uses the transparent ink SVG. Dark mode uses the transparent light-on-dark SVG. Leave both files as they are. It is the maintainer signature, not a project logo.

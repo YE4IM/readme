@@ -41,6 +41,10 @@ python3 scripts/check-readme.py all
 
 它会检查两份模板、这对 README，以及仓库根目录的 README 成稿。运行这项 README 检查需要 Python 3.8 或更高版本。
 
+## 徽章配色示例
+
+![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+
 ## 署名
 
 生成的 README 在全文最上方、标题之前居中显示下面的署名。点击图片打开 [opc.fish](https://opc.fish)。中英文使用同一组图、同一个链接。浅色主题用透明底、墨色字的那张。深色主题用透明底、浅色字的那张。两张图都保持原文件，不要改颜色。它是维护者署名，不是项目 Logo。
