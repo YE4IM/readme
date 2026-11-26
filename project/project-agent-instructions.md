@@ -97,6 +97,10 @@
 | `Language` | 一门主要实现语言，采用官方拼写。优先核对项目声明与核心源码，排除依赖、生成文件和辅助脚本。主语言不明确时省略 | 核心源码目录 | `#993D58` |
 | `Platform` | 从下表选择主要交付物的适用环境。纯文档、模板或没有明确主要环境时省略 | 项目文档、配置文件或商店页 | `#566520` |
 
+**配色示例**
+
+![License: MIT](https://img.shields.io/badge/License-MIT-2359D1?style=flat&labelColor=382A26) ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-A34422?style=flat&labelColor=382A26) ![Language: JavaScript](https://img.shields.io/badge/Language-JavaScript-993D58?style=flat&labelColor=382A26) ![Platform: Web](https://img.shields.io/badge/Platform-Web-566520?style=flat&labelColor=382A26)
+
 | 环境 | 固定值与选择规则 |
 |---|---|
 | 浏览器 | 浏览器插件统一写 `Browser Extension`，网页应用写 `Web`。具体浏览器写入兼容性说明。 |
