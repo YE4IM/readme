@@ -25,7 +25,7 @@ REMOTE_LIGHT = (
 )
 REMOTE_DARK = (
     "https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/"
-    "opc-fish-project-signature-web-dark.svg"
+    "opc-fish-project-signature-dark.svg"
 )
 PLACEHOLDER = re.compile(r"\{\{([^{}]+)\}\}")
 FENCE_START = re.compile(r"^[ \t]*(`{3,}|~{3,})(.*)$")
@@ -516,7 +516,7 @@ def signature_errors(label: str, text: str, signature: str, readme_path: Path) -
         light, dark = REMOTE_LIGHT, REMOTE_DARK
     else:
         light = local_asset(readme_path, "opc-fish-project-signature.svg")
-        dark = local_asset(readme_path, "opc-fish-project-signature-web-dark.svg")
+        dark = local_asset(readme_path, "opc-fish-project-signature-dark.svg")
         for path in (light, dark):
             if not (readme_path.parent / path).is_file():
                 errors.append(f"{label} local signature asset is missing: {path}")

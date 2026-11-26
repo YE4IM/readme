@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/opc-fish-project-signature-web-dark.svg"><img src="../assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/opc-fish-project-signature-dark.svg"><img src="../assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
 </p>
 
 # readme
@@ -53,7 +53,7 @@ The picture on this file uses the assets in this repository. New READMEs use the
 
 ```html
 <p align="center">
-<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature-web-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
+<a href="https://opc.fish" title="OPC.FISH Project."><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature-dark.svg"><img src="https://raw.githubusercontent.com/YE4IM/readme/main/project/assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720"></picture></a>
 </p>
 ```
 
