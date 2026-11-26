@@ -16,7 +16,7 @@ Writing guides and bilingual Markdown templates for agents preparing GitHub proj
 
 Choose a guide for what you want to publish. You can read the guides and templates on GitHub or in a local checkout. No installation is required.
 
-The README guide and templates apply to every GitHub project maintained by this repository’s owner, including projects under a personal account. Put the OPC.FISH project signature before the title in every README. Third-party projects follow their own attribution rules.
+The README guide and templates apply to GitHub projects maintained by this repository’s owner, including projects under a personal account. Third-party projects follow their own attribution rules.
 
 | Deliverable | Writing guide | Templates |
 | --- | --- | --- |
@@ -30,7 +30,7 @@ The README guide and templates apply to every GitHub project maintained by this 
 2. Ask the agent to verify the project facts, use the matching template, and remove unused sections.
 3. Save a project README as `README.md` and `README-zh-CN.md`, paste a single bilingual release note into GitHub Releases, or add the version entry to your project changelog.
 
-See the finished project README examples for the expected layout. [English](./project/docs/project.md) · [中文](./project/docs/project-zh-CN.md)
+For project READMEs, center the OPC.FISH signature above the title in both files. Below the introduction, use the same row of 1–4 clickable static Shields.io badges. Include each verified category in the order `License`, `Version`, `Language`, and `Platform`. Use `Source: Repository` only if none of those categories can be verified. Check the finished pair before publishing. [Badge rules](./project/project-agent-instructions.md#必填徽章) · [English example](./project/docs/project.md) · [中文示例](./project/docs/project-zh-CN.md)
 
 For a GitHub Release, verify the target tag or commit and the comparison range on the same release line. Use the verified release identifier as the GitHub title unless the project has an established title convention. Start the body with a summary, then write the English and Chinese sections in that order, separated by a standalone `---`. Include the pre-release warning in both languages when applicable. [Stable patch](./releases/examples/patch.md) · [Initial release](./releases/examples/initial.md)
 
@@ -51,6 +51,8 @@ python3 project/scripts/check-readme.py pair /path/to/README.md /path/to/README-
 ```
 
 The first two commands check the templates and bundled README pairs, then run the regression tests. For your own pair, use `--signature remote` for the shared images or `--signature local` for copies in the target repository. Add `--draft` to allow editorial TODOs. The checker compares Installation and Quick Start commands and checks relative links, anchors, template residue, common secret patterns, the required row of 1–4 matching badges, the signature and folded core steps. Verify project facts, commands and rendered layout. Check that reference-style links such as `[guide][install]` have definitions. For targeted edits, run the same check before and after and report existing failures separately.
+
+To generate a badge image URL, pass its category and verified value to the `badge` subcommand. For example, `python3 project/scripts/check-readme.py badge License MIT` prints the image URL used above. Verify the chosen badge values and their link destinations against the target repository.
 
 ### Release notes
 
