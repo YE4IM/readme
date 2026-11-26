@@ -53,3 +53,7 @@ python3 'project readme/scripts/check-readme.py' pair /path/to/README.md /path/t
 python3 scripts/check-release-docs.py release /path/to/release.md
 python3 scripts/check-release-docs.py changelog /path/to/CHANGELOG.md /path/to/CHANGELOG-zh-CN.md
 ```
+
+For a single-language changelog, pass one path. For one file containing both languages separated by a standalone `---`, add `--bilingual`. For an established layout outside those formats, review the existing structure manually. Published entries support dash or parenthesized ISO dates and use newest-first order, with ties allowed. A bilingual changelog in one file shares one set of Markdown reference definitions across languages. Define a reused version link once.
+
+The release checks compare standard category order, list counts, visible alerts, issue references and recognizable shared download or comparison links. Review custom category translations, localized documentation destinations, commands and factual equivalence against the release evidence. Before publication, record copy readiness separately from publication status. For targeted README edits, run the same check before and after and report existing failures separately.

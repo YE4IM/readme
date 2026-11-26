@@ -39,6 +39,7 @@ class ReleaseTemplateTests(unittest.TestCase):
         rendered = "\n\n---\n\n".join(halves)
         sample = (TEMPLATE_DIR / "examples" / f"{name}.md").read_text(encoding="utf-8")
         self.assertEqual(rendered, sample.strip())
+        self.assertEqual(CHECK["check_release"](sample), [])
         self.assertNotIn("[!WARNING]", rendered)
         self.assertNotIn("{{", rendered)
         self.assertNotIn("<!--", rendered)
@@ -183,6 +184,34 @@ class ReleaseTemplateTests(unittest.TestCase):
             self.assertTrue(check(todo))
             self.assertEqual(check(todo, draft=True), [])
         self.assertTrue(check("Summary {{USER_ID}}\n\n---\n\n摘要"))
+
+
+    def test_visible_warning_immediately_follows_summary(self):
+        check = CHECK["check_release"]
+        warning = "> [!WARNING]\n> Testing only."
+        for block in (warning, "<!--\n" + warning + "\n-->", "> [!WARNING]\n>", "## Added\n\n- Item\n\n" + warning,
+                      "```md\n" + warning + "\n```", "```sh\necho ok\n```\n\n" + warning):
+            half = "Summary.\n\n" + block
+            self.assertEqual(bool(check(half + "\n---\n" + half, prerelease=True)), block != warning, block)
+
+    def test_inline_literals_and_chinese_issue_boundaries(self):
+        en = "Fixed `<!--` handling.\n\n## Fixed\n\n- Fix #12 in parser."
+        zh = "改进行内标记解析。\n\n## 问题修复\n\n- 修复#12中的问题。"
+        check = CHECK["check_release"]
+        self.assertFalse(check(en + "\n---\n" + zh))
+        self.assertTrue(check(en + "\n---\n" + zh.replace("#12", "#13")))
+        self.assertFalse(check(en.replace("#12", "team/repo#12") + "\n---\n" + zh.replace("#12", "team/repo#12")))
+
+    def test_bilingual_categories_counts_references_and_assets(self):
+        en = "Fixed export.\n\n## Fixed\n\n- Export. #12\n\n## Installation & Upgrade\n\n1. [Download](https://host/v1/tool.zip)"
+        zh = "修复导出。\n\n## 问题修复\n\n- 导出。 #12\n\n## 安装与升级\n\n1. [下载](https://host/v1/tool.zip)"
+        check = lambda chinese: CHECK["check_release"](en + "\n---\n" + chinese)
+        self.assertEqual(check(zh), [])
+        for bad in (zh.replace("问题修复", "新增功能"), zh.replace("#12", "#39"),
+                    zh.replace("#12", "#12\n- 其他"), zh.replace("/v1/", "/v2/")):
+            self.assertTrue(check(bad), bad)
+        en += "\n\n[Migration](https://host/docs/en/guide)"
+        self.assertEqual(check(zh + "\n\n[迁移](https://host/docs/zh/guide)"), [])
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ Remove all editorial TODOs and template fields from publishable copy. Keep {{TOD
 The version heading defaults to plain text. Follow existing inline links or reference definitions and verify the destination. Keep the comparison link in one place. Use the publication event and time zone defined in the guide.
 Local anchors and official translated docs may use equivalent destinations.
 Follow changelog-agent-instructions.md in this directory for scope, evidence, bilingual alignment, and cleanup rules.
+Group by the verified publication date, newest first; entries published on the same local day may retain project order.
 -->
 
 ## {{VERSION}} - {{RELEASE_DATE}}

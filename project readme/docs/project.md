@@ -35,7 +35,7 @@ From `project readme`:
 python3 scripts/check-readme.py all
 ```
 
-That checks both templates and this README pair. Python 3 is enough.
+That checks both templates and this README pair. Use Python 3.8 or later for this README check.
 
 ## Signature
 

@@ -35,7 +35,7 @@ Agent 写 README 的工作流程和规范都在 [AGENTS.md](../agent/AGENTS.md)�
 python3 scripts/check-readme.py all
 ```
 
-它会检查两份模板和这对 README。有 Python 3 即可。
+它会检查两份模板和这对 README。运行这项 README 检查需要 Python 3.8 或更高版本。
 
 ## 署名
 

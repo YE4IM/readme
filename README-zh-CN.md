@@ -53,3 +53,7 @@ python3 'project readme/scripts/check-readme.py' pair /path/to/README.md /path/t
 python3 scripts/check-release-docs.py release /path/to/release.md
 python3 scripts/check-release-docs.py changelog /path/to/CHANGELOG.md /path/to/CHANGELOG-zh-CN.md
 ```
+
+单语言 CHANGELOG 传一个文件路径。单篇双语且两部分用独立一行的 `---` 分隔时，再加 `--bilingual`。其他既有布局按项目格式人工审阅。已发布版本支持短横线或括号包围的 ISO 日期，按日期从新到旧排列，允许同日多个版本。 单篇双语 CHANGELOG 的两部分共用整篇文件的引用式链接定义；同一版本链接只需定义一次。
+
+发布文档检查器对照标准分类顺序、列表条数、可见警示、事项编号和可识别的共享下载或比较链接。自定义分类译名、本地化文档目标、命令与事实含义仍需结合发布证据核对。发布前分列文案就绪状态和实际公开状态。局部修改 README 时，改前改后运行同一条检查命令，在交付说明中单列已有问题。

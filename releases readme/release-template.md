@@ -3,7 +3,7 @@ Release title (separate GitHub field): use the actual release identifier by defa
 Start directly with the English release summary. Do not add a project-name or version-number heading, a date/type line, a previous-release line, "English" / "中文" headings, or in-page language-switch links: the GitHub Release page already shows the title and tag.
 Write the full English notes first, then a --- separator, then the full Chinese notes.
 Keep the opening compact so the summary and any breaking changes stay close.
-Keep compatibility, migration, security, and command versions where they carry verified information. Mark the delivery as a draft if key facts are missing. Remove editorial TODOs from publishable copy. Local anchors and official translated docs may use equivalent destinations.
+Keep compatibility, migration, security, and command versions where they carry verified information. Report copy readiness and publication status separately outside the body. Mark the delivery as a draft if key copy facts are missing. Remove editorial TODOs from publishable copy. Local anchors and official translated docs may use equivalent destinations.
 -->
 
 {{RELEASE_SUMMARY}}
@@ -60,7 +60,7 @@ To enable: remove the surrounding comment markers and fill verified items. Other
 -->
 
 <!--
-OPTIONAL: Changed. Enable only for verified improvements to behavior, performance, usability, or reliability. Do not invent metrics.
+OPTIONAL: Changed. Enable only for verified changes in user-visible behavior, including neutral changes to defaults or output order, or documented improvements. Do not invent metrics.
 To enable: remove the surrounding comment markers and fill verified items. Otherwise delete this entire block.
 
 ## Changed
@@ -171,7 +171,7 @@ To enable: remove the surrounding comment markers and fill verified links. Other
 
 ---
 
-<!-- GitHub 标题默认用真实发布标识，如 v2.0.0-rc.1。按项目标题惯例保留预发布身份。正文保留兼容、迁移、安全和命令所需的真实版本号。可发布成稿须清除编辑用 TODO。本页锚点和官方译版文档可使用等价地址。 -->
+<!-- GitHub 标题默认用真实发布标识，如 v2.0.0-rc.1。按项目标题惯例保留预发布身份。正文保留兼容、迁移、安全和命令所需的真实版本号。交付说明分列文案状态和发布状态。可发布成稿须清除编辑用 TODO。本页锚点和官方译版文档可使用等价地址。 -->
 
 {{RELEASE_SUMMARY}}
 
@@ -227,10 +227,10 @@ OPTIONAL: 新增功能。仅当本版本确实落地了用户可见的新能力�
 -->
 
 <!--
-OPTIONAL: 优化与改进。仅当确有行为、性能、体验或可靠性方面的改进时启用。不要编造数据。
+OPTIONAL: 行为变更。仅当确有用户可观察的行为变化，或有证据的性能、体验或可靠性改进时启用。不要编造数据。
 启用：去掉包围的注释标记，填入已核实的条目。不需要则整块删除。
 
-## 优化与改进
+## 行为变更
 
 - {{CHANGED_1}}
 -->

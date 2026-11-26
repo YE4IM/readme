@@ -222,5 +222,69 @@ class ChangelogTemplateTests(unittest.TestCase):
         self.assertTrue(check(sample.replace("USER_ID", "TODO"), draft=False)[1])
 
 
+    def test_bilingual_version_content(self):
+        en = "## v2 (2026-01-01)\n\nChange.\n\n### Changed\n\n- Default changed. #22"
+        zh = "## v2 - 2026-01-01\n\n变更。\n\n### 行为变更\n\n- 默认值调整。 #22"
+        check = lambda other: CHECK["check_changelog"]([("en", en), ("zh", other)])
+        self.assertEqual(check(zh), [])
+        self.assertEqual(check(zh.replace("行为变更", "优化与改进")), [])
+        for bad in (zh.split("###")[0], zh.split("\n")[0], zh.replace("#22", "#21"), zh + "\n- 更多"):
+            self.assertTrue(check(bad))
+
+    def test_nested_standard_category_must_use_expected_level(self):
+        for name in ("Breaking Changes", "破坏性变更"):
+            source = f"## v1 - 2026-01-01\nSummary.\n\n#### {name}\n\n- API removed."
+            self.assertTrue(CHECK["changelog_entries"](source, draft=False)[1])
+            correct = source.replace("####", "###") + "\n\n1. Replace the removed method."
+            self.assertFalse(CHECK["changelog_entries"](correct, draft=False)[1])
+
+    def test_date_order_and_formats(self):
+        check = lambda text: CHECK["changelog_entries"](text, draft=False)[1]
+        first = "## [v2](url) (2026-02-01)\nSummary.\n"
+        older = "## v1 - 2026-01-31\nSummary.\n"
+        self.assertFalse(check(first + older))
+        self.assertFalse(check(first + older.replace("01-31", "02-01")))
+        self.assertTrue(check(older + first))
+        self.assertTrue(check(first.replace("02-01", "02-30")))
+        self.assertIn("unrecognized", check(first.replace("(2026-02-01)", "on 2026-02-01"))[0])
+        self.assertIn("needs a version", check(first.replace("(2026-02-01)", ""))[0])
+
+    def test_reference_destinations_and_empty_referenced_version(self):
+        en = "## [v2] - 2026-01-01\nSummary.\n### Fixed\n- [Patch][file]\n\n[v2]: https://host/compare/a...b\n[file]: https://host/a.zip"
+        zh = en.replace("Fixed", "问题修复").replace("Patch", "修复").replace("[file]:", "[FILE]:")
+        check = lambda text: CHECK["check_changelog"]([("en", en), ("zh", text)])
+        self.assertFalse(check(zh))
+        for bad in (zh.replace("a.zip", "b.zip"), zh.replace("/a...b", "/a...c"), zh.replace("[v2]:", "[unused]:"),
+                    zh + "\n[V2]: https://host/other"):
+            self.assertTrue(check(bad))
+        empty = "## [v2] - 2026-01-01\n\n[v2]: https://host/v2"
+        self.assertTrue(CHECK["check_changelog"]([("en", empty)]))
+
+    def test_cli_single_pair_and_combined(self):
+        import subprocess
+        import sys
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as tmp:
+            en, zh, combined = [Path(tmp) / name for name in ("en.md", "zh.md", "both.md")]
+            source = "## v2 - 2026-02-01\n\nSummary.\n\n~~~md\n---\n~~~"
+            en.write_text(source)
+            zh.write_text(source.replace("Summary.", "摘要。"))
+            combined.write_text(en.read_text() + "\n\n---\n\n" + zh.read_text())
+            def run(*args):
+                return subprocess.run([sys.executable, "-B", str(TEMPLATE_DIR.parent / "scripts/check-release-docs.py"),
+                                       "changelog", *args], capture_output=True, text=True)
+            for args in ((en,), (en, zh), (combined, "--bilingual")):
+                result = run(*args)
+                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            combined.write_text(en.read_text() + "\n---\n" + zh.read_text().replace("v2", "v3"))
+            self.assertNotEqual(run(combined, "--bilingual").returncode, 0)
+            # Markdown reference labels are shared by the entire bilingual document.
+            release = "## [v2] - 2026-02-01\nSummary.\n"
+            combined.write_text(release + "\n---\n" + release + "\n[v2]: https://host/tag/v2")
+            self.assertEqual(run(combined, "--bilingual").returncode, 0)
+            combined.write_text(combined.read_text().replace("---", "[V2]: https://host/other\n\n---"))
+            self.assertNotEqual(run(combined, "--bilingual").returncode, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

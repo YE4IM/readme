@@ -10,6 +10,8 @@ alt 可以按语言改写。宽度保持 720。
 
 # {{PROJECT_NAME}}
 
+[English](./README.md) | [**中文**](./README-zh-CN.md)
+
 <!--
 OPTIONAL: Logo。仅当仓库已有 Logo 文件时启用。优先相对路径。不要编造或生成 Logo。
 启用：去掉包围的注释标记，填入真实路径。不需要则整块删除。
@@ -17,13 +19,11 @@ OPTIONAL: Logo。仅当仓库已有 Logo 文件时启用。优先相对路径。
 <img src="{{LOGO_PATH}}" alt="{{PROJECT_NAME}} logo" width="120">
 -->
 
-[English](./README.md) | [**中文**](./README-zh-CN.md)
-
 {{ONE_LINE_DESCRIPTION}}
 
 <!--
 首屏按这个顺序放，并且只放真实材料：
-标题、可选的已有 Logo、语言切换、一句具体价值说明、
+标题、语言切换、可选的已有 Logo、一句具体价值说明、
 不超过 4 枚真实徽章、一个主要入口、一份演示。
 让「安装」和「快速开始」留在附近。不要加横幅、访问计数器、技术栈图标墙或装饰动画。
 OPC.FISH 署名留在文件最上方、标题之前，不要在这里再放一次。

@@ -10,6 +10,8 @@ In a publishable README, replace template fields even inside code fences and rem
 
 # {{PROJECT_NAME}}
 
+[**English**](./README.md) | [中文](./README-zh-CN.md)
+
 <!--
 OPTIONAL: Logo. Enable only if the repo already has a logo file. Prefer a relative path. Do not invent or generate a logo.
 To enable: remove the surrounding comment markers and fill the real path. Otherwise delete this entire block.
@@ -17,13 +19,11 @@ To enable: remove the surrounding comment markers and fill the real path. Otherw
 <img src="{{LOGO_PATH}}" alt="{{PROJECT_NAME}} logo" width="120">
 -->
 
-[**English**](./README.md) | [中文](./README-zh-CN.md)
-
 {{ONE_LINE_DESCRIPTION}}
 
 <!--
 First screen, in this order, and only with real material:
-title, optional existing logo, language switch, one specific value statement,
+title, language switch, optional existing logo, one specific value statement,
 at most 4 real badges, one primary entry, one exhibit.
 Keep Installation and Quick Start close. No banners, visit counters, icon walls, or decorative animation.
 The OPC.FISH signature stays at the top of the file, before the title. Do not repeat it here.

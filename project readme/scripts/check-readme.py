@@ -181,7 +181,7 @@ def check_pair(
     return errors
 
 
-INLINE_CODE = re.compile(r"(?<!\x60)(\x60+)(?!\x60).*?(?<!\x60)\1(?!\x60)", re.S)
+INLINE_CODE = re.compile(r"(?<!\x60)(\x60+)(?!\x60)(?:(?!\n[ \t]*\n).)*?(?<!\x60)\1(?!\x60)", re.S)
 SWITCH = {
     "English": re.compile(r"\[\*\*English\*\*\]\(([^)]+)\) \| \[中文\]\(([^)]+)\)"),
     "Chinese": re.compile(r"\[English\]\(([^)]+)\) \| \[\*\*中文\*\*\]\(([^)]+)\)"),
@@ -265,6 +265,10 @@ def heading_anchors(text: str) -> set[str]:
 def link_errors(path: Path, visible: str) -> list[str]:
     markdown = INLINE_CODE.sub(mask, visible)
     destinations = [angle or plain for angle, plain in MARKDOWN_LINK.findall(markdown)]
+    for tag in re.findall(r"<img\b[^>]*>", markdown, re.I):
+        source = html_attributes(tag).get("src")
+        if source:
+            destinations.append(source)
     destinations.extend(
         angle or plain for label, angle, plain in REFERENCE_DEFINITION.findall(markdown)
         if re.search(r"\[" + re.escape(label) + r"\](?!:)", markdown, re.I)
@@ -430,7 +434,7 @@ def document_views(text: str) -> tuple[str, str, str]:
     """Return source without fences, visible Markdown, and source without comments."""
     prose, visible, uncommented = [], [], []
     # Scan the two block types together, ignoring their markers inside each other.
-    token = re.compile(r"(?m)^[ \t]*(\x60{3,}|~{3,})[^\n]*|<!--")
+    token = re.compile(r"(?m)^[ \t]*(\x60{3,}|~{3,})[^\n]*|<!--|\x60+")
     position = 0
     while match := token.search(text, position):
         prefix = text[position:match.start()]
@@ -438,6 +442,13 @@ def document_views(text: str) -> tuple[str, str, str]:
             view.append(prefix)
         end = match.end()
         fence = match[1]
+        if not fence and match[0] != "<!--":
+            span = INLINE_CODE.match(text, match.start())
+            end = span.end() if span else end
+            for view in (prose, visible, uncommented):
+                view.append(text[match.start():end])
+            position = end
+            continue
         if fence:
             closing = re.search(r"(?m)^[ \t]*" + re.escape(fence[0]) + rf"{{{len(fence)},}}[ \t]*$", text[end:])
             end += closing.end() if closing else len(text) - end

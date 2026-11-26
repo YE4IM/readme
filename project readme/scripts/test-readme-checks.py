@@ -157,6 +157,13 @@ $ example --output json
         self.assertTrue(any("link relatively to both README files" in error for error in
                             self.check_pair(en.replace("./project-zh-CN.md", "./project.md", 1), zh)))
 
+    def test_inline_comment_delimiters_do_not_hide_following_links(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        text = en + "\nWrite `<!--` to begin a comment.\n\n[Guide](./missing.md)"
+        self.assertTrue(any("missing path" in error for error in self.check_pair(text, zh)))
+        self.assertFalse(self.check_pair(text.replace("./missing.md", "./project.md"), zh))
+
     def test_navigation_checks_relative_files_and_localized_anchors(self):
         en = ENGLISH.replace("../assets/", "./assets/")
         zh = CHINESE.replace("../assets/", "./assets/")
@@ -207,6 +214,20 @@ $ example --output json
         english, chinese = "## Quick Start" + snippet, "## 快速开始" + snippet
         self.assertEqual(CHECK["command_errors"](english, chinese), [])
         self.assertTrue(CHECK["command_errors"](english, chinese.replace("powershell", "bash")))
+
+
+    def test_template_logo_with_real_local_image(self):
+        rendered = []
+        for path, example in zip(("readme-template.md", "readme-zh-CN-template.md"), (ENGLISH, CHINESE)):
+            source = (ROOT / "templates" / path).read_text()
+            switch = next(line for line in source.splitlines() if "./README-zh-CN.md)" in line)
+            self.assertLess(source.index(switch), source.index("{{LOGO_PATH}}"))
+            logo = next(line for line in source.splitlines() if "{{LOGO_PATH}}" in line)
+            image = logo.replace("{{LOGO_PATH}}", "./assets/opc-fish-project-signature.svg").replace("{{PROJECT_NAME}}", "Example")
+            header = example.replace("../assets/", "./assets/").split("\n\n", 3)
+            rendered.append("\n\n".join([*header[:3], image, header[3]]))
+        self.assertEqual(self.check_pair(*rendered), [])
+        self.assertTrue(self.check_pair(rendered[0].replace('src="./assets/opc-fish-project-signature.svg" alt="Example', 'src="missing.svg" alt="Example'), rendered[1]))
 
 
 if __name__ == "__main__":
