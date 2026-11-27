@@ -370,10 +370,23 @@ class ChangelogTemplateTests(unittest.TestCase):
         )
         # Empty Unreleased remains valid.
         self.assertEqual(entries("## Unreleased\n", draft=False)[1], [])
-        # Missing reference link in heading does not duplicate errors.
-        for heading in ("## [v2] - 2026-01-01\nSummary.", "## [v2][] - 2026-01-01\nSummary."):
-            errs = entries(heading, draft=False)[1]
-            self.assertEqual(errs, ["missing link definition for v2"], heading)
+        # Missing reference link in heading does not duplicate errors or corrupt version label extraction.
+        for heading, ref_name in (
+            ("## [v2] - 2026-01-01\nSummary.", "v2"),
+            ("## [v2][] - 2026-01-01\nSummary.", "v2"),
+            ("## [v2][ref] - 2026-01-01\nSummary.", "ref"),
+        ):
+            labels, errs = entries(heading, draft=False)
+            self.assertEqual(labels, [("v2", "2026-01-01")], heading)
+            self.assertEqual(errs, [f"missing link definition for {ref_name}"], heading)
+        bilingual_errs = CHECK["check_changelog"]([
+            ("en", "## [v2][] - 2026-01-01\nSummary."),
+            ("zh", "## v2 - 2026-01-01\n摘要。"),
+        ])
+        self.assertEqual(bilingual_errs, ["en: missing link definition for v2"])
+        # Monorepo @-separated PEP 440 prerelease tags trigger warning requirement, while normal @ tags do not.
+        self.assertTrue(entries("## pkg@2.0.0rc1 - 2026-01-01\nSummary.", draft=False)[1])
+        self.assertEqual(entries("## pkg@2.0.0 - 2026-01-01\nSummary.", draft=False)[1], [])
         # Body explicit reference links without definitions fail; alerts and plain brackets pass.
         for ref in ("[Full Changelog][missing]", "[missing][]"):
             errs = entries(f"## v2 - 2026-01-01\n\nSummary.\n\n{ref}", draft=False)[1]

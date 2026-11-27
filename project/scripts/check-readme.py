@@ -2,11 +2,11 @@
 """Check README pairs and the bilingual templates in this repository.
 
 Usage:
-  python3 scripts/check-readme.py all
-  python3 scripts/check-readme.py templates
-  python3 scripts/check-readme.py pair README.md README-zh-CN.md --signature local [--draft]
-  python3 scripts/check-readme.py pair A.md B.md --signature remote [--draft]
-  python3 scripts/check-readme.py badge License MIT
+  python3 project/scripts/check-readme.py all
+  python3 project/scripts/check-readme.py templates
+  python3 project/scripts/check-readme.py pair README.md README-zh-CN.md --signature local [--draft]
+  python3 project/scripts/check-readme.py pair A.md B.md --signature remote [--draft]
+  python3 project/scripts/check-readme.py badge License MIT
 """
 
 from __future__ import annotations
@@ -323,8 +323,32 @@ def heading_anchors(text: str) -> set[str]:
 
 
 EXPLICIT_REFERENCE = re.compile(
-    r"(?<!\\)\[((?:!\[[^\]\n]*\]\([^)\n]*\)|[^\[\]\n])+)\]\[([^\]\n]*)\]"
+    r"(?<!\\)\[((?:!\[[^\]\n]*\]\([^)\n]*\)|[^\[\]\n])+)\]\[([^\]\n]*)\](?![(:\[])"
 )
+
+
+def srcset_urls(srcset: str) -> list[str]:
+    """Extract candidate URLs from an HTML srcset without splitting commas inside URLs."""
+    urls = []
+    pos = 0
+    length = len(srcset)
+    while pos < length:
+        while pos < length and srcset[pos].isspace():
+            pos += 1
+        if pos >= length:
+            break
+        start = pos
+        while pos < length and not srcset[pos].isspace():
+            pos += 1
+        url = srcset[start:pos]
+        if url.endswith(","):
+            url = url.rstrip(",")
+        else:
+            comma = srcset.find(",", pos)
+            pos = comma + 1 if comma != -1 else length
+        if url:
+            urls.append(url)
+    return urls
 
 
 def link_errors(path: Path, visible: str) -> list[str]:
@@ -335,10 +359,7 @@ def link_errors(path: Path, visible: str) -> list[str]:
         if attrs.get("src"):
             destinations.append(attrs["src"])
         if attrs.get("srcset"):
-            for candidate in attrs["srcset"].split(","):
-                parts = candidate.strip().split()
-                if parts:
-                    destinations.append(parts[0])
+            destinations.extend(srcset_urls(attrs["srcset"]))
     definitions = REFERENCE_DEFINITION.findall(markdown)
     defined = {label.casefold() for label, _, _ in definitions}
     destinations.extend(

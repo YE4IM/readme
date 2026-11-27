@@ -444,19 +444,28 @@ $ example --output json
     def test_source_srcset_and_explicit_reference_link_definitions(self):
         en = ENGLISH.replace("../assets/", "./assets/")
         zh = CHINESE.replace("../assets/", "./assets/")
-        # <source srcset> checks relative paths with 1x/2x descriptors.
+        # <source srcset> checks relative paths with 1x/2x descriptors, including comma-tight candidates and comma-bearing URLs.
         bad_srcset = en + '\n<picture><source media="(prefers-color-scheme: dark)" srcset="./assets/opc-fish-project-signature-dark.svg 1x, ./missing-2x.png 2x"><img src="./assets/opc-fish-project-signature.svg" alt="Demo"></picture>\n'
         self.assertTrue(any("missing path: ./missing-2x.png" in e for e in self.check_pair(bad_srcset, zh)))
+        tight_bad_srcset = bad_srcset.replace(" 1x, ./missing-2x.png", " 1x,./missing-2x.png")
+        self.assertTrue(any("missing path: ./missing-2x.png" in e for e in self.check_pair(tight_bad_srcset, zh)))
         good_srcset = bad_srcset.replace("./missing-2x.png", "./assets/opc-fish-project-signature-dark.svg")
         self.assertEqual(self.check_pair(good_srcset, zh), [])
+        comma_url_srcset = (
+            en
+            + '\n<picture><source srcset="https://example.com/w_400,c_scale/demo.png 1x, ./assets/opc-fish-project-signature-dark.svg 2x">'
+            '<source srcset="https://example.com/w_400,c_scale/demo.png, ./assets/opc-fish-project-signature-dark.svg">'
+            '<img src="./assets/opc-fish-project-signature.svg" alt="Demo"></picture>\n'
+        )
+        self.assertEqual(self.check_pair(comma_url_srcset, zh), [])
         # Explicit full and collapsed reference links without definitions fail.
         for link in ("[Guide][missing]", "[missing][]", "[![Badge](./assets/opc-fish-project-signature.svg)][missing]"):
             with self.subTest(link=link):
                 errors = self.check_pair(en + f"\n{link}\n", zh)
                 self.assertTrue(any("missing reference link definition: missing" in e for e in errors), errors)
-        # Defined references, shortcut brackets, alerts, task lists, and code examples do not fail.
+        # Defined references, adjacent inline links, shortcut brackets, alerts, task lists, and code examples do not fail.
         valid = en + (
-            "\n[Guide][doc] and [doc][] and [plain].\n\n"
+            "\n[Guide][doc] and [doc][] and [plain] and [Section 1][Guide](./project.md).\n\n"
             "> [!NOTE]\n> Keep reading.\n\n- [ ] Task item\n\n"
             "`[Guide][missing]`\n\n~~~md\n[missing][]\n~~~\n\n[doc]: ./project.md\n"
         )

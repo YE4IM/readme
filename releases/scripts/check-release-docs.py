@@ -21,7 +21,7 @@ VERSION_DATE = re.compile(
 )
 PRERELEASE_VERSION = re.compile(
     r"(?:[-.](?:alpha|beta|rc|dev|preview|canary|nightly)(?:[.\d+-]|$)"
-    r"|(?:^|[/-])v?\d+(?:\.\d+)*(?:a|b|rc)\d+(?:[.\d+-]|$))",
+    r"|(?:^|[/@-])v?\d+(?:\.\d+)*(?:a|b|rc)\d+(?:[.\d+-]|$))",
     re.I,
 )
 PRERELEASE_LABELS = {"pre-release", "prerelease", "pre release", "预发布", "预发布版"}
@@ -318,7 +318,7 @@ def check_release(text, *, draft=False, prerelease=False):
 
 
 def heading_label(title):
-    return re.sub(r"^\[([^\]]+)\](?:\(.*\))?$", r"\1", title)
+    return re.sub(r"^\[([^\]]+)\](?:\(.*\)|\[[^\]]*\])?$", r"\1", title)
 
 
 def inspect_changelog(text, *, draft, shared_definitions=None):

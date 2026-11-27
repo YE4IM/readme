@@ -388,9 +388,10 @@ class ReleaseTemplateTests(unittest.TestCase):
         self.assertTrue(check(asset_en + "\n---\n" + asset_zh.replace("app.sha512", "other.sha512")))
         # PEP 440 and SemVer prerelease identifiers trigger warning requirement; non-prerelease suffixes do not.
         entries = CHECK["changelog_entries"]
-        for ver in ("2.0.0rc1", "v2.0.0a1", "v2.0.0b2", "v2.0.0-preview.1", "v2.0.0-dev"):
+        for ver in ("2.0.0rc1", "v2.0.0a1", "v2.0.0b2", "v2.0.0-preview.1", "v2.0.0-dev",
+                    "pkg@2.0.0rc1", "core@v2.0.0a1", "@scope/pkg@2.0.0b2"):
             self.assertTrue(entries(f"## {ver} - 2026-11-26\nSummary.", draft=False)[1], ver)
-        for ver in ("v2.0.0-basic", "v1.0.0-g1a2"):
+        for ver in ("v2.0.0-basic", "v1.0.0-g1a2", "pkg@2.0.0", "core@v1.0.0-basic"):
             self.assertEqual(entries(f"## {ver} - 2026-11-26\nSummary.", draft=False)[1], [], ver)
 
     def test_body_undefined_reference_links(self):
