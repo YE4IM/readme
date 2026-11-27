@@ -335,6 +335,54 @@ class ChangelogTemplateTests(unittest.TestCase):
             self.assertEqual(run(combined, "--bilingual").returncode, 0)
             combined.write_text(combined.read_text().replace("---", "[V2]: https://host/other\n\n---"))
             self.assertNotEqual(run(combined, "--bilingual").returncode, 0)
+            # Missing or extra --- separators fail with exit code 1 and FAIL prefix.
+            for invalid in (en.read_text(), en.read_text() + "\n---\n" + zh.read_text() + "\n---\nExtra."):
+                combined.write_text(invalid)
+                res = run(combined, "--bilingual")
+                self.assertEqual(res.returncode, 1)
+                self.assertTrue(res.stdout.startswith("FAIL "), res.stdout)
+
+    def test_utf8_bom_and_zh_template_comments_and_prose_optional(self):
+        # UTF-8 BOM does not hide the first version heading.
+        self.assertEqual(CHECK["changelog_entries"]("\ufeff## v1.0.0 - 2026-11-26\n\nSummary.", draft=False)[1], [])
+        # Normal prose starting with "Optional:" is allowed, while Chinese template comments are loaded.
+        self.assertEqual(
+            CHECK["changelog_entries"]("## v1.0.0 - 2026-11-26\n\nOptional: run cleanup.", draft=False)[1],
+            [],
+        )
+        zh_comments = CHECK["template_comments"]("changelog/changelog-version-zh-CN-template.md")
+        self.assertTrue(zh_comments)
+        # Ensure inspect_changelog uses both English and Chinese template comment sets.
+        self.assertIn(
+            "template instructions remain",
+            CHECK["changelog_entries"](
+                f"<!-- {next(iter(zh_comments))} -->\n\n## v1.0.0 - 2026-11-26\n\n摘要。",
+                draft=False,
+            )[1],
+        )
+
+    def test_draft_todo_date_empty_body_and_body_reference_links(self):
+        entries = CHECK["changelog_entries"]
+        # Empty draft version with TODO date must still report missing visible content.
+        self.assertIn(
+            "v2.0.0 - {{TODO: verify publication date}} has no visible content",
+            entries("## v2.0.0 - {{TODO: verify publication date}}\n", draft=True)[1],
+        )
+        # Empty Unreleased remains valid.
+        self.assertEqual(entries("## Unreleased\n", draft=False)[1], [])
+        # Missing reference link in heading does not duplicate errors.
+        for heading in ("## [v2] - 2026-01-01\nSummary.", "## [v2][] - 2026-01-01\nSummary."):
+            errs = entries(heading, draft=False)[1]
+            self.assertEqual(errs, ["missing link definition for v2"], heading)
+        # Body explicit reference links without definitions fail; alerts and plain brackets pass.
+        for ref in ("[Full Changelog][missing]", "[missing][]"):
+            errs = entries(f"## v2 - 2026-01-01\n\nSummary.\n\n{ref}", draft=False)[1]
+            self.assertIn("missing link definition for missing", errs)
+        ok = (
+            "## v2 - 2026-01-01\n\nSummary.\n\n> [!NOTE]\n> Keep [plain].\n\n"
+            "[Full Changelog][cmp]\n\n[cmp]: https://host/compare/v1...v2"
+        )
+        self.assertEqual(entries(ok, draft=False)[1], [])
 
 
 if __name__ == "__main__":

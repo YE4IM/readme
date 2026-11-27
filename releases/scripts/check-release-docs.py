@@ -10,17 +10,20 @@ from pathlib import Path
 
 
 HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$", re.M)
-FENCE = re.compile(r"^ {0,3}(\x60{3,}|~{3,})(.*)$")
 ALERT = re.compile(r"^> \[!(WARNING|IMPORTANT|NOTE)\][ \t]*$", re.M)
 FIELD = re.compile(r"\{\{\s*(TODO(?:\s*[:：][^{}]*)?|[A-Z][A-Z0-9_]*)\s*\}\}")
 BROKEN_SECTION = {"Breaking Changes", "破坏性变更"}
-MIGRATION = re.compile(r"(?im)^\s*\*\*(?:Migration|迁移步骤)[:：]\*\*[ \t]*$")
+MIGRATION = re.compile(r"(?im)^\s*\*\*(?:Migration|迁移步骤)(?:[:：]\*\*|\*\*[:：])[ \t]*$")
 DATE_VALUE = r"(?:\d{4}-\d{2}-\d{2}|\{\{\s*TODO(?:\s*[:：][^{}\n]*)?\s*\}\})"
 VERSION_DATE = re.compile(
     rf"^(?P<version>.+?)[ \t]+(?:[-–—][ \t]+(?P<date>{DATE_VALUE})"
     rf"|\((?P<parenthesized>{DATE_VALUE})\))(?:[ \t]+(?P<status>.+))?$"
 )
-PRERELEASE_VERSION = re.compile(r"[-.](?:alpha|beta|rc)(?:[.\d-]|$)", re.I)
+PRERELEASE_VERSION = re.compile(
+    r"(?:[-.](?:alpha|beta|rc|dev|preview|canary|nightly)(?:[.\d+-]|$)"
+    r"|(?:^|[/-])v?\d+(?:\.\d+)*(?:a|b|rc)\d+(?:[.\d+-]|$))",
+    re.I,
+)
 PRERELEASE_LABELS = {"pre-release", "prerelease", "pre release", "预发布", "预发布版"}
 STABLE_LABELS = {"stable", "正式版", "稳定版"}
 UNRELEASED = {"unreleased", "未发布"}
@@ -28,29 +31,38 @@ LANGUAGE_TITLE = {"english", "中文", "简体中文", "chinese"}
 
 
 INLINE_CODE = re.compile(r"(?<!\x60)(\x60+)(?!\x60)(?:(?!\n[ \t]*\n).)*?(?<!\x60)\1(?!\x60)", re.S)
-MARKER = re.compile(r"(?m)^ {0,3}(?P<fence>\x60{3,}|~{3,})[^\n]*|<!--|\x60+")
+MARKER = re.compile(r"(?m)^ {0,3}(?:(?P<bt>\x60{3,})[^\x60\n]*|(?P<tilde>~{3,})[^\n]*)$|<!--|\x60+")
 
 
-def visible_markdown(text):
+def visible_markdown(text, *, keep_comments=False):
     """Keep source line positions while hiding comments and fenced examples."""
+    text = text.lstrip("\ufeff")
     visible = []
     start = 0
     while marker := MARKER.search(text, start):
         visible.append(text[start:marker.start()])
         end = marker.end()
-        fence = marker["fence"]
+        fence = marker["bt"] or marker["tilde"]
         if fence:
             closing = re.compile(r"(?m)^ {0,3}" + re.escape(fence[0]) + rf"{{{len(fence)},}}[ \t]*$")
             close = closing.search(text, end)
             end = close.end() if close else len(text)
-            visible.append("⟦code block⟧")
+            if not keep_comments:
+                visible.append("⟦code block⟧")
         elif marker[0] == "<!--":
             close = text.find("-->", end)
             end = close + 3 if close >= 0 else len(text)
+            if keep_comments:
+                visible.append(text[marker.start():end])
+                start = end
+                continue
         else:
             span = INLINE_CODE.match(text, marker.start())
             end = span.end() if span else end
-            visible.append(text[marker.start():end])
+            if keep_comments:
+                visible.append(" " if "\n" not in text[marker.start():end] else "\n" * text.count("\n", marker.start(), end))
+            else:
+                visible.append(text[marker.start():end])
             start = end
             continue
         visible.append("\n" * text.count("\n", marker.start(), end))
@@ -78,17 +90,24 @@ def template_comments(template):
     return {normalize_comment(comment) for comment in re.findall(r"<!--(.*?)-->", text, re.S)}
 
 
-def residue_errors(text, visible, template, *, draft):
+def residue_errors(text, visible, templates, *, draft):
+    if isinstance(templates, str):
+        templates = (templates,)
     errors = []
-    instructions = re.search(r"(?im)<!--(?:(?!-->).)*?(?:OPTIONAL|REQUIRED|必需)|^[ \t]*OPTIONAL:", text, re.S)
-    leftover = any(
-        normalize_comment(comment) in template_comments(template)
-        for comment in re.findall(r"<!--(.*?)-->", text, re.S)
-    )
-    if instructions or leftover:
-        errors.append("template instructions remain")
+    expected_comments = set().union(*(template_comments(t) for t in templates))
+    expected_fields = set().union(*(template_fields(t) for t in templates))
     prose = INLINE_CODE.sub(" ", visible)
-    checked_fields = set(FIELD.findall(prose)) | template_fields(template)
+    unquoted = visible_markdown(text, keep_comments=True)
+    comments = re.findall(r"<!--(.*?)-->", unquoted, re.S)
+    comment_residue = any(
+        re.search(r"(?i)\b(?:OPTIONAL|REQUIRED)\b|必需", comment)
+        or normalize_comment(comment) in expected_comments
+        for comment in comments
+    )
+    uncommented_optional = bool(re.search(r"(?m)^[ \t]*OPTIONAL:", prose))
+    if comment_residue or uncommented_optional:
+        errors.append("template instructions remain")
+    checked_fields = set(FIELD.findall(prose)) | expected_fields
     for field in FIELD.finditer(text):
         todo = field[1] == "TODO" or re.match(r"TODO\s*[:：]", field[1])
         if (todo and not draft) or (not todo and field[1] in checked_fields):
@@ -135,6 +154,7 @@ CATEGORY = {
 }
 KNOWN_CATEGORIES = set(CATEGORY.values())
 CATEGORY_TITLES = KNOWN_CATEGORIES | set(CATEGORY)
+CATEGORY_TITLES_CF = {title.casefold() for title in CATEGORY_TITLES}
 LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d+[.)])[ \t]+\S", re.M)
 # A "#" after "#", a quote, or "=" (as in ##333 or fill="#333") is not an issue reference.
 ISSUE = re.compile(r"(?<![A-Za-z0-9_/#\"'=])(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#[0-9]+(?![A-Za-z0-9_])")
@@ -142,7 +162,11 @@ HANDLE = re.compile(r"(?<![A-Za-z0-9_./-])@[A-Za-z0-9-]+")
 LINK = re.compile(r"(?:\[([^\[\]\n]*))?\]\(\s*(?:<([^>]+)>|([^\s)]+))")
 IMAGE = re.compile(r"!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))")
 IMG_SRC = re.compile(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", re.I)
-ASSET = re.compile(r"/(?:releases/(?:download|tag)|compare|pull|issues)/|\.(?:zip|gz|xz|exe|msi|dmg|pkg|apk|deb|rpm|whl|sha256)(?:[?#]|$)", re.I)
+ASSET = re.compile(
+    r"/(?:releases/(?:download|tag)|compare|pull|issues)/"
+    r"|\.(?:zip|gz|tgz|bz2|xz|zst|exe|msi|dmg|pkg|apk|deb|rpm|whl|appimage|flatpak|snap|sha256|sha512|asc|sig)(?:[?#]|$)",
+    re.I,
+)
 
 
 DOWNLOAD_LABEL = re.compile(r"\b(?:download|installer|binary|app store|google play)\b|下载|安装包|二进制|应用商店", re.I)
@@ -165,7 +189,7 @@ def shared_link(label, url, category):
 
 
 DEFINITION = re.compile(r"(?m)^ {0,3}\[([^\]\n]+)\]:[ \t]*(?:<([^>\n]+)>|(\S+))[^\n]*$")
-REFERENCE = re.compile(r"\[([^\]\n]+)\](?:\[([^\]\n]*)\])?(?![(:\[])")
+REFERENCE = re.compile(r"(?<!\\)\[([^\]\n]+)\](?:\[([^\]\n]*)\])?(?![(:\[])")
 
 def link_definitions(visible):
     definitions = {}
@@ -185,11 +209,24 @@ def reference_links(visible, shared_definitions=None):
     else:
         definitions, errors = shared_definitions, []
 
+    stripped = DEFINITION.sub("", visible)
+    seen_missing = set()
+    for match in REFERENCE.finditer(INLINE_CODE.sub(" ", stripped)):
+        if match[2] is None:
+            continue
+        if match[2] and not match[2].strip():
+            continue
+        label = (match[2] or match[1]).strip()
+        key = label.casefold()
+        if label and key not in definitions and key not in seen_missing:
+            seen_missing.add(key)
+            errors.append(f"missing link definition for {label}")
+
     def expand(match):
         url = definitions.get((match[2] or match[1]).casefold())
         return f"[{match[1]}]({url})" if url else match[0]
 
-    return REFERENCE.sub(expand, DEFINITION.sub("", visible)), errors
+    return REFERENCE.sub(expand, stripped), errors
 
 
 def section_facts(body, category):
@@ -201,9 +238,10 @@ def section_facts(body, category):
         shared.extend(IMG_SRC.findall(prose))
     # Contributor handles must match on both sides; GitHub usernames are case-insensitive.
     handles = [handle.lower() for handle in HANDLE.findall(prose)] if category == "Contributors" else []
+    subheadings = tuple(len(heading[1]) for heading in HEADING.finditer(body))
     return (
-        category, len(LIST_ITEM.findall(body)), Counter(ISSUE.findall(body)), Counter(shared),
-        Counter(handles),
+        category, len(LIST_ITEM.findall(body)), Counter(ISSUE.findall(prose)), Counter(shared),
+        Counter(handles), subheadings,
     )
 
 
@@ -244,8 +282,26 @@ def check_release(text, *, draft=False, prerelease=False):
             errors.append(f"{label} release notes must begin with a summary")
         headings = list(HEADING.finditer(part))
         alerts = ALERT.findall(part)
-        if any(len(heading[1]) != 2 for heading in headings):
+        seen_h2 = False
+        prev_level = 2
+        level_error = False
+        skip_error = False
+        for heading in headings:
+            depth = len(heading[1])
+            if depth == 1:
+                level_error = True
+            elif depth == 2:
+                seen_h2 = True
+            else:
+                if not seen_h2 or heading[2].casefold() in CATEGORY_TITLES_CF:
+                    level_error = True
+                elif depth > prev_level + 1:
+                    skip_error = True
+            prev_level = depth
+        if level_error:
             errors.append(f"{label} release sections must use level-two headings")
+        if skip_error:
+            errors.append(f"{label} release subheadings must not skip heading levels")
         if any(
             heading[2].casefold() in LANGUAGE_TITLE
             or re.match(r"(?i)^v?\d+(?:[.\-]|$)", heading[2])
@@ -267,7 +323,12 @@ def heading_label(title):
 
 def inspect_changelog(text, *, draft, shared_definitions=None):
     visible = visible_markdown(text)
-    errors = residue_errors(text, visible, "changelog/changelog-version-template.md", draft=draft)
+    errors = residue_errors(
+        text,
+        visible,
+        ("changelog/changelog-version-template.md", "changelog/changelog-version-zh-CN-template.md"),
+        draft=draft,
+    )
     entries = []
     layout = []
     seen_versions = set()
@@ -306,7 +367,7 @@ def inspect_changelog(text, *, draft, shared_definitions=None):
         version = label[0] if isinstance(label, tuple) else label
         if version in seen_versions:
             errors.append(f"duplicate CHANGELOG entry: {heading}")
-        if isinstance(label, tuple) and not body:
+        if version != "Unreleased" and not body:
             errors.append(f"{heading} has no visible content")
         prerelease = bool(PRERELEASE_VERSION.search(version)) or status in PRERELEASE_LABELS
         if prerelease and status in STABLE_LABELS:
@@ -315,10 +376,13 @@ def inspect_changelog(text, *, draft, shared_definitions=None):
             errors.extend(f"{heading}: {error}" for error in warning_errors(body))
         seen_versions.add(version)
         entries.append(label)
-        target = re.match(r"^\[([^\]]+)\](?:\(([^)]+)\))?", heading)
-        url = target[2] if target else None
+        target = re.match(r"^\[([^\]]+)\](?:\[([^\]]*)\]|\(([^)]+)\))?", heading)
+        url = target[3] if target else None
         if target and not url:
-            errors.append(f"missing link definition for {target[1]}")
+            ref_name = (target[2] or target[1]).strip()
+            msg = f"missing link definition for {ref_name}"
+            if msg not in errors:
+                errors.append(msg)
         layout.append((prerelease, url, structure(body, 3)))
         for subheading in HEADING.finditer(body):
             if subheading[2] in CATEGORY_TITLES and len(subheading[1]) != 3:
@@ -379,17 +443,20 @@ def main():
             if args.bilingual:
                 if args.chinese:
                     parser.error("--bilingual accepts a single file")
-                source = documents[0][1]
+                source = documents[0][1].lstrip("\ufeff")
                 markdown = visible_markdown(source)
                 shared_definitions, reference_errors = link_definitions(markdown)
                 visible = markdown.splitlines()
                 splits = [i for i, line in enumerate(visible) if line.strip() == "---"]
                 if len(splits) != 1:
-                    parser.error("single-file bilingual format requires one --- separator between languages")
-                lines = source.splitlines()
-                cut = splits[0]
-                documents = [("English", "\n".join(lines[:cut])), ("Chinese", "\n".join(lines[cut + 1:]))]
-            errors = reference_errors + check_changelog(documents, draft=args.draft, shared_definitions=shared_definitions)
+                    errors = ["single-file bilingual format requires one --- separator between languages"]
+                else:
+                    lines = source.splitlines()
+                    cut = splits[0]
+                    documents = [("English", "\n".join(lines[:cut])), ("Chinese", "\n".join(lines[cut + 1:]))]
+                    errors = reference_errors + check_changelog(documents, draft=args.draft, shared_definitions=shared_definitions)
+            else:
+                errors = reference_errors + check_changelog(documents, draft=args.draft, shared_definitions=shared_definitions)
     except (OSError, UnicodeError) as error:
         errors = [str(error)]
     if errors:

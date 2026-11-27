@@ -360,6 +360,107 @@ $ example --output json
             self.assertTrue(any("found 0" in e for e in self.check_pair(en.replace(row, example), zh)))
             self.assertEqual(self.check_pair(en + "\n" + example, zh), [])
 
+    def test_setext_commands_and_shell_continuation_and_inline_fences(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        # Setext headings are tracked by section_commands (both entering and closing sections).
+        setext_en = "Quick Start\n-----------\n\n~~~bash\necho a\n~~~\n"
+        setext_zh = "快速开始\n--------\n\n~~~bash\necho b\n~~~\n"
+        self.assertEqual(CHECK["command_errors"](setext_en, setext_zh), [
+            "quick start commands differ between English and Chinese",
+        ])
+        closed_en = "## Quick Start\n\n~~~bash\necho ok\n~~~\n\nUsage\n-----\n\n~~~bash\necho en\n~~~\n"
+        closed_zh = "## 快速开始\n\n~~~bash\necho ok\n~~~\n\n用法\n----\n\n~~~bash\necho zh\n~~~\n"
+        self.assertEqual(CHECK["command_errors"](closed_en, closed_zh), [])
+        # Backticks in POSIX console commands are command substitution, not line continuation.
+        bt_en = "## Quick Start\n\n~~~console\n$ echo `whoami`\nhello\n~~~\n"
+        bt_zh = "## 快速开始\n\n~~~console\n$ echo `whoami`\n你好\n~~~\n"
+        self.assertEqual(CHECK["command_errors"](bt_en, bt_zh), [])
+        # Inline triple-backtick code span at start of line does not swallow following content.
+        inline_bt = en + "\n```foo``` is inline.\n\n[Broken](./missing.md)\n"
+        self.assertTrue(any("missing path" in e for e in self.check_pair(inline_bt, zh)))
+        # Inline code HTML comments and non-template HTML comments with foreign {{ syntax }} do not false-positive.
+        allowed = en + "\nUse `<!-- OPTIONAL: custom -->`.\n\n<!-- Jinja {{ item }} -->\n"
+        self.assertEqual(self.check_pair(allowed, zh), [])
+        # Setext heading immediately after switch cannot pose as the description before badges.
+        header = "# Example\n\n[**English**](./README.md) | [中文](./README-zh-CN.md)\n\nOverview\n--------\n\n"
+        badge = f"[![License: MIT]({CHECK['badge_url']('License', 'MIT')})](./LICENSE)"
+        self.assertTrue(CHECK["check_badges"]("English", header + badge)[1])
+
+    def test_subdirectory_local_signature_paths(self):
+        badge = f"[![License: MIT]({CHECK['badge_url']('License', 'MIT')})](../../LICENSE)"
+        en = (
+            '<p align="center">\n'
+            '<a href="https://opc.fish" title="OPC.FISH Project."><picture>'
+            '<source media="(prefers-color-scheme: dark)" srcset="../../assets/opc-fish-project-signature-dark.svg">'
+            '<img src="../../assets/opc-fish-project-signature.svg" alt="OPC.FISH Project" width="720">'
+            '</picture></a>\n</p>\n\n'
+            '# cli\n\n[**English**](./README.md) | [中文](./README-zh-CN.md)\n\n'
+            f'CLI package.\n\n{badge}\n'
+        )
+        zh = (
+            '<p align="center">\n'
+            '<a href="https://opc.fish" title="OPC.FISH Project."><picture>'
+            '<source media="(prefers-color-scheme: dark)" srcset="../../assets/opc-fish-project-signature-dark.svg">'
+            '<img src="../../assets/opc-fish-project-signature.svg" alt="OPC.FISH 项目署名" width="720">'
+            '</picture></a>\n</p>\n\n'
+            '# cli\n\n[English](./README.md) | [**中文**](./README-zh-CN.md)\n\n'
+            f'命令行包。\n\n{badge}\n'
+        )
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / "LICENSE").write_text("MIT", encoding="utf-8")
+            (repo / "assets").mkdir()
+            for asset in (ROOT / "assets").glob("*.svg"):
+                (repo / "assets" / asset.name).write_bytes(asset.read_bytes())
+            sub = repo / "packages" / "cli"
+            sub.mkdir(parents=True)
+            en_path = sub / "README.md"
+            zh_path = sub / "README-zh-CN.md"
+            en_path.write_text(en, encoding="utf-8")
+            zh_path.write_text(zh, encoding="utf-8")
+            self.assertEqual(CHECK["check_pair"](en_path, zh_path, "local"), [])
+            # Non-assets directory is rejected.
+            (repo / "images").mkdir()
+            for asset in (ROOT / "assets").glob("*.svg"):
+                (repo / "images" / asset.name).write_bytes(asset.read_bytes())
+            en_path.write_text(en.replace("../../assets/", "../../images/"), encoding="utf-8")
+            self.assertTrue(any("missing the light signature src" in e for e in CHECK["check_pair"](en_path, zh_path, "local")))
+            # Bilingual mismatch when both paths exist locally in different directories is caught.
+            (sub / "assets").mkdir()
+            for asset in (ROOT / "assets").glob("*.svg"):
+                (sub / "assets" / asset.name).write_bytes(asset.read_bytes())
+            en_path.write_text(en, encoding="utf-8")
+            zh_path.write_text(zh.replace("../../assets/", "./assets/"), encoding="utf-8")
+            errors = CHECK["check_pair"](en_path, zh_path, "local")
+            self.assertIn("local signature light asset differs between English and Chinese", errors)
+            self.assertIn("local signature dark asset differs between English and Chinese", errors)
+            # Missing target file in ../../assets/ fails.
+            (repo / "assets" / "opc-fish-project-signature.svg").unlink()
+            zh_path.write_text(zh, encoding="utf-8")
+            missing_errors = CHECK["check_pair"](en_path, zh_path, "local")
+            self.assertTrue(any("local signature asset is missing" in e for e in missing_errors), missing_errors)
+
+    def test_source_srcset_and_explicit_reference_link_definitions(self):
+        en = ENGLISH.replace("../assets/", "./assets/")
+        zh = CHINESE.replace("../assets/", "./assets/")
+        # <source srcset> checks relative paths with 1x/2x descriptors.
+        bad_srcset = en + '\n<picture><source media="(prefers-color-scheme: dark)" srcset="./assets/opc-fish-project-signature-dark.svg 1x, ./missing-2x.png 2x"><img src="./assets/opc-fish-project-signature.svg" alt="Demo"></picture>\n'
+        self.assertTrue(any("missing path: ./missing-2x.png" in e for e in self.check_pair(bad_srcset, zh)))
+        good_srcset = bad_srcset.replace("./missing-2x.png", "./assets/opc-fish-project-signature-dark.svg")
+        self.assertEqual(self.check_pair(good_srcset, zh), [])
+        # Explicit full and collapsed reference links without definitions fail.
+        for link in ("[Guide][missing]", "[missing][]", "[![Badge](./assets/opc-fish-project-signature.svg)][missing]"):
+            with self.subTest(link=link):
+                errors = self.check_pair(en + f"\n{link}\n", zh)
+                self.assertTrue(any("missing reference link definition: missing" in e for e in errors), errors)
+        # Defined references, shortcut brackets, alerts, task lists, and code examples do not fail.
+        valid = en + (
+            "\n[Guide][doc] and [doc][] and [plain].\n\n"
+            "> [!NOTE]\n> Keep reading.\n\n- [ ] Task item\n\n"
+            "`[Guide][missing]`\n\n~~~md\n[missing][]\n~~~\n\n[doc]: ./project.md\n"
+        )
+        self.assertEqual(self.check_pair(valid, zh), [])
 
 
 if __name__ == "__main__":

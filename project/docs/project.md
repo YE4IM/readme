@@ -39,7 +39,7 @@ From `project`:
 python3 scripts/check-readme.py all
 ```
 
-That checks both templates, this README pair, and the repository's root README pair. Use Python 3.8 or later for this README check.
+That checks both templates, this README pair, and the repository's root README pair (or run `python3 project/scripts/check-readme.py all` from the repository root). Use Python 3.8 or later for this README check.
 
 ## Badge color examples
 

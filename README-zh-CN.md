@@ -54,7 +54,7 @@ python3 project/scripts/test-readme-checks.py
 python3 project/scripts/check-readme.py pair /path/to/README.md /path/to/README-zh-CN.md --signature remote
 ```
 
-第一条命令检查模板和仓库内的双语成稿，第二条运行回归测试。审阅自己的成稿时，共用远程署名图选 `--signature remote`，使用目标仓库中的副本选 `--signature local`，草稿可加 `--draft` 保留编辑用 TODO。检查器比较安装和快速开始的命令，检查相对链接、锚点、模板残留、常见密钥模式、双语一致的 1–4 枚必填徽章、署名和折叠的核心步骤。人工核对项目事实、命令和页面布局，并确认 `[指南][install]` 这类引用式链接有对应定义。局部更新前后运行相同命令，单列已有问题。
+第一条命令检查模板和仓库内的双语成稿，第二条运行回归测试。审阅自己的成稿时，共用远程署名图选 `--signature remote`，使用目标仓库中的副本选 `--signature local`，草稿可加 `--draft` 保留编辑用 TODO。检查器比较安装和快速开始的命令，检查相对链接（含 `<img src>` 和 `<source srcset>`）、锚点、显式引用式链接定义（`[指南][install]` 与 `[install][]`）、模板残留、常见密钥模式、双语一致的 1–4 枚必填徽章、署名和折叠的核心步骤。人工核对项目事实、命令和页面布局，并确认 `[install]` 这类快捷引用式链接有对应定义。局部更新前后运行相同命令，单列已有问题。
 
 生成徽章图片地址时，将类别和已核实的值传给 `badge` 子命令。例如，`python3 project/scripts/check-readme.py badge License MIT` 会输出本页徽章的图片地址。请对照目标仓库核实徽章取值与点击目标。
 

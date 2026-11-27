@@ -324,6 +324,88 @@ class ReleaseTemplateTests(unittest.TestCase):
         self.assertEqual(check("修复。\n\n## 问题修复\n\n- 标题里的 ##333 不是事项编号。"), [])
         self.assertTrue(check("修复。\n\n## 问题修复\n\n- 修复 #12。"))
 
+    def test_residue_and_parsing_edge_cases(self):
+        check = CHECK["check_release"]
+        # Prose "Optional:" and code-block/inline comments do not trigger residue errors.
+        prose_opt = (
+            "Summary.\n\n## Installation & Upgrade\n\nOptional: restart the daemon.\n\n"
+            "## Added\n\n- Support `<!-- OPTIONAL: custom -->`.\n\n```html\n<!-- required -->\n```\n\n"
+            "---\n\n摘要。\n\n## 安装与升级\n\n可选：重启服务。\n\n"
+            "## 新增功能\n\n- 支持 `<!-- OPTIONAL: custom -->`。\n\n```html\n<!-- required -->\n```"
+        )
+        self.assertEqual(check(prose_opt), [])
+        # Uncommented uppercase OPTIONAL: in prose is still caught.
+        self.assertIn("template instructions remain", check("Summary.\n\nOPTIONAL: Added.\n\n---\n\n摘要。"))
+        # Inline triple-backtick span at start of line does not swallow the separator.
+        inline_bt = (
+            "Summary.\n\n## Added\n\n```foo``` is supported.\n\n---\n\n"
+            "摘要。\n\n## 新增功能\n\n支持 ```foo```。"
+        )
+        self.assertEqual(check(inline_bt), [])
+        # UTF-8 BOM at file start does not break release parsing.
+        self.assertEqual(check("\ufeffSummary.\n\n---\n\n摘要。"), [])
+        # **Migration**: (colon outside bold) still requires numbered steps after it.
+        bad_migration = (
+            "Summary.\n\n## Breaking Changes\n\n1. **CLI**: Flag removed.\n\n**Migration**:\n\n"
+            "---\n\n摘要。\n\n## 破坏性变更\n\n1. **CLI**：移除参数。\n\n**迁移步骤**："
+        )
+        self.assertEqual(len(check(bad_migration)), 2)
+
+    def test_release_subsection_hierarchy(self):
+        check = CHECK["check_release"]
+        valid = (
+            "Summary.\n\n## Installation & Upgrade\n\n### macOS\n\n- `brew install tool`\n\n"
+            "### Linux\n\n- `apt install tool`\n\n---\n\n"
+            "摘要。\n\n## 安装与升级\n\n### macOS\n\n- `brew install tool`\n\n"
+            "### Linux\n\n- `apt install tool`"
+        )
+        self.assertEqual(check(valid), [])
+        # Bilingual subheading mismatch fails.
+        self.assertTrue(check(valid.replace("\n\n### Linux\n\n- `apt install tool`", "", 1)))
+        # H1 heading, orphan H3 before H2, and demoted standard category all fail.
+        for bad in (
+            "# Title\n\n" + valid,
+            "Summary.\n\n### Notes\n\n- Note.\n\n## Added\n\n- Feature.\n\n---\n\n摘要。\n\n### 说明\n\n- 说明。\n\n## 新增功能\n\n- 功能。",
+            "Summary.\n\n## Added\n\n### Breaking Changes\n\n- Removed.\n\n---\n\n摘要。\n\n## 新增功能\n\n### 破坏性变更\n\n- 移除。",
+        ):
+            self.assertIn("English release sections must use level-two headings", check(bad))
+        # Skipping H2 to H4 fails.
+        skipped = valid.replace("### macOS", "#### macOS", 1)
+        self.assertIn("English release subheadings must not skip heading levels", check(skipped))
+
+    def test_issue_inline_code_and_extended_assets_and_prerelease_patterns(self):
+        check = CHECK["check_release"]
+        # Inline code #333 is ignored, while real #12 is still compared.
+        code_en = "Summary.\n\n## Fixed\n\n- Set `color: #333` in theme. #12"
+        code_zh = "摘要。\n\n## 问题修复\n\n- 修复主题颜色。 #12"
+        self.assertEqual(check(code_en + "\n---\n" + code_zh), [])
+        self.assertTrue(check(code_en + "\n---\n" + code_zh.replace("#12", "#13")))
+        # Extended asset extensions (.appimage, .sha512) are compared across languages.
+        asset_en = "Summary.\n\n## Installation & Upgrade\n\n1. [AppImage](https://host/v1/app.AppImage) ([SHA512](https://host/v1/app.sha512))"
+        asset_zh = "摘要。\n\n## 安装与升级\n\n1. [AppImage](https://host/v1/app.AppImage)（[SHA512](https://host/v1/app.sha512)）"
+        self.assertEqual(check(asset_en + "\n---\n" + asset_zh), [])
+        self.assertTrue(check(asset_en + "\n---\n" + asset_zh.replace("app.AppImage", "app-other.AppImage")))
+        self.assertTrue(check(asset_en + "\n---\n" + asset_zh.replace("app.sha512", "other.sha512")))
+        # PEP 440 and SemVer prerelease identifiers trigger warning requirement; non-prerelease suffixes do not.
+        entries = CHECK["changelog_entries"]
+        for ver in ("2.0.0rc1", "v2.0.0a1", "v2.0.0b2", "v2.0.0-preview.1", "v2.0.0-dev"):
+            self.assertTrue(entries(f"## {ver} - 2026-11-26\nSummary.", draft=False)[1], ver)
+        for ver in ("v2.0.0-basic", "v1.0.0-g1a2"):
+            self.assertEqual(entries(f"## {ver} - 2026-11-26\nSummary.", draft=False)[1], [], ver)
+
+    def test_body_undefined_reference_links(self):
+        check = CHECK["check_release"]
+        for ref in ("[Full Changelog][missing]", "[missing][]"):
+            body = f"Summary.\n\n{ref}\n\n---\n\n摘要。"
+            self.assertIn("missing link definition for missing", check(body))
+        valid = (
+            "Summary.\n\n> [!NOTE]\n> Keep reading [plain].\n\n"
+            "`[code][missing]`\n\n~~~md\n[also][missing]\n~~~\n\n"
+            "[Full Changelog][cmp] and [cmp][]\n\n---\n\n摘要。\n\n> [!NOTE]\n> 说明。\n\n"
+            "[完整变更日志][cmp] 与 [cmp][]\n\n[cmp]: https://host/compare/v1...v2"
+        )
+        self.assertEqual(check(valid), [])
+
 
 if __name__ == "__main__":
     unittest.main()

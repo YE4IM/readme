@@ -104,7 +104,7 @@ To enable: remove the surrounding comment markers and fill the real status. Othe
 {{PROJECT_STATUS}}
 -->
 
-<!-- 默认保留。大多数项目需要本节。不适用则整节删除，不要留空标题。纯文档项目通常删除本节。 -->
+<!-- Kept by default; most projects need this section. Delete the entire section if inapplicable; do not leave an empty heading. Docs-only projects usually delete this section. -->
 
 ## Requirements
 
@@ -115,7 +115,7 @@ List only runtimes, tools, and minimum versions confirmed by the repo or verifie
 If none are required (common for docs-only projects), replace this section with one factual sentence, or delete it. Do not invent version floors.
 -->
 
-<!-- 默认保留。大多数项目需要本节。不适用则整节删除，不要留空标题。纯文档项目通常删除本节。 -->
+<!-- Kept by default; most projects need this section. Delete the entire section if inapplicable; do not leave an empty heading. Docs-only projects usually delete this section. -->
 
 ## Installation
 
@@ -177,7 +177,7 @@ To enable: remove the surrounding comment markers and fill verified items. Other
 - {{FEATURE_2}}
 -->
 
-<!-- 默认保留。大多数项目需要本节。不适用则整节删除，不要留空标题。 -->
+<!-- Kept by default; most projects need this section. Delete the entire section if inapplicable; do not leave an empty heading. -->
 
 ## Usage
 
@@ -336,7 +336,7 @@ To enable: remove the surrounding comment markers and fill real links. Otherwise
 {{RELATED_PROJECTS}}
 -->
 
-<!-- 默认保留。大多数项目需要本节。没有许可证文件、也没有明确声明时整节删除，不要留空标题。 -->
+<!-- Kept by default; most projects need this section. Delete the entire section if there is neither a license file nor an explicit license declaration; do not leave an empty heading. -->
 
 ## License
 

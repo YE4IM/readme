@@ -4,8 +4,9 @@
 Usage:
   python3 scripts/check-readme.py all
   python3 scripts/check-readme.py templates
-  python3 scripts/check-readme.py pair README.md README-zh-CN.md --signature local
-  python3 scripts/check-readme.py pair A.md B.md --signature remote
+  python3 scripts/check-readme.py pair README.md README-zh-CN.md --signature local [--draft]
+  python3 scripts/check-readme.py pair A.md B.md --signature remote [--draft]
+  python3 scripts/check-readme.py badge License MIT
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ REMOTE_DARK = (
     "opc-fish-project-signature-dark.svg"
 )
 PLACEHOLDER = re.compile(r"\{\{([^{}]+)\}\}")
-FENCE_START = re.compile(r"^[ \t]*(`{3,}|~{3,})(.*)$")
+FENCE_START = re.compile(r"^[ \t]*(?:(`{3,})([^`\n]*)|(~{3,})([^\n]*))$")
 SECTION_HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.+?)\s*#*\s*$")
 COMMAND_HEADINGS = {
     "installation": "installation",
@@ -205,25 +206,38 @@ def check_pair(
     errors.extend(command_errors(texts["English"], texts["Chinese"]))
 
     badge_rows = []
+    local_signatures: dict[str, tuple[Path | None, Path | None]] = {}
     for label, text in texts.items():
         prose, visible, uncommented = document_views(text)
         errors.extend(language_switch_errors(label, visible, files, switch_filenames))
         errors.extend(link_errors(files[label], visible))
-        errors.extend(placeholder_errors(label, INLINE_CODE.sub(mask, prose), draft=draft))
-        for snippet in INLINE_CODE.finditer(prose):
+        prose_no_inline = INLINE_CODE.sub(mask, prose)
+        errors.extend(placeholder_errors(label, INLINE_CODE.sub(mask, visible), draft=draft))
+        for comment in COMMENT.findall(prose_no_inline):
+            errors.extend(placeholder_errors(label, comment, fields=fields, draft=draft))
+        for snippet in INLINE_CODE.finditer(visible):
             errors.extend(placeholder_errors(label, snippet[0], fields=fields, draft=draft))
         for _, _, language, lines in fenced_blocks(uncommented):
             snippet = "\n".join([language, *lines])
             errors.extend(placeholder_errors(label, snippet, fields=fields, draft=draft))
-        errors.extend(comment_errors(label, prose, instructions))
+        errors.extend(comment_errors(label, prose_no_inline, instructions))
         errors.extend(secret_errors(label, text))
         errors.extend(signature_errors(label, text, signature, files[label]))
+        if signature == "local":
+            local_signatures[label] = resolved_local_signatures(text, files[label])
         row, problems = check_badges(label, visible)
         badge_rows.append(row)
         errors.extend(problems)
         errors.extend(folded_section_errors(label, uncommented))
     if badge_rows[0] != badge_rows[1]:
         errors.append("badge Markdown differs between English and Chinese")
+    if signature == "local" and len(local_signatures) == 2:
+        en_light, en_dark = local_signatures["English"]
+        zh_light, zh_dark = local_signatures["Chinese"]
+        if en_light and zh_light and en_light != zh_light:
+            errors.append("local signature light asset differs between English and Chinese")
+        if en_dark and zh_dark and en_dark != zh_dark:
+            errors.append("local signature dark asset differs between English and Chinese")
     return errors
 
 
@@ -308,18 +322,38 @@ def heading_anchors(text: str) -> set[str]:
     return anchors | heading_ids
 
 
+EXPLICIT_REFERENCE = re.compile(
+    r"(?<!\\)\[((?:!\[[^\]\n]*\]\([^)\n]*\)|[^\[\]\n])+)\]\[([^\]\n]*)\]"
+)
+
+
 def link_errors(path: Path, visible: str) -> list[str]:
     markdown = INLINE_CODE.sub(mask, visible)
     destinations = [angle or plain for angle, plain in MARKDOWN_LINK.findall(markdown)]
-    for tag in re.findall(r"<img\b[^>]*>", markdown, re.I):
-        source = html_attributes(tag).get("src")
-        if source:
-            destinations.append(source)
+    for tag in re.findall(r"<(?:img|source)\b[^>]*>", markdown, re.I):
+        attrs = html_attributes(tag)
+        if attrs.get("src"):
+            destinations.append(attrs["src"])
+        if attrs.get("srcset"):
+            for candidate in attrs["srcset"].split(","):
+                parts = candidate.strip().split()
+                if parts:
+                    destinations.append(parts[0])
+    definitions = REFERENCE_DEFINITION.findall(markdown)
+    defined = {label.casefold() for label, _, _ in definitions}
     destinations.extend(
-        angle or plain for label, angle, plain in REFERENCE_DEFINITION.findall(markdown)
+        angle or plain for label, angle, plain in definitions
         if re.search(r"\[" + re.escape(label) + r"\](?!:)", markdown, re.I)
     )
     errors = []
+    seen_missing: set[str] = set()
+    for match in EXPLICIT_REFERENCE.finditer(REFERENCE_DEFINITION.sub("", markdown)):
+        if match[2] and not match[2].strip():
+            continue
+        ref = (match[2] or match[1]).strip()
+        if ref and ref.casefold() not in defined and ref.casefold() not in seen_missing:
+            seen_missing.add(ref.casefold())
+            errors.append(f"{path} missing reference link definition: {ref}")
     anchors_by_file = {path.resolve(): heading_anchors(visible)}
     for destination in dict.fromkeys(destinations):
         try:
@@ -355,7 +389,7 @@ def check_badges(label: str, visible: str) -> tuple[str, list[str]]:
     if paragraphs and re.match(r"(?:<[^>]+>\s*)*<img\b|\[?!\[", paragraphs[0].lstrip(), re.I):
         intro = 1
     row = ""
-    if intro + 1 < len(paragraphs) and not SECTION_HEADING.match(paragraphs[intro]):
+    if intro + 1 < len(paragraphs) and not SECTION_HEADING.match(paragraphs[intro]) and not SETEXT.match(paragraphs[intro]):
         row = paragraphs[intro + 1]
     badges = list(LINKED_IMAGE.finditer(row))
     errors = []
@@ -486,12 +520,34 @@ def secret_errors(label: str, text: str) -> list[str]:
     return errors
 
 
+def is_spec_repo_path(readme_path: Path) -> bool:
+    parent = readme_path.resolve().parent
+    root = ROOT.resolve()
+    return parent == root or root in parent.parents
+
+
 def local_asset(readme_path: Path, filename: str) -> str:
     parent = readme_path.resolve().parent
     root = ROOT.resolve()
     if parent == root or root in parent.parents:
         return Path(os.path.relpath(root / "assets" / filename, parent)).as_posix()
     return f"./assets/{filename}"
+
+
+def valid_local_signature_path(readme_path: Path, raw_path: str, filename: str) -> Path | None:
+    try:
+        parts = urlsplit(raw_path)
+    except ValueError:
+        return None
+    if parts.scheme or parts.netloc or parts.query or parts.fragment or parts.path.startswith("/"):
+        return None
+    relative = Path(unquote(parts.path))
+    if relative.is_absolute():
+        return None
+    normalized = Path(os.path.normpath(relative))
+    if normalized.parts[-2:] != ("assets", filename):
+        return None
+    return (readme_path.parent / relative).resolve()
 
 
 def html_attributes(tag: str) -> dict[str, str]:
@@ -501,10 +557,36 @@ def html_attributes(tag: str) -> dict[str, str]:
     }
 
 
-def signature_errors(label: str, text: str, signature: str, readme_path: Path) -> list[str]:
+def signature_elements(text: str):
     text = re.sub(r"\A(?:\s|<!--.*?-->)*", "", text.lstrip("\ufeff"), flags=re.S)
     paragraph = re.match(r"\A<p(\s[^>]*)?>(.*?)</p>", text, re.S | re.I)
     anchor = SIGNATURE_LINK.match(paragraph[2] if paragraph else text)
+    return paragraph, anchor
+
+
+def resolved_local_signatures(text: str, readme_path: Path) -> tuple[Path | None, Path | None]:
+    _, anchor = signature_elements(text)
+    if not anchor:
+        return None, None
+    picture = COMMENT.sub("", anchor[2])
+    sources = [html_attributes(tag) for tag in re.findall(r"<source\b[^>]*>", picture, re.I)]
+    images = re.findall(r"<img\b[^>]*>", picture, re.I)
+    light_src = html_attributes(images[0]).get("src", "") if len(images) == 1 else ""
+    light = valid_local_signature_path(readme_path, light_src, "opc-fish-project-signature.svg") if light_src else None
+    dark = next(
+        (
+            valid_local_signature_path(readme_path, source.get("srcset", ""), "opc-fish-project-signature-dark.svg")
+            for source in sources
+            if source.get("media") == "(prefers-color-scheme: dark)"
+            and valid_local_signature_path(readme_path, source.get("srcset", ""), "opc-fish-project-signature-dark.svg")
+        ),
+        None,
+    )
+    return light, dark
+
+
+def signature_errors(label: str, text: str, signature: str, readme_path: Path) -> list[str]:
+    paragraph, anchor = signature_elements(text)
     if not anchor or html_attributes(anchor[1]).get("href") != "https://opc.fish":
         return [f"{label} must begin with the signature picture linked to https://opc.fish"]
     errors = []
@@ -512,27 +594,53 @@ def signature_errors(label: str, text: str, signature: str, readme_path: Path) -
         errors.append(f'{label} signature must be centered in <p align="center">')
     if html_attributes(anchor[1]).get("title") != "OPC.FISH Project.":
         errors.append(f"{label} signature needs the OPC.FISH Project. link title")
-    if signature == "remote":
-        light, dark = REMOTE_LIGHT, REMOTE_DARK
-    else:
-        light = local_asset(readme_path, "opc-fish-project-signature.svg")
-        dark = local_asset(readme_path, "opc-fish-project-signature-dark.svg")
-        for path in (light, dark):
-            if not (readme_path.parent / path).is_file():
-                errors.append(f"{label} local signature asset is missing: {path}")
     picture = COMMENT.sub("", anchor[2])
     sources = [html_attributes(tag) for tag in re.findall(r"<source\b[^>]*>", picture, re.I)]
-    if not any(
-        source.get("media") == "(prefers-color-scheme: dark)" and source.get("srcset") == dark
-        for source in sources
-    ):
-        errors.append(f"{label} is missing the dark signature source")
     images = re.findall(r"<img\b[^>]*>", picture, re.I)
+    exact_expected = signature == "remote" or is_spec_repo_path(readme_path)
+    if exact_expected:
+        if signature == "remote":
+            light, dark = REMOTE_LIGHT, REMOTE_DARK
+        else:
+            light = local_asset(readme_path, "opc-fish-project-signature.svg")
+            dark = local_asset(readme_path, "opc-fish-project-signature-dark.svg")
+            for path in (light, dark):
+                if not (readme_path.parent / path).is_file():
+                    errors.append(f"{label} local signature asset is missing: {path}")
+        if not any(
+            source.get("media") == "(prefers-color-scheme: dark)" and source.get("srcset") == dark
+            for source in sources
+        ):
+            errors.append(f"{label} is missing the dark signature source")
+    else:
+        dark_matches = [
+            (
+                source.get("srcset", ""),
+                valid_local_signature_path(
+                    readme_path, source.get("srcset", ""), "opc-fish-project-signature-dark.svg"
+                ),
+            )
+            for source in sources
+            if source.get("media") == "(prefers-color-scheme: dark)"
+        ]
+        valid_dark = [(raw, resolved) for raw, resolved in dark_matches if resolved is not None]
+        if not valid_dark:
+            errors.append(f"{label} is missing the dark signature source")
+        elif not any(resolved.is_file() for _, resolved in valid_dark):
+            errors.append(f"{label} local signature asset is missing: {valid_dark[0][0]}")
     if len(images) != 1:
         return errors + [f"{label} signature needs one fallback img"]
     attrs = html_attributes(images[0])
-    if attrs.get("src") != light:
-        errors.append(f"{label} is missing the light signature src")
+    if exact_expected:
+        if attrs.get("src") != light:
+            errors.append(f"{label} is missing the light signature src")
+    else:
+        raw_light = attrs.get("src", "")
+        resolved_light = valid_local_signature_path(readme_path, raw_light, "opc-fish-project-signature.svg")
+        if resolved_light is None:
+            errors.append(f"{label} is missing the light signature src")
+        elif not resolved_light.is_file():
+            errors.append(f"{label} local signature asset is missing: {raw_light}")
     if attrs.get("width") != "720":
         errors.append(f"{label} signature width must be 720")
     if not attrs.get("alt", "").strip():
@@ -549,7 +657,8 @@ def fenced_blocks(text: str):
         if not start:
             index += 1
             continue
-        fence, language = start.groups()
+        fence = start[1] or start[3]
+        language = start[2] if start[1] else start[4]
         first = index
         closing = re.compile(r"^\s*" + re.escape(fence[0]) + rf"{{{len(fence)},}}\s*$")
         index += 1
@@ -561,16 +670,17 @@ def fenced_blocks(text: str):
 
 def document_views(text: str) -> tuple[str, str, str]:
     """Return source without fences, visible Markdown, and source without comments."""
+    text = text.lstrip("\ufeff")
     prose, visible, uncommented = [], [], []
     # Scan the two block types together, ignoring their markers inside each other.
-    token = re.compile(r"(?m)^[ \t]*(\x60{3,}|~{3,})[^\n]*|<!--|\x60+")
+    token = re.compile(r"(?m)^[ \t]*(?:(\x60{3,})[^\x60\n]*|(~{3,})[^\n]*)$|<!--|\x60+")
     position = 0
     while match := token.search(text, position):
         prefix = text[position:match.start()]
         for view in (prose, visible, uncommented):
             view.append(prefix)
         end = match.end()
-        fence = match[1]
+        fence = match[1] or match[2]
         if not fence and match[0] != "<!--":
             span = INLINE_CODE.match(text, match.start())
             end = span.end() if span else end
@@ -622,7 +732,13 @@ def shell_commands(lines: list[str], language: str) -> list[str]:
                 break
             command += part
         commands.append(command.rstrip())
-        continued = command.rstrip().endswith(("\\", "^", "`"))
+        if language in {"powershell", "pwsh", "ps1"} or (prompt and prompt[0].startswith("PS")):
+            continuation = "`"
+        elif language in {"cmd", "bat", "batch", "dos"}:
+            continuation = "^"
+        else:
+            continuation = "\\"
+        continued = command.rstrip().endswith(continuation)
     return commands
 
 
@@ -645,12 +761,22 @@ def section_commands(text: str) -> dict[str, list[tuple[str, list[str]]]]:
             continue
         heading = SECTION_HEADING.match(source[index])
         if heading:
-            depth, title = heading.groups()
+            depth, title, step = len(heading[1]), heading[2], 1
+        elif (
+            index + 1 < len(source)
+            and (index + 1) not in blocks
+            and SETEXT.fullmatch(source[index] + "\n" + source[index + 1])
+        ):
+            depth = 1 if source[index + 1].strip().startswith("=") else 2
+            title, step = source[index].strip(), 2
+        else:
+            depth, title, step = 0, "", 1
+        if depth:
             match = COMMAND_HEADINGS.get(title.strip().casefold())
-            if match or len(depth) <= level:
+            if match or depth <= level:
                 section = match
-                level = len(depth)
-        index += 1
+                level = depth
+        index += step
     return commands
 
 
